@@ -1,0 +1,228 @@
+/* Copyright (c) 2020 Roberto Treviño Cervantes
+
+This file is part of FUTURE (Powered by Monad).
+
+FUTURE is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+FUTURE is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with FUTURE.  If not, see <https://www.gnu.org/licenses/>. */
+
+body {
+  background-color: #EEEEEE;/*#b6b6b6;*/
+}
+
+#header {
+  background-color: #1b1a1a;
+}
+
+#subheader span {
+  color: #1b1a1a;
+}
+
+#subheader {
+  background-color: #DDDDDD;
+  box-shadow: 0px -2px 6px 2px rgba(0,0,0,0.66);
+}
+
+#godfvt {
+  background-color: rgba(242, 153, 153, 0.3);
+}
+
+/*
+#gods_fvt_logo {
+    background-color: #111111;
+}
+*/
+
+p#gathered {
+  color: #bfbfbf;
+}
+
+#summary_content {
+  color: #111111;
+}
+
+.hex {
+    background: #383737;
+}
+.hex:before, .hex:after {
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+}
+.hex:before {
+    border-bottom: 10px solid #383737;
+}
+.hex:after {
+    border-top: 10px solid #383737;
+}
+.hex.inner {
+    background-color: #1b1a1a;
+}
+.hex.inner:before {
+    border-bottom: 10px solid #1b1a1a;
+}
+.hex.inner:after {
+    border-top: 10px solid #1b1a1a;
+}
+.hex.inner2 {
+    background-color: #9e3434;
+}
+.hex.inner2:before {
+    border-bottom: 10px solid #9e3434;
+}
+.hex.inner2:after {
+    border-top: 10px solid #9e3434;
+}
+.hex.inner3 {
+    background-color: #1b1a1a;
+}
+.hex.inner3:before {
+    border-bottom: 11px solid #1b1a1a;
+}
+.hex.inner3:after {
+    border-top: 11px solid #1b1a1a;
+}
+
+#title, #sidebar_show, #sendbutton, #searchbar, #account_options a, #sign_or_log, #sign_or_log a, #sidebar_bottom {
+  color: #DDDDDD;
+}
+
+#david {
+  text-shadow: 0px 3px 3px rgba(94, 94, 94, 0.5);
+}
+
+#searchbar, #sendbutton {
+  background-color: #2b2b2b;
+}
+
+#sendbutton:hover {
+  background-color: #a6a6a6;
+  color: #2b2b2b;
+}
+
+#chat {
+  background-color: #DDDDDD;
+  box-shadow: 3px 4px 6px -1px rgba(0,0,0,0.71);
+}
+
+.machine {
+  color: #333333;
+}
+
+.you {
+  color: #EEEEEE;
+}
+
+.container {
+  background-color: #ffffff;
+}
+
+.container2, .simplebar-scrollbar {
+  background-color: #222222;
+}
+
+#sidebar_menu {
+  background-color: #222222;
+}
+
+#sidebar_show {
+  border-left: 50px solid #1b1a1a;
+}
+
+*::-webkit-input-placeholder {
+    color: #CCCCCC;
+}
+*:-moz-placeholder {
+    color: #CCCCCC;
+}
+*::-moz-placeholder {
+    color: #CCCCCC;
+}
+*:-ms-input-placeholder {
+    color: #CCCCCC;
+}
+
+.grid-item {
+  background-color: #BDBDBD;
+  border: 1px solid #323232;
+}
+
+.file_name {
+  background-color: #2f2f2f;
+  color: #d2d2d2;
+}
+
+.file_options {
+  color: #363636;
+}
+
+.file_options a:hover{
+  color: #FFFFFF;
+}
+
+#file_input + label {
+  color: #d4a45d;
+  background-color: #111111;
+}
+
+.url_item .link_paragraph .domain a {
+  color: #DAA520;
+  text-decoration: none;
+}
+
+.url_item .link_paragraph .header a {
+  color: #959595;
+  text-decoration: none;
+}
+
+.url_item .body {
+  color: #111111;
+}
+
+.url_item .link_paragraph2 .link a {
+  color: #b82f2f;
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 960px) and (max-height: 1000px) {
+
+  /*#eye {*/
+    /*box-shadow: inset 0 0 0 6px #383737, inset 0 0 0 8px #1b1a1a, inset 0 0 0 12px #9e3434;*/
+  /*}*/
+
+.hex:before {
+    border-bottom: 10px solid #383737;
+}
+.hex:after {
+    border-top: 10px solid #383737;
+}
+
+  .hex.inner2:before {
+    border-bottom: 11px solid #9e3434;
+  }
+  .hex.inner2:after {
+    border-top: 11px solid #9e3434;
+  }
+
+  #sidebar_show {
+    border: 0;
+  }
+
+  p#gathered {
+    color: #bfbfbf;
+  }
+
+  /* #sendbutton, #searchbar  {
+    color: #1C1C1C;
+    background-color: #CCCCCC;
+  } */
+
+}

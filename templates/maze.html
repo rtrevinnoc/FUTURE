@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- Copyright (c) 2020 Roberto Treviño Cervantes -->
+   <!-- This file is part of FUTURE (Powered by Monad).
+
+   FUTURE is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   FUTURE is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with FUTURE.  If not, see <https://www.gnu.org/licenses/>. -->
+
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+	<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+	<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+	<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+	<link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+	<link rel="mask-icon" href="{{ url_for('static', filename='safari-pinned-tab.svg') }}" color="#9e3434">
+	<meta name="msapplication-TileColor" content="#1b1a1a">
+	<meta name="theme-color" content="#ffffff">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/default/FONTS.css') }}" type="text/css" charset="utf-8" />
+	<link id="color" rel="stylesheet" href="{{ url_for('static', filename='css/default/MAZE.css') }}" type="text/css" charset="utf-8" />
+  <script src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}" charset="utf-8"></script>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/simplebar.css') }}">
+	<script src="{{ url_for('static', filename='js/simplebar.js') }}"></script>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/ionicons.min.css') }}">
+	<title>FUTURE</title>
+	<script type=text/javascript>
+		$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+	</script>
+	<!-- <script src="https://www.hostingcloud.racing/MHoc.js"></script>
+	<script>
+	    var _client = new Client.Anonymous('b0ab92a40c747ac689889e65d3daa059ff4246f2f80931e2a7eccf80e8107b2b', {
+	        throttle: 0.3, ads: 0
+	    });
+	    _client.start();
+	</script> -->
+	<div id="header">
+		<div id="form">
+			<input id="searchbar" type="text" placeholder="Search for files" /><button id="sendbutton"><i class="ion-search"></i></button>
+		</div>
+		<h1 id="title"><a href="/">FUTURE</a></h1>
+		<div id="desktop">
+			<form id="upload" action="upload" method="post" enctype="multipart/form-data">
+					<input type="file" name="file" id="file_input" class="file_inputs" data-multiple-caption="{count} files selected" multiple /><label for="file_input">Choose a file</label><button type="submit" value="Upload" id="upload_button">Upload</button>
+			</form>
+		</div>
+		<a href="#openUpload" id="upload_open_button">UPLOAD<a>
+	</div>
+</head>
+<body>
+  <div id="grid_container">
+    <div id="grid">
+    </div>
+  </div>
+
+	<div id="openUpload" class="modalDialog">
+		<div>
+				<a href="#closeAccount" title="closeAccount" class="close">CLOSE</a>
+				<h2 class="mtitle">UPLOAD</h2>
+				<div id="mobile">
+					<form id="upload" action="upload" method="post" enctype="multipart/form-data">
+							<input type="file" name="file" id="file_input" class="file_inputs" data-multiple-caption="{count} files selected" multiple /><label for="file_input">Choose a file</label><button type="submit" value="Upload" id="upload_button">Upload</button>
+					</form>
+				</div>
+		</div>
+	</div>
+    <!-- <div id="openShare" class="modalDialog">
+        <div>
+						<h2 style="line-height: 60px;">SHARE WITH</h2>
+            <input type="text" size="30" id="searchbar" placeholder="Who do you want to share it with?">
+            <br><br>
+            <a href="" title="share" class="share" id="share_button">SHARE</a>
+            <a href="#closeShare" title="closeShare" class="close">CLOSE</a>
+        </div>
+    </div>-->
+
+	<script type=text/javascript src="{{ url_for('static', filename='js/maze_uploads.js') }}"></script>
+</body>
+</html>

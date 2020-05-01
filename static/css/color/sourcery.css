@@ -1,0 +1,109 @@
+/* Copyright (c) 2020 Roberto Treviño Cervantes
+
+This file is part of FUTURE (Powered by Monad).
+
+FUTURE is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+FUTURE is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with FUTURE.  If not, see <https://www.gnu.org/licenses/>. */
+
+body {
+  background-color: #b6b6b6;
+}
+
+#header {
+  background-color: #1b1a1a;
+  box-shadow: 0px -2px 6px 7px rgba(0,0,0,0.66);
+}
+
+#eye {
+  box-shadow: inset 0 0 0 8px #383737, inset 0 0 0 10px #1b1a1a, inset 0 0 0 14px #9e3434;
+}
+
+#title, #sendbutton, #writebutton, #writebutton2, #sidebar_show, #searchbar, #upload_phrase, .user_item {
+  color: #DDDDDD;
+}
+
+#searchbar {
+  background-color: #2b2b2b;
+}
+
+#publication, #sendbutton, #writebutton, #publication2, #writebutton2 {
+  background-color: #d4a45d;
+  color: #111111;
+}
+
+#publication::-webkit-input-placeholder, #publication2::-webkit-input-placeholder {
+    color: #222222;
+}
+#publication:-moz-placeholder, #publication2:-moz-placeholder {
+    color: #222222;
+}
+#publication::-moz-placeholder, #publication2::-moz-placeholder {
+    color: #222222;
+}
+#publication:-ms-input-placeholder, #publication2:-ms-input-placeholder {
+    color: #222222;
+}
+
+#sendbutton:hover, #writebutton:hover, #writebutton2:hover {
+  background-color: #000000;
+  color: #FFFFFF;
+}
+
+#sidebar_menu {
+  background-color: #222222;
+}
+
+#sidebar_show {
+  border-left: 50px solid #1b1a1a;
+}
+
+#file_input + label {
+  color: #d4a45d;
+  background-color: #111111;
+}
+
+#file_input:focus + label,
+#file_input + label:hover {
+    background-color: #d4a45d;
+    color: #111111;
+}
+
+#file_input:focus + label {
+	outline: 1px dotted #000;
+}
+
+#upload_button {
+  background-color: #3e3e3e;
+}
+
+#upload_button, #file_input + label {
+  border: 3px solid #3e3e3e;
+  border: 3px solid #3e3e3e;
+}
+
+#make_a_post, .user_item {
+  background-color: #222222;
+}
+
+*::-webkit-input-placeholder {
+    color: #CCCCCC;
+}
+*:-moz-placeholder {
+    color: #CCCCCC;
+}
+*::-moz-placeholder {
+    color: #CCCCCC;
+}
+*:-ms-input-placeholder {
+    color: #CCCCCC;
+}
