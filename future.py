@@ -77,11 +77,11 @@ accounts = db.accounts
 app = Flask(__name__, static_url_path="")
 app.config.from_object("config")
 app.config.update(
-    MAIL_SERVER=app.config['MAIL_SERVER'],
+    MAIL_SERVER=app.config['SERVER'],
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
-    MAIL_USERNAME=app.config['MAIL_USERNAME'],
-    MAIL_PASSWORD=app.config['MAIL_PASSWORD'],
+    MAIL_USERNAME=app.config['USERNAME'],
+    MAIL_PASSWORD=app.config['PASSWORD'],
 )
 mail = Mail(app)
 np.random.seed(0)
