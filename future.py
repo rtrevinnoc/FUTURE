@@ -76,10 +76,7 @@ db = client["Prometheus"]
 accounts = db.accounts
 app = Flask(__name__, static_url_path="")
 app.config.from_pyfile(os.path.abspath("config.py"))
-app.config.update(
-    MAIL_PORT=587,
-    MAIL_USE_TLS=True
-)
+app.config.update(MAIL_PORT=587, MAIL_USE_TLS=True)
 mail = Mail(app)
 np.random.seed(0)
 hnswImagesLookup = hnswlib.Index(space="cosine", dim=50)
