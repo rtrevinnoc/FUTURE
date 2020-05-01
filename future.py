@@ -75,7 +75,7 @@ client = MongoClient("localhost", 27017)
 db = client["Prometheus"]
 accounts = db.accounts
 app = Flask(__name__, static_url_path="")
-app.config.from_pyfile("config.py")
+app.config.from_pyfile(os.path.abspath("config.py"))
 app.config.update(
     MAIL_PORT=587,
     MAIL_USE_TLS=True
