@@ -177,7 +177,6 @@ class User(UserMixin):
     @app.route("/signup", methods=["GET", "POST"])
     def signup():
         sign = SignForm()
-        error = None
         if (sign.validate_on_submit()
                 and sign.password.data == sign.confirmPassword.data
                 and not accounts.find_one({"name": sign.name.data})):
@@ -185,7 +184,7 @@ class User(UserMixin):
             user.register(sign.password.data, sign.email.data)
             login_user(user, remember=True)
             return redirect("/")
-        return render_template("signup.html", login=sign, error=error)
+        return render_template("signup.html", login=sign)
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
