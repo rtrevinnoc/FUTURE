@@ -164,7 +164,7 @@ class User(UserMixin):
             sender="rtrevinnoc@hotmail.com",
             recipients=[self.email],
         )
-        msg.html = open("./templates/confirmation.html").read()
+        msg.html = open("./templates/confirmation.html", encoding='utf8').read()
         mail.send(msg)
 
     @loginManager.user_loader
@@ -177,6 +177,7 @@ class User(UserMixin):
     @app.route("/signup", methods=["GET", "POST"])
     def signup():
         sign = SignForm()
+        error = None
         if (sign.validate_on_submit()
                 and sign.password.data == sign.confirmPassword.data
                 and not accounts.find_one({"name": sign.name.data})):
@@ -184,7 +185,7 @@ class User(UserMixin):
             user.register(sign.password.data, sign.email.data)
             login_user(user, remember=True)
             return redirect("/")
-        return render_template("signup.html", login=sign)
+        return render_template("signup.html", login=sign, error=error)
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
