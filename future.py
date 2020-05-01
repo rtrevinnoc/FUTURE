@@ -65,7 +65,6 @@ from symspellpy.symspellpy import SymSpell, Verbosity
 from polyglot.detect import Detector
 from bs4 import BeautifulSoup
 from naive_bayes_chatbot_classifier import *
-from config import Config
 
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
@@ -76,13 +75,10 @@ client = MongoClient("localhost", 27017)
 db = client["Prometheus"]
 accounts = db.accounts
 app = Flask(__name__, static_url_path="")
-app.config.from_object("Config")
+app.config.from_pyfile("config.py")
 app.config.update(
-    MAIL_SERVER=app.config['SERVER'],
     MAIL_PORT=587,
-    MAIL_USE_TLS=True,
-    MAIL_USERNAME=app.config['USERNAME'],
-    MAIL_PASSWORD=app.config['PASSWORD'],
+    MAIL_USE_TLS=True
 )
 mail = Mail(app)
 np.random.seed(0)
