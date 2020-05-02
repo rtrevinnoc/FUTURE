@@ -50,6 +50,17 @@ $(function() {
   images_button.hide();
   maps_button.hide();
 
+  if (annyang) {
+		var commands = {
+			'search for *query': function(query) {
+        searchbar.val(query);
+        submit_form();
+			}
+		};
+		annyang.addCommands(commands);
+		annyang.start();
+  }
+
   $('#sidebar_content').hide();
   scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
   var submit_form = function(e) {

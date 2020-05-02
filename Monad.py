@@ -596,7 +596,7 @@ class Monad():
         with self.database.begin(write=True) as databaseTransaction:
             databaseTransaction.put(key, element)
 
-    def searchIndex(self, term, number):
+    def searchIndex(self, term: np.ndarray, number):
         vectorIds, vectorScores = self.index.knn_query(term, k=number)
         with self.database.begin() as databaseTransaction:
             return {
