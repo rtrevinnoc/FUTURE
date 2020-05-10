@@ -17,3 +17,4 @@ models/*
 indexer_state
 future_serve_local.py
 config.py
+future_analytics/

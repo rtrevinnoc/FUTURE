@@ -69,7 +69,7 @@ from naive_bayes_chatbot_classifier import *
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
 
-global app, mail, accounts, hnswImagesLookup, imageDBIndex, spellChecker, dirname, queryClassifier
+global app, mail, accounts, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, queryClassifier
 dirname = os.path.dirname(__file__)
 client = MongoClient("localhost", 27017)
 db = client["Prometheus"]
@@ -83,6 +83,7 @@ hnswImagesLookup = hnswlib.Index(space="cosine", dim=50)
 hnswImagesLookup.load_index("FUTURE_images_vecs.bin", max_elements=100000)
 hnswImagesLookup.set_ef(100)
 imageDBIndex = lmdb.open("future_images", map_size=int(1e12), writemap=True)
+analyticsDBIndex = lmdb.open("future_analytics", map_size=int(1e12), writemap=True)
 FUTURE = Monad("future_urls")
 FUTURE.loadIndex("FUTURE_url_vecs")
 spellChecker = SymSpell(
@@ -271,6 +272,13 @@ def _answer():
             })
 
     search = FUTURE.searchIndex(q_vec, 25)
+    with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
+        queryBytes = query.encode("utf-8")
+        analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
+        if analyticsPreviousValue == None:
+            analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
+        else:
+            analyticsDBTransaction.put(queryBytes, str(int(analyticsPreviousValue.decode("utf-8")) + 1).encode("utf-8"))
     imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=25)
     numberOfURLs = 25  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
 
