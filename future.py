@@ -35,20 +35,9 @@ from flask_login import (
 )
 from chatbot import *
 import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, pyqrcode, lmdb, hnswlib, time, bson, requests
-from flask import (
-    Flask,
-    render_template,
-    request,
-    redirect,
-    send_file,
-    url_for,
-    send_from_directory,
-    flash,
-    abort,
-    jsonify,
-    escape,
-    Response
-)
+from flask import (Flask, render_template, request, redirect, send_file,
+                   url_for, send_from_directory, flash, abort, jsonify, escape,
+                   Response)
 from forms import *
 # from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.contrib.fixers import ProxyFix
@@ -83,7 +72,9 @@ hnswImagesLookup = hnswlib.Index(space="cosine", dim=50)
 hnswImagesLookup.load_index("FUTURE_images_vecs.bin", max_elements=100000)
 hnswImagesLookup.set_ef(100)
 imageDBIndex = lmdb.open("future_images", map_size=int(1e12), writemap=True)
-analyticsDBIndex = lmdb.open("future_analytics", map_size=int(1e12), writemap=True)
+analyticsDBIndex = lmdb.open("future_analytics",
+                             map_size=int(1e12),
+                             writemap=True)
 FUTURE = Monad("future_urls")
 FUTURE.loadIndex("FUTURE_url_vecs")
 spellChecker = SymSpell(
@@ -165,7 +156,8 @@ class User(UserMixin):
             sender="rtrevinnoc@hotmail.com",
             recipients=[self.email],
         )
-        msg.html = open("./templates/confirmation.html", encoding='utf8').read()
+        msg.html = open("./templates/confirmation.html",
+                        encoding='utf8').read()
         mail.send(msg)
 
     @loginManager.user_loader
@@ -228,14 +220,23 @@ def index():
         return render_template("index.html", name=current_user.get_id())
     return render_template("index.html", name=None)
 
+
 @app.route("/_autocomplete", methods=["GET", "POST"])
 def _autocomplete():
     term = request.args.get("term", 0, type=str)
     with analyticsDBIndex.begin() as analyticsDBTransaction:
         analyticsDBSelector = analyticsDBTransaction.cursor()
-        decodedPreviousQueries = [(str(key.decode("utf-8")), int(value)) for key, value in analyticsDBSelector]
-        similarPreviousQueries = [innerlist[0] for innerlist in sorted([query for query in decodedPreviousQueries if term in query[0]][:5], key=lambda x: x[1], reverse=True)]
-        return Response(json.dumps(similarPreviousQueries),  mimetype='application/json')
+        decodedPreviousQueries = [(str(key.decode("utf-8")), int(value))
+                                  for key, value in analyticsDBSelector]
+        similarPreviousQueries = [
+            innerlist[0] for innerlist in sorted([
+                query for query in decodedPreviousQueries if term in query[0]
+            ][:5],
+                                                 key=lambda x: x[1],
+                                                 reverse=True)
+        ]
+        return Response(json.dumps(similarPreviousQueries),
+                        mimetype='application/json')
 
 
 @app.route("/_answer")
@@ -287,7 +288,10 @@ def _answer():
         if analyticsPreviousValue == None:
             analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
         else:
-            analyticsDBTransaction.put(queryBytes, str(int(analyticsPreviousValue.decode("utf-8")) + 1).encode("utf-8"))
+            analyticsDBTransaction.put(
+                queryBytes,
+                str(int(analyticsPreviousValue.decode("utf-8")) +
+                    1).encode("utf-8"))
     imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=25)
     numberOfURLs = 25  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
 
