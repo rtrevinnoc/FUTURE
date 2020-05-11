@@ -17,11 +17,29 @@ along with FUTURE.  If not, see <https://www.gnu.org/licenses/>. */
 
 @import "../color/index.css";
 
+.ui-autocomplete {
+  z-index:1001 !important;
+  float: left;
+  min-width: 160px;   
+  padding: 10px;
+  list-style: none;
+  font-family: 'Source Sans Pro';
+  font-weight: 400;
+  font-style: normal;
+  font-size: 15px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+.ui-menu-item > a.ui-corner-all {
+  white-space: nowrap;
+}
+
 #small_summary {
-  background-color: #1C1C1C;
   border-radius: 8px;
   font-size: 18px;
-  color: #bfbfbf;
   padding: 12px;
 }
 
@@ -249,7 +267,7 @@ p#gathered {
 #searchbar {
   width: 80%;
   border-top-left-radius: 2px;
-  border-bottom-left-radius: 2px;
+  border-bottom-left-radius: 0px;
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
 }

@@ -47,7 +47,7 @@ from flask import (
     abort,
     jsonify,
     escape,
-    make_response,
+    Response
 )
 from forms import *
 # from werkzeug.middleware.proxy_fix import ProxyFix
@@ -227,6 +227,15 @@ def index():
     if current_user.is_authenticated:
         return render_template("index.html", name=current_user.get_id())
     return render_template("index.html", name=None)
+
+@app.route("/_autocomplete", methods=["GET", "POST"])
+def _autocomplete():
+    term = request.args.get("term", 0, type=str)
+    with analyticsDBIndex.begin() as analyticsDBTransaction:
+        analyticsDBSelector = analyticsDBTransaction.cursor()
+        decodedPreviousQueries = [(str(key.decode("utf-8")), int(value)) for key, value in analyticsDBSelector]
+        similarPreviousQueries = [innerlist[0] for innerlist in sorted([query for query in decodedPreviousQueries if term in query[0]][:5], key=lambda x: x[1], reverse=True)]
+        return Response(json.dumps(similarPreviousQueries),  mimetype='application/json')
 
 
 @app.route("/_answer")
