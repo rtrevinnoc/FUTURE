@@ -61,7 +61,7 @@ $(function() {
 		annyang.start();
   }
 
-  searchbar.autocomplete({source: "/_autocomplete", minLength: 3});
+  searchbar.autocomplete({source: "/_autocomplete", minLength: 1});
 
   $('#sidebar_content').hide();
   scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;

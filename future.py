@@ -230,7 +230,8 @@ def _autocomplete():
                                   for key, value in analyticsDBSelector]
         similarPreviousQueries = [
             innerlist[0] for innerlist in sorted([
-                query for query in decodedPreviousQueries if term in query[0]
+                query for query in decodedPreviousQueries
+                if query[0].startswith(term)
             ][:5],
                                                  key=lambda x: x[1],
                                                  reverse=True)
