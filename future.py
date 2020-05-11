@@ -282,16 +282,17 @@ def _answer():
             })
 
     search = FUTURE.searchIndex(q_vec, 25)
-    with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
-        queryBytes = query.encode("utf-8")
-        analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
-        if analyticsPreviousValue == None:
-            analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
-        else:
-            analyticsDBTransaction.put(
-                queryBytes,
-                str(int(analyticsPreviousValue.decode("utf-8")) +
-                    1).encode("utf-8"))
+    if len(query) <= 160:
+        with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
+            queryBytes = query.encode("utf-8")
+            analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
+            if analyticsPreviousValue == None:
+                analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
+            else:
+                analyticsDBTransaction.put(
+                    queryBytes,
+                    str(int(analyticsPreviousValue.decode("utf-8")) +
+                        1).encode("utf-8"))
     imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=25)
     numberOfURLs = 25  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
 
