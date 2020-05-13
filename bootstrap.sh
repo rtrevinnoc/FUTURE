@@ -1,8 +1,10 @@
 ################################################################### INSTALL DEPENDENCIES #
 
-if sudo lshw -C display | grep -q nvidia
+if sudo hwinfo --gfxcard | grep nvidia
 then 
    sudo apt-get install nvidia-cuda-toolkit
+   sudo zypper addrepo --refresh https://download.nvidia.com/opensuse/tumbleweed NVIDIA
+   sudo zypper install x11-video-nvidiaG05 nvidia-computeG05
    pip install -U torch torchvision
    pip install -U tensorflow-gpu
 else
@@ -11,6 +13,7 @@ else
    pip install -U torch==1.5.0+cpu torchvision==0.6.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
 fi
 sudo apt-get install libssl-dev
+sudo zypper install gcc-c++ openssl-devel
 
 pip install -U flask
 pip install -U SPARQLWrapper
@@ -35,13 +38,18 @@ pip install -U flask_wtf
 pip install -U polyglot
 pip install -U PyICU
 pip install -U pycld2
-pip install -U werkzeug
+pip install -U werkzeug==0.16.1
 pip install -U scrapy
 pip install -U tldextract
 
 python -m spacy download en_core_web_sm
 python -c "import nltk; nltk.download('punkt')"
 
+chmod +x future.py
+
+echo "All dependencies installed"
+echo "Terminate now with CTRL+C if you do not want to train any machine learning model"
+read -p "Otherwise, press enter to continue"
 ##########################################################################################
 
 
@@ -64,7 +72,6 @@ python translator_esp_eng.py
 echo "Building index..."
 echo "Terminate at any time with CTRL+C and proceed to execute ./save_index.sh"
 echo "The process can be resumed later by running ./build_index.sh again"
-chmod +x future.py
 chmod +x save_index.sh
 chmod +x build_index.sh
 ./build_index.sh
