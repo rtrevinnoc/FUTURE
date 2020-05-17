@@ -108,6 +108,94 @@ trainLabels = [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0]
 queryClassifier = QueryClassifier(np.unique(trainLabels))
 queryClassifier.train(trainData, trainLabels)
 
+def answer(query: str) -> jsonify:
+    start = time.time()
+    queryBeforePreprocessing = query
+    queryLanguage = Detector(query).language.name
+    if getResourceFromDBPedia(
+            queryBeforePreprocessing)["verification"] == False:
+        if (
+                queryLanguage == "Spanish" or queryLanguage != "English"
+        ):  # HACK: AS LONG AS THERE IS ONLY SUPPORT FOR SPANISH-ENGLISH TRANSLATION, KEEP THIS LINE
+            query = translate(query)
+            queryList = query.split(" ")[:-2]
+            if queryList[0] == "the":
+                queryList.pop(0)
+            del query
+            query = " ".join(queryList)
+        spellCheckerSuggestions = spellChecker.lookup_compound(
+            query, 2)  # LAST PARAMETER INDICATES MAX EDIT DISTANCE LOOKUP
+        query = " ".join(
+            [suggestion.term for suggestion in spellCheckerSuggestions])
+    else:
+        query = queryBeforePreprocessing
+    query = query.lower()
+    try:
+        q_vec = getSentenceMeanVector(query)
+    except:
+        return {
+                "answer": "No relevant information available.",
+                "small_summary": "No relevant information available.",
+                "reply": escapeHTMLString(predict_chatbot_response(query)),
+                "time": time.time() - start,
+                "corrected": query,
+                "urls": [],
+                "images": [],
+                "n_res": 0,
+                "map": "",
+                "chatbot": 0,
+            }
+
+    numberOfURLs = 25  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
+    search = FUTURE.searchIndex(q_vec, numberOfURLs)
+    if len(query) <= 160:
+        with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
+            queryBytes = query.encode("utf-8")
+            analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
+            if analyticsPreviousValue == None:
+                analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
+            else:
+                analyticsDBTransaction.put(
+                    queryBytes,
+                    str(int(analyticsPreviousValue.decode("utf-8")) +
+                        1).encode("utf-8"))
+    imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=numberOfURLs)
+
+    urls = [{
+        "url": escapeHTMLString(url["url"]),
+        "domain": escapeHTMLString(url["domain"]),
+        "header": escapeHTMLString(url["sentence"]),
+        "body": escapeHTMLString(url["body"]),
+        "language": url["language"],
+    } for url in search["results"]]
+
+    urlsInPreferedLanguage, urlsInOtherLanguages = [], []
+    for url in urls:
+        if url["language"] == queryLanguage:
+            urlsInPreferedLanguage.append(url)
+        else:
+            urlsInOtherLanguages.append(url)
+    urls = urlsInPreferedLanguage + urlsInOtherLanguages
+
+    with imageDBIndex.begin() as imageDBTransaction:
+        imagesBinaryDictionary = [
+            bson.loads(imageDBTransaction.get(
+                str(image).encode("utf-8")))["url"]
+            for image in imageVectorIds[0]
+        ]  # [:n_imgs]]
+
+    return {
+            "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
+            "small_summary": escapeHTMLString(getDefinitionFromDBPedia(query)),
+            "reply": escapeHTMLString(predict_chatbot_response(query)),
+            "time": time.time() - start,
+            "corrected": escapeHTMLString(query),
+            "urls": urls,
+            "images": imagesBinaryDictionary,
+            "n_res": numberOfURLs,
+            "map": getMap(queryBeforePreprocessing, query),
+            "chatbot": queryClassifier.test(query),
+        }
 
 class User(UserMixin):
     def __init__(self, name: str):
@@ -218,6 +306,19 @@ def particlesBlack():
 def index():
     if current_user.is_authenticated:
         return render_template("index.html", name=current_user.get_id())
+    if request.method == "POST":
+        query = request.form.get("a", 0, type=str)
+        response = answer(query)
+        if request.form.get("links", 0, type=bool):
+            return render_template("answer.html", previousQuery=query, section="links", answer=response["urls"])
+        elif request.form.get("summary", 0, type=bool):
+            return render_template("answer.html", previousQuery=query, section="summary", answer=response["answer"])
+        elif request.form.get("images", 0, type=bool):
+            return render_template("answer.html", previousQuery=query, section="images", answer=response["images"])
+        elif request.form.get("maps", 0, type=bool):
+            return render_template("answer.html", previousQuery=query, section="maps", answer=response["map"])
+        else:
+            return render_template("answer.html", previousQuery=query, section="summary", answer=response["answer"])
     return render_template("index.html", name=None)
 
 
@@ -243,96 +344,8 @@ def _autocomplete():
 @app.route("/_answer")
 def _answer():
     """The method for processing form data and answering."""
-    start = time.time()
     query = request.args.get("query", 0, type=str)
-    queryBeforePreprocessing = query
-    queryLanguage = Detector(query).language.name
-    if getResourceFromDBPedia(
-            queryBeforePreprocessing)["verification"] == False:
-        if (
-                queryLanguage == "Spanish" or queryLanguage != "English"
-        ):  # HACK: AS LONG AS THERE IS ONLY SUPPORT FOR SPANISH-ENGLISH TRANSLATION, KEEP THIS LINE
-            query = translate(query)
-            queryList = query.split(" ")[:-2]
-            if queryList[0] == "the":
-                queryList.pop(0)
-            del query
-            query = " ".join(queryList)
-        spellCheckerSuggestions = spellChecker.lookup_compound(
-            query, 2)  # LAST PARAMETER INDICATES MAX EDIT DISTANCE LOOKUP
-        query = " ".join(
-            [suggestion.term for suggestion in spellCheckerSuggestions])
-    else:
-        query = queryBeforePreprocessing
-    query = query.lower()
-    try:
-        q_vec = getSentenceMeanVector(query)
-    except:
-        return jsonify(
-            result={
-                "answer": "No relevant information available.",
-                "small_summary": "No relevant information available.",
-                "reply": escapeHTMLString(predict_chatbot_response(query)),
-                "time": time.time() - start,
-                "corrected": query,
-                "urls": [],
-                "images": [],
-                "n_res": 0,
-                "map": "",
-                "chatbot": 0,
-            })
-
-    search = FUTURE.searchIndex(q_vec, 25)
-    if len(query) <= 160:
-        with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
-            queryBytes = query.encode("utf-8")
-            analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
-            if analyticsPreviousValue == None:
-                analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
-            else:
-                analyticsDBTransaction.put(
-                    queryBytes,
-                    str(int(analyticsPreviousValue.decode("utf-8")) +
-                        1).encode("utf-8"))
-    imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=25)
-    numberOfURLs = 25  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
-
-    urls = [{
-        "url": escapeHTMLString(url["url"]),
-        "domain": escapeHTMLString(url["domain"]),
-        "header": escapeHTMLString(url["sentence"]),
-        "body": escapeHTMLString(url["body"]),
-        "language": url["language"],
-    } for url in search["results"]]
-
-    urlsInPreferedLanguage, urlsInOtherLanguages = [], []
-    for url in urls:
-        if url["language"] == queryLanguage:
-            urlsInPreferedLanguage.append(url)
-        else:
-            urlsInOtherLanguages.append(url)
-    urls = urlsInPreferedLanguage + urlsInOtherLanguages
-
-    with imageDBIndex.begin() as imageDBTransaction:
-        imagesBinaryDictionary = [
-            bson.loads(imageDBTransaction.get(
-                str(image).encode("utf-8")))["url"]
-            for image in imageVectorIds[0]
-        ]  # [:n_imgs]]
-
-    return jsonify(
-        result={
-            "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
-            "small_summary": escapeHTMLString(getDefinitionFromDBPedia(query)),
-            "reply": escapeHTMLString(predict_chatbot_response(query)),
-            "time": time.time() - start,
-            "corrected": escapeHTMLString(query),
-            "urls": urls,
-            "images": imagesBinaryDictionary,
-            "n_res": numberOfURLs,
-            "map": getMap(queryBeforePreprocessing, query),
-            "chatbot": queryClassifier.test(query),
-        })
+    return jsonify(result=answer(query))
 
 
 @app.route("/sourcery", methods=["GET", "POST"])

@@ -66,6 +66,7 @@ $(function() {
   $('#sidebar_content').hide();
   scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
   var submit_form = function(e) {
+    e.preventDefault();
     $("#welcome").fadeOut("fast");
     $(".hex").addClass("rotate");
     scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
