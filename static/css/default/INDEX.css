@@ -43,10 +43,17 @@ along with FUTURE.  If not, see <https://www.gnu.org/licenses/>. */
   padding: 12px;
 }
 
+#load_more_items {
+  margin-bottom: 10px;
+  max-width: 200px;
+  margin: 0 auto;
+  margin-bottom: 10px;
+}
+
 #maps_content, iframe {
-    display: block;
-    width: 100%;
-    height: 100%;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 #maps_content {
