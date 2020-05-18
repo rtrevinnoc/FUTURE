@@ -58,7 +58,8 @@ from naive_bayes_chatbot_classifier import *
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
 
-global app, mail, accounts, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, queryClassifier
+global app, mail, accounts, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, queryClassifier, numberOfURLs
+numberOfURLs = 5  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
 dirname = os.path.dirname(__file__)
 client = MongoClient("localhost", 27017)
 db = client["Prometheus"]
@@ -108,6 +109,27 @@ trainLabels = [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0]
 queryClassifier = QueryClassifier(np.unique(trainLabels))
 queryClassifier.train(trainData, trainLabels)
 
+def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs:int, page: int):
+    search = FUTURE.searchIndex(q_vec, numberOfURLs, page)
+
+    urls = [{
+        "url": escapeHTMLString(url["url"]),
+        "domain": escapeHTMLString(url["domain"]),
+        "header": escapeHTMLString(url["sentence"]),
+        "body": escapeHTMLString(url["body"]),
+        "language": url["language"],
+    } for url in search["results"]]
+
+    urlsInPreferedLanguage, urlsInOtherLanguages = [], []
+    for url in urls:
+        if url["language"] == queryLanguage:
+            urlsInPreferedLanguage.append(url)
+        else:
+            urlsInOtherLanguages.append(url)
+    urls = urlsInPreferedLanguage + urlsInOtherLanguages
+
+    return urls
+
 def answer(query: str) -> jsonify:
     start = time.time()
     queryBeforePreprocessing = query
@@ -146,8 +168,6 @@ def answer(query: str) -> jsonify:
                 "chatbot": 0,
             }
 
-    numberOfURLs = 25  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
-    search = FUTURE.searchIndex(q_vec, numberOfURLs)
     if len(query) <= 160:
         with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
             queryBytes = query.encode("utf-8")
@@ -161,21 +181,7 @@ def answer(query: str) -> jsonify:
                         1).encode("utf-8"))
     imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=numberOfURLs)
 
-    urls = [{
-        "url": escapeHTMLString(url["url"]),
-        "domain": escapeHTMLString(url["domain"]),
-        "header": escapeHTMLString(url["sentence"]),
-        "body": escapeHTMLString(url["body"]),
-        "language": url["language"],
-    } for url in search["results"]]
-
-    urlsInPreferedLanguage, urlsInOtherLanguages = [], []
-    for url in urls:
-        if url["language"] == queryLanguage:
-            urlsInPreferedLanguage.append(url)
-        else:
-            urlsInOtherLanguages.append(url)
-    urls = urlsInPreferedLanguage + urlsInOtherLanguages
+    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
 
     with imageDBIndex.begin() as imageDBTransaction:
         imagesBinaryDictionary = [
@@ -307,18 +313,39 @@ def index():
     if current_user.is_authenticated:
         return render_template("index.html", name=current_user.get_id())
     if request.method == "POST":
+        currentPage = request.form.get("current_page", 0, type=int)
+        if currentPage:
+            nextPage = request.form.get("next_page", 0, type=bool)
+            lastPage = request.form.get("last_page", 0, type=bool)
+            previousQuery = request.form.get("previous_query", 0, type=str)
+            q_vec = getSentenceMeanVector(previousQuery)
+            queryLanguage = Detector(previousQuery).language.name
+            if nextPage:
+                followingPage = currentPage + 1
+            elif lastPage:
+                if currentPage == 1:
+                    followingPage = 1
+                else:
+                    followingPage = currentPage - 1
+            return render_template("answer.html", previousQuery=previousQuery, section="links", answer=loadMoreUrls(q_vec, queryLanguage, numberOfURLs, followingPage), currentPage=followingPage)
+
         query = request.form.get("a", 0, type=str)
         response = answer(query)
+
         if request.form.get("links", 0, type=bool):
-            return render_template("answer.html", previousQuery=query, section="links", answer=response["urls"])
+            return render_template("answer.html", previousQuery=query, section="links", answer=response["urls"], currentPage=1)
         elif request.form.get("summary", 0, type=bool):
-            return render_template("answer.html", previousQuery=query, section="summary", answer=response["answer"])
+            return render_template("answer.html", previousQuery=query, section="summary", answer=response["answer"], currentPage=1)
         elif request.form.get("images", 0, type=bool):
-            return render_template("answer.html", previousQuery=query, section="images", answer=response["images"])
+            print("#######################")
+            print(response["images"])
+            print(response["images"][0])
+            print("#######################")
+            return render_template("answer.html", previousQuery=query, section="images", answer=response["images"], currentPage=1)
         elif request.form.get("maps", 0, type=bool):
-            return render_template("answer.html", previousQuery=query, section="maps", answer=response["map"])
+            return render_template("answer.html", previousQuery=query, section="maps", answer=response["map"], currentPage=1)
         else:
-            return render_template("answer.html", previousQuery=query, section="summary", answer=response["answer"])
+            return render_template("answer.html", previousQuery=query, section="summary", answer=response["answer"], currentPage=1)
     return render_template("index.html", name=None)
 
 
@@ -347,6 +374,16 @@ def _answer():
     query = request.args.get("query", 0, type=str)
     return jsonify(result=answer(query))
 
+@app.route("/_updateAnswer", methods=["GET", "POST"])
+def _updateAnswer():
+    query = request.args.get("query", 0, type=str)
+    page = request.args.get("page", 0, type=int)
+    q_vec = getSentenceMeanVector(query)
+    queryLanguage = Detector(query).language.name
+
+    return jsonify(result={
+            "urls": loadMoreUrls(q_vec, queryLanguage, numberOfURLs, page)
+        })
 
 @app.route("/sourcery", methods=["GET", "POST"])
 @login_required

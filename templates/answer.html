@@ -64,9 +64,16 @@
 			{% for link in answer %}
 			<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="{{ link['url'] }}">{{ link['domain'] }}</a></span> <span class="header"><a href="{{ link['url'] }}">{{ link['header'] }}</a></span></p><p class="link_paragraph2"><span class="link"><a href="{{ link['url'] }}">{{ link['url'] }}</a></span></p><p>{{ link['body'] }}<p></div>
 			{% endfor %}
+			<form method="post" name="load_more_items">
+				<input type="hidden" name="previous_query" value="{{ previousQuery }}" />
+				<input type="hidden" name="current_page" value="{{ currentPage }}" />
+				<button type="submit" name="last_page" value="True">Last Page</button>
+				<span>{{ currentPage }}</span>
+				<button type="submit" name="next_page" value="True">Next Page</button>
+			</form>
 			{% elif section == "images" %}
 			{% for image in answer %}
-			<div class="grid-item"><img class="image-item" src="{{ image['url'] }}" alt="Not available"></div>
+			<div class="grid-item"><img class="image-item" src="{{ image['url'] }}" alt="{{ image['url'] }}"></div>
 			{% endfor %}
 			{% elif section == "maps" %}
 			{{ answer }}

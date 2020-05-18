@@ -596,20 +596,30 @@ class Monad():
         with self.database.begin(write=True) as databaseTransaction:
             databaseTransaction.put(key, element)
 
-    def searchIndex(self, term: np.ndarray, number):
-        vectorIds, vectorScores = self.index.knn_query(term, k=number)
+    def searchIndex(self, term: np.ndarray, number, page: int) -> dict:
         with self.database.begin() as databaseTransaction:
+            databaseLimit = databaseTransaction.stat()["entries"]
+            totalItems = number * page
+            if totalItems <= databaseLimit:
+                vectorIds, vectorScores = self.index.knn_query(term, k=totalItems)
+            else:
+                raise ValueError("Number of items to fetch higher than items in database.")
+
+            if page > 1:
+                lowerLimit = number * (page - 1)
+            elif page == 1:
+                lowerLimit = 0
+
             return {
                 "results": [
                     bson.loads(databaseTransaction.get(str(x).encode("utf-8")))
-                    for x in vectorIds[0]
+                    for x in vectorIds[0][lowerLimit:totalItems]
                 ],
                 "vectorIds":
-                vectorIds,
+                vectorIds[0][lowerLimit:totalItems],
                 "vectorScores":
-                vectorScores
+                vectorScores[0][lowerLimit:totalItems]
             }
-
 
 # newTokenizedSentences = []
 

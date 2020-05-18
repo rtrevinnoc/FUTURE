@@ -37,7 +37,7 @@ along with FUTURE.  If not, see <https://www.gnu.org/licenses/>. */
   white-space: nowrap;
 }
 
-#small_summary {
+#small_summary, #load_more_items {
   border-radius: 8px;
   font-size: 18px;
   padding: 12px;

@@ -66,7 +66,6 @@ $(function() {
   $('#sidebar_content').hide();
   scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
   var submit_form = function(e) {
-    e.preventDefault();
     $("#welcome").fadeOut("fast");
     $(".hex").addClass("rotate");
     scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
@@ -74,6 +73,7 @@ $(function() {
       query: searchbar.val()
       }, function(data) {
         response = data.result
+        var current_page = 1
         summary_button.show();
         links_button.show();
         images_button.show();
@@ -113,6 +113,22 @@ $(function() {
               links.append('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["domain"] + '</a></span> <span class="header">' + '<a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>')
           });
         }
+
+        links.append('<div id="load_more_items"><span>Load more items<span></div>')
+        $('#load_more_items').click(function(e){
+          $.getJSON($SCRIPT_ROOT + '/_updateAnswer', {
+            query: searchbar.val(),
+            page: (current_page + 1)
+            }, function(data) {
+              response = data.result
+              console.log(searchbar.val(), (current_page + 1))
+              console.log(response)
+              response["urls"].forEach(function(url) {
+                $('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["domain"] + '</a></span> <span class="header">' + '<a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>').insertBefore("#load_more_items");
+              });
+              current_page = current_page + 1;
+            });
+        });      
 
         summary.text(response["answer"]);
         $('#chat .simplebar-content').append('<div class="blockline"><div class="container"><span class="machine">' + response["reply"] + '</span></div></div>');

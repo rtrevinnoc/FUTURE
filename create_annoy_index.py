@@ -49,7 +49,7 @@ with imageDBIndex.begin() as imageDBTransaction:
         except:
             pass
 
-search = futureURLs.searchIndex(getSentenceMeanVector("web hosting"), 10)
+search = futureURLs.searchIndex(getSentenceMeanVector("web hosting"), 10, 1)
 print(search["vectorIds"])
 print(search["vectorScores"])
 futureURLs.saveIndex()
