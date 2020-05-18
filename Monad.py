@@ -171,7 +171,7 @@ def tokenizeSentence(text: str) -> List[str]:
 
       What the function does?
       -----------------------
-      Divides <<text>> in tokens for use in FUTURE, while intelligently joining phrasal nouns, such as "Rage Agains The Machine"
+      Divides <<text>> in tokens for use in FUTURE, while intelligently joining phrasal nouns, such as "Rage Against The Machine"
 
       Returns:
       ---------
