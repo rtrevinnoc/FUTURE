@@ -93,4 +93,4 @@ Name | License
 [Image Captioning](https://github.com/yunjey/pytorch-tutorial/tree/master/tutorials/03-advanced/)|MIT
 
 ### FUTURE on w3m
-[![asciicast](https://asciinema.org/a/331246.svg)](https://asciinema.org/a/331246)
+[![asciicast](https://asciinema.org/a/331246.svg)](https://asciinema.org/a/331246?autoplay=1)
