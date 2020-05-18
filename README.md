@@ -1,4 +1,7 @@
 # FUTURE
+
+![Screenshot_20200517_192300](https://user-images.githubusercontent.com/7103315/82164538-bea0e600-9876-11ea-8d42-c8a1b126d8fb.png)
+
 __FUTURE__ is a search engine that improves on traditional methods of search by keyword by instead relying on machine learning techniques to encode words as vectors, and capture their meaning and be able to return more precise matches, all while dropping user tracking as only the query is sufficient to retrieve meaningful data.
 It was written with Python for backend, using Tensorflow and PyTorch and web technologies for the frontend.
 
@@ -88,3 +91,6 @@ Name | License
 [NMT with Attention](https://github.com/tensorflow/docs/blob/master/site/en/tutorials/text/nmt_with_attention.ipynb)|Apache 2.0
 [Transformer Chatbot](https://github.com/tensorflow/examples/blob/master/community/en/transformer_chatbot.ipynb)|Apache 2.0
 [Image Captioning](https://github.com/yunjey/pytorch-tutorial/tree/master/tutorials/03-advanced/)|MIT
+
+### FUTURE on w3m
+[![asciicast](https://asciinema.org/a/331246.svg)](https://asciinema.org/a/331246)
