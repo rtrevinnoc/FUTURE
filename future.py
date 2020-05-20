@@ -109,7 +109,9 @@ trainLabels = [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0]
 queryClassifier = QueryClassifier(np.unique(trainLabels))
 queryClassifier.train(trainData, trainLabels)
 
-def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs:int, page: int):
+
+def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
+                 page: int):
     search = FUTURE.searchIndex(q_vec, numberOfURLs, page)
 
     urls = [{
@@ -129,6 +131,7 @@ def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs:int, page: 
     urls = urlsInPreferedLanguage + urlsInOtherLanguages
 
     return urls
+
 
 def answer(query: str) -> jsonify:
     start = time.time()
@@ -156,17 +159,17 @@ def answer(query: str) -> jsonify:
         q_vec = getSentenceMeanVector(query)
     except:
         return {
-                "answer": "No relevant information available.",
-                "small_summary": "No relevant information available.",
-                "reply": escapeHTMLString(predict_chatbot_response(query)),
-                "time": time.time() - start,
-                "corrected": query,
-                "urls": [],
-                "images": [],
-                "n_res": 0,
-                "map": "",
-                "chatbot": 0,
-            }
+            "answer": "No relevant information available.",
+            "small_summary": "No relevant information available.",
+            "reply": escapeHTMLString(predict_chatbot_response(query)),
+            "time": time.time() - start,
+            "corrected": query,
+            "urls": [],
+            "images": [],
+            "n_res": 0,
+            "map": "",
+            "chatbot": 0,
+        }
 
     if len(query) <= 160:
         with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
@@ -191,17 +194,18 @@ def answer(query: str) -> jsonify:
         ]  # [:n_imgs]]
 
     return {
-            "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
-            "small_summary": escapeHTMLString(getDefinitionFromDBPedia(query)),
-            "reply": escapeHTMLString(predict_chatbot_response(query)),
-            "time": time.time() - start,
-            "corrected": escapeHTMLString(query),
-            "urls": urls,
-            "images": imagesBinaryDictionary,
-            "n_res": numberOfURLs,
-            "map": getMap(queryBeforePreprocessing, query),
-            "chatbot": queryClassifier.test(query),
-        }
+        "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
+        "small_summary": escapeHTMLString(getDefinitionFromDBPedia(query)),
+        "reply": escapeHTMLString(predict_chatbot_response(query)),
+        "time": time.time() - start,
+        "corrected": escapeHTMLString(query),
+        "urls": urls,
+        "images": imagesBinaryDictionary,
+        "n_res": numberOfURLs,
+        "map": getMap(queryBeforePreprocessing, query),
+        "chatbot": queryClassifier.test(query),
+    }
+
 
 class User(UserMixin):
     def __init__(self, name: str):
@@ -327,25 +331,47 @@ def index():
                     followingPage = 1
                 else:
                     followingPage = currentPage - 1
-            return render_template("answer.html", previousQuery=previousQuery, section="links", answer=loadMoreUrls(q_vec, queryLanguage, numberOfURLs, followingPage), currentPage=followingPage)
+            return render_template("answer.html",
+                                   previousQuery=previousQuery,
+                                   section="links",
+                                   answer=loadMoreUrls(q_vec, queryLanguage,
+                                                       numberOfURLs,
+                                                       followingPage),
+                                   currentPage=followingPage)
 
         query = request.form.get("a", 0, type=str)
         response = answer(query)
 
         if request.form.get("links", 0, type=bool):
-            return render_template("answer.html", previousQuery=query, section="links", answer=response["urls"], currentPage=1)
+            return render_template("answer.html",
+                                   previousQuery=query,
+                                   section="links",
+                                   answer=response["urls"],
+                                   currentPage=1)
         elif request.form.get("summary", 0, type=bool):
-            return render_template("answer.html", previousQuery=query, section="summary", answer=response["answer"], currentPage=1)
+            return render_template("answer.html",
+                                   previousQuery=query,
+                                   section="summary",
+                                   answer=response["answer"],
+                                   currentPage=1)
         elif request.form.get("images", 0, type=bool):
-            print("#######################")
-            print(response["images"])
-            print(response["images"][0])
-            print("#######################")
-            return render_template("answer.html", previousQuery=query, section="images", answer=response["images"], currentPage=1)
+            return render_template("answer.html",
+                                   previousQuery=query,
+                                   section="images",
+                                   answer=response["images"],
+                                   currentPage=1)
         elif request.form.get("maps", 0, type=bool):
-            return render_template("answer.html", previousQuery=query, section="maps", answer=response["map"], currentPage=1)
+            return render_template("answer.html",
+                                   previousQuery=query,
+                                   section="maps",
+                                   answer=response["map"],
+                                   currentPage=1)
         else:
-            return render_template("answer.html", previousQuery=query, section="summary", answer=response["answer"], currentPage=1)
+            return render_template("answer.html",
+                                   previousQuery=query,
+                                   section="summary",
+                                   answer=response["answer"],
+                                   currentPage=1)
     return render_template("index.html", name=None)
 
 
@@ -374,6 +400,7 @@ def _answer():
     query = request.args.get("query", 0, type=str)
     return jsonify(result=answer(query))
 
+
 @app.route("/_updateAnswer", methods=["GET", "POST"])
 def _updateAnswer():
     query = request.args.get("query", 0, type=str)
@@ -381,9 +408,11 @@ def _updateAnswer():
     q_vec = getSentenceMeanVector(query)
     queryLanguage = Detector(query).language.name
 
-    return jsonify(result={
+    return jsonify(
+        result={
             "urls": loadMoreUrls(q_vec, queryLanguage, numberOfURLs, page)
         })
+
 
 @app.route("/sourcery", methods=["GET", "POST"])
 @login_required

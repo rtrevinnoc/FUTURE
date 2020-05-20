@@ -116,10 +116,12 @@ $(function() {
 
         links.append('<div id="load_more_items"><span>Load more items<span></div>')
         $('#load_more_items').click(function(e){
+	  $(".hex").addClass("rotate");	
           $.getJSON($SCRIPT_ROOT + '/_updateAnswer', {
             query: searchbar.val(),
             page: (current_page + 1)
             }, function(data) {
+	      $(".hex").removeClass( "rotate" )
               response = data.result
               console.log(searchbar.val(), (current_page + 1))
               console.log(response)
