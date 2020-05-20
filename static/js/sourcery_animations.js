@@ -26,62 +26,62 @@ function getDocHeight() {
 
 // LOAD POSTS WITH AJAX
 function get_posts() {
-  $.getJSON($SCRIPT_ROOT + '/_posts', {}, function(data) {
-      data.result.forEach(function(post) {
-          $('#user_list').append('<div class="user_item"><p><a href="/iw/user/' + post[0] + '" style="color: #d4a45d">' + post[0] + '</a> <span style="color: #DDDDDD">' + post[2] + ':</span></p><p>' + post[1] + '<p></div><br>')
-      });
-  });
+    $.getJSON($SCRIPT_ROOT + '/_posts', {}, function(data) {
+        data.result.forEach(function(post) {
+            $('#user_list').append('<div class="user_item"><p><a href="/iw/user/' + post[0] + '" style="color: #d4a45d">' + post[0] + '</a> <span style="color: #DDDDDD">' + post[2] + ':</span></p><p>' + post[1] + '<p></div><br>')
+        });
+    });
 }
 
 // ALLOW TO SEND FILES
-var file_inputs = document.querySelectorAll( '.file_inputs' );
-Array.prototype.forEach.call( file_inputs, function( file_input ) {
-  var label	= file_input.nextElementSibling,
-      labelVal = label.innerHTML;
-  file_input.addEventListener( 'change', function( e ) {
-      var fileName = '';
-      if( this.files && this.files.length > 1 ) {
-        label.innerHTML = (this.getAttribute( 'data-multiple-caption' ) || '' ).replace( '{count}', this.files.length);
-      } else {
-        label.innerHTML = e.target.value.split( '\\' ).pop();
-      }
-  });
+var file_inputs = document.querySelectorAll('.file_inputs');
+Array.prototype.forEach.call(file_inputs, function(file_input) {
+    var label = file_input.nextElementSibling,
+        labelVal = label.innerHTML;
+    file_input.addEventListener('change', function(e) {
+        var fileName = '';
+        if (this.files && this.files.length > 1) {
+            label.innerHTML = (this.getAttribute('data-multiple-caption') || '').replace('{count}', this.files.length);
+        } else {
+            label.innerHTML = e.target.value.split('\\').pop();
+        }
+    });
 });
 
 $(function() {
-  // SEND FORM WITH AJAX
-  var submit_form = function(e) {
-    e.preventDefault();
-    data = new FormData($("#publication_form")[0])
+    // SEND FORM WITH AJAX
+    var submit_form = function(e) {
+        e.preventDefault();
+        data = new FormData($("#publication_form")[0])
 
-    $.ajax({
-      url: $SCRIPT_ROOT + '/_upload',
-      type: 'POST',
-      data: data,
-      processData: false,
-      contentType: false
-    })
+        $.ajax({
+            url: $SCRIPT_ROOT + '/_upload',
+            type: 'POST',
+            data: data,
+            processData: false,
+            contentType: false
+        })
 
-  };
+    };
 
-  $("#publication_form").submit(function(e) {
-    submit_form();
-  });
+    $("#publication_form").submit(function(e) {
+        submit_form();
+    });
 
-  $('#writebutton').bind('click', submit_form);
-  $('#publication').bind('keydown', function(e) {
-    if (e.keyCode == 13) {
-      submit_form();
-    }
-  });
+    $('#writebutton').bind('click', submit_form);
+    $('#publication').bind('keydown', function(e) {
+        if (e.keyCode == 13) {
+            submit_form();
+        }
+    });
 
-  // LOAD INITIAL POSTS WITH AJAX
-  get_posts()
+    // LOAD INITIAL POSTS WITH AJAX
+    get_posts()
 
-  // AS THE USER SCROLLS, LOAD MORE POSTS WITH AJAX
-  $(window).scroll(function() {
-       if($(window).scrollTop() + $(window).height() == getDocHeight()) {
-         get_posts()
-       }
-   });
+    // AS THE USER SCROLLS, LOAD MORE POSTS WITH AJAX
+    $(window).scroll(function() {
+        if ($(window).scrollTop() + $(window).height() == getDocHeight()) {
+            get_posts()
+        }
+    });
 });

@@ -17,33 +17,33 @@
 
 // SWITCH TO DIFFERENT LAYOUT DUE TO SCREEN SIZE
 if ($(window).height() <= 768 && $(window).width() <= 960) {
-  $('.file_inputs')[0].remove()
+    $('.file_inputs')[0].remove()
 }
 
 // CODE FOR MULTIPLE FILE CAPTION
-var file_inputs = document.querySelectorAll( '.file_inputs' );
-Array.prototype.forEach.call( file_inputs, function( file_input ) {
-  var label	= file_input.nextElementSibling,
-      labelVal = label.innerHTML;
-  file_input.addEventListener( 'change', function( e ) {
-      var fileName = '';
-      if( this.files && this.files.length > 1 ) {
-        label.innerHTML = (this.getAttribute( 'data-multiple-caption' ) || '' ).replace( '{count}', this.files.length);
-      } else {
-        label.innerHTML = e.target.value.split( '\\' ).pop();
-      }
-  });
+var file_inputs = document.querySelectorAll('.file_inputs');
+Array.prototype.forEach.call(file_inputs, function(file_input) {
+    var label = file_input.nextElementSibling,
+        labelVal = label.innerHTML;
+    file_input.addEventListener('change', function(e) {
+        var fileName = '';
+        if (this.files && this.files.length > 1) {
+            label.innerHTML = (this.getAttribute('data-multiple-caption') || '').replace('{count}', this.files.length);
+        } else {
+            label.innerHTML = e.target.value.split('\\').pop();
+        }
+    });
 });
 
 // CODE FOR FILE SEARCH ENGINE
 function search_file(q) {
-  $.getJSON($SCRIPT_ROOT + '/_files', {
-    q: q
+    $.getJSON($SCRIPT_ROOT + '/_files', {
+        q: q
     }, function(data) {
-      data.result.forEach(function(file) {
-          grid.append('<div class="grid-item"><div class="file_options"><i class="ion-document"></i> - <a href="/MAZE/'+file+'"><i class="ion-arrow-down-c"></i></a> <a href="/edit/'+file+'"><i class="ion-edit"></i></a> <a href="/remove/'+file+'"><i class="ion-backspace"></i></a>  <a onclick="openshare('+file+')" href="#openShare"><i class="ion-share"></i></a></div><div class="file_name"><a href="/MAZE/'+file+'">'+file+'</a></div></div>')
-      });
-  });
+        data.result.forEach(function(file) {
+            grid.append('<div class="grid-item"><div class="file_options"><i class="ion-document"></i> - <a href="/MAZE/' + file + '"><i class="ion-arrow-down-c"></i></a> <a href="/edit/' + file + '"><i class="ion-edit"></i></a> <a href="/remove/' + file + '"><i class="ion-backspace"></i></a>  <a onclick="openshare(' + file + ')" href="#openShare"><i class="ion-share"></i></a></div><div class="file_name"><a href="/MAZE/' + file + '">' + file + '</a></div></div>')
+        });
+    });
 }
 
 // INITIALLY SHOW ALL FILES
@@ -53,7 +53,7 @@ search_file("")
 var search_input = $('#searchbar'),
     grid = $('#grid')
 
-search_input.on('input',function(e){
-  grid.html("")
-  search_file(search_input.val())
+search_input.on('input', function(e) {
+    grid.html("")
+    search_file(search_input.val())
 });

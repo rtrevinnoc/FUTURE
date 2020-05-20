@@ -16,18 +16,18 @@
 // along with FUTURE.  If not, see <https://www.gnu.org/licenses/>.
 
 // ALLOW TO UPLOAD FILES
-var file_inputs = document.querySelectorAll( '.file_inputs' );
-Array.prototype.forEach.call( file_inputs, function( file_input ) {
-  var label	= file_input.nextElementSibling,
-      labelVal = label.innerHTML;
-  file_input.addEventListener( 'change', function( e ) {
-      var fileName = '';
-      if( this.files && this.files.length > 1 ) {
-        label.innerHTML = (this.getAttribute( 'data-multiple-caption' ) || '' ).replace( '{count}', this.files.length);
-      } else {
-        label.innerHTML = e.target.value.split( '\\' ).pop();
-      }
-  });
+var file_inputs = document.querySelectorAll('.file_inputs');
+Array.prototype.forEach.call(file_inputs, function(file_input) {
+    var label = file_input.nextElementSibling,
+        labelVal = label.innerHTML;
+    file_input.addEventListener('change', function(e) {
+        var fileName = '';
+        if (this.files && this.files.length > 1) {
+            label.innerHTML = (this.getAttribute('data-multiple-caption') || '').replace('{count}', this.files.length);
+        } else {
+            label.innerHTML = e.target.value.split('\\').pop();
+        }
+    });
 });
 
 // TODO: GET HEIGHT TO LOAD POSTS WITH AJAX
@@ -41,62 +41,62 @@ Array.prototype.forEach.call( file_inputs, function( file_input ) {
 // }
 
 $(function() {
-  // SEND MAIN FORM WITH AJAX
-  var submit_form = function(e) {
-    e.preventDefault();
-    data = new FormData($("#publication_form")[0])
+    // SEND MAIN FORM WITH AJAX
+    var submit_form = function(e) {
+        e.preventDefault();
+        data = new FormData($("#publication_form")[0])
 
-    $.ajax({
-      url: $SCRIPT_ROOT + '/_upload/' + $USERNAME,
-      type: 'POST',
-      data: data,
-      processData: false,
-      contentType: false
-    })
+        $.ajax({
+            url: $SCRIPT_ROOT + '/_upload/' + $USERNAME,
+            type: 'POST',
+            data: data,
+            processData: false,
+            contentType: false
+        })
 
-  };
+    };
 
-  $("#publication_form").submit(function(e) {
-    submit_form();
-  });
+    $("#publication_form").submit(function(e) {
+        submit_form();
+    });
 
-  $('#writebutton').bind('click', submit_form);
-  $('#publication').bind('keydown', function(e) {
-    if (e.keyCode == 13) {
-      submit_form();
-    }
-  });
+    $('#writebutton').bind('click', submit_form);
+    $('#publication').bind('keydown', function(e) {
+        if (e.keyCode == 13) {
+            submit_form();
+        }
+    });
 
-  // SEND SECOND FORM WITH AJAX
-  var submit_form2 = function(e) {
-    e.preventDefault();
-    data = new FormData($("#publication_form2")[0])
+    // SEND SECOND FORM WITH AJAX
+    var submit_form2 = function(e) {
+        e.preventDefault();
+        data = new FormData($("#publication_form2")[0])
 
-    $.ajax({
-      url: $SCRIPT_ROOT + '/_upload',
-      type: 'POST',
-      data: data,
-      processData: false,
-      contentType: false
-    })
+        $.ajax({
+            url: $SCRIPT_ROOT + '/_upload',
+            type: 'POST',
+            data: data,
+            processData: false,
+            contentType: false
+        })
 
-  };
+    };
 
-  $("#publication_form2").submit(function(e) {
-    submit_form2();
-  });
+    $("#publication_form2").submit(function(e) {
+        submit_form2();
+    });
 
-  $('#writebutton2').bind('click', submit_form2);
-  $('#publication2').bind('keydown', function(e) {
-    if (e.keyCode == 13) {
-      submit_form2();
-    }
-  });
+    $('#writebutton2').bind('click', submit_form2);
+    $('#publication2').bind('keydown', function(e) {
+        if (e.keyCode == 13) {
+            submit_form2();
+        }
+    });
 
-  // // TODO: SHOW RESULTS WITH AJAX
-  // $(window).scroll(function() {
-  //      if($(window).scrollTop() + $(window).height() == getDocHeight()) {
-  //        get_posts()
-  //      }
-  //  });
+    // // TODO: SHOW RESULTS WITH AJAX
+    // $(window).scroll(function() {
+    //      if($(window).scrollTop() + $(window).height() == getDocHeight()) {
+    //        get_posts()
+    //      }
+    //  });
 });
