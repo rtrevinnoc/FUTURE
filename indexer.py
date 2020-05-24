@@ -144,7 +144,7 @@ class Indexer(scrapy.Spider):
         "AJAXCRAWL_ENABLED": True
     }
 
-    start_urls = ["https://techcrunch.com/"]
+    start_urls = ["https://www.wsj.com/"]
 
     def parse(self, response) -> Iterator:
         webPageVector = getWebpageMeanVector(response)
