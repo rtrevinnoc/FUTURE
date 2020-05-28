@@ -1,19 +1,20 @@
 ################################################################### INSTALL DEPENDENCIES #
 
-if sudo hwinfo --gfxcard | grep nvidia
-then 
-   sudo apt-get install nvidia-cuda-toolkit
-   sudo zypper addrepo --refresh https://download.nvidia.com/opensuse/tumbleweed NVIDIA
-   sudo zypper install x11-video-nvidiaG05 nvidia-computeG05
-   pip install -U torch torchvision
-   pip install -U tensorflow-gpu
-else
-   echo "NO CUDA-CAPABLE GPU AVAILABLE";
-   pip install -U tensorflow
-   pip install -U torch==1.5.0+cpu torchvision==0.6.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
-fi
+#if sudo hwinfo --gfxcard | grep nvidia
+#then 
+#   sudo apt-get install nvidia-cuda-toolkit
+#   sudo zypper addrepo --refresh https://download.nvidia.com/opensuse/tumbleweed NVIDIA
+#   sudo zypper install x11-video-nvidiaG05 nvidia-computeG05
+#   pip install -U torch torchvision
+#   pip install -U tensorflow-gpu
+#else
+#   echo "NO CUDA-CAPABLE GPU AVAILABLE";
+#   pip install -U tensorflow
+#   pip install -U torch==1.5.0+cpu torchvision==0.6.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+#fi
 sudo apt-get install libssl-dev
 sudo zypper install gcc-c++ openssl-devel
+sudo pacman -S python-pyopenssl
 
 pip install -U flask
 pip install -U SPARQLWrapper
