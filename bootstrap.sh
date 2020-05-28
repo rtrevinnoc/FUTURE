@@ -42,6 +42,9 @@ pip install -U pycld2
 pip install -U werkzeug==0.16.1
 pip install -U scrapy
 pip install -U tldextract
+pip install -U scikit-learn
+pip install -U pandas
+pip install -U torchvision
 
 python -m spacy download en_core_web_sm
 python -c "import nltk; nltk.download('punkt')"
