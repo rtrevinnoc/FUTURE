@@ -20,3 +20,4 @@ config.py
 future_analytics/
 indexer/target/
 future_test.py
+test.sh
