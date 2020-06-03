@@ -622,9 +622,6 @@ class Monad():
                 vectorScores[0][lowerLimit:totalItems]
             }
 
-
-print(getDefinitionFromDBPedia("dog"))
-
 # newTokenizedSentences = []
 
 # for sentence in getAbstractFromDBPedia("statue of liberty").split("."):
