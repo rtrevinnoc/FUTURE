@@ -38,11 +38,12 @@ bson.dumps = bson.BSON.encode
 
 sparql = SPARQLWrapper("http://dbpedia.org/sparql")
 sparql.setReturnFormat(JSON)
+sparql.setTimeout(20)
 
 gloveVectors = KeyedVectors.load_word2vec_format("./glove.6B/glove.6B.50d.txt",
                                                  binary=False)
 gloveVectors.init_sims()
-normalizedGloveVectors: np.ndarray = gloveVectors.syn0norm
+normalizedGloveVectors: np.ndarray = gloveVectors.vectors_norm
 gloveVocabulary: dict = gloveVectors.vocab
 
 stopWords: List[str] = [
@@ -620,6 +621,9 @@ class Monad():
                 "vectorScores":
                 vectorScores[0][lowerLimit:totalItems]
             }
+
+
+print(getDefinitionFromDBPedia("dog"))
 
 # newTokenizedSentences = []
 
