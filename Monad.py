@@ -38,7 +38,7 @@ bson.dumps = bson.BSON.encode
 
 sparql = SPARQLWrapper("http://dbpedia.org/sparql")
 sparql.setReturnFormat(JSON)
-sparql.setTimeout(20)
+sparql.setTimeout(5)
 
 gloveVectors = KeyedVectors.load_word2vec_format("./glove.6B/glove.6B.50d.txt",
                                                  binary=False)
