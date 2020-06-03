@@ -414,6 +414,24 @@ def _updateAnswer():
         })
 
 
+@app.route("/_midnightcypher")
+def _midnightcypher():
+    query = request.args.get("query", 0, type=str)
+    q_vec = getSentenceMeanVector(query)
+    imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=numberOfURLs)
+
+    with imageDBIndex.begin() as imageDBTransaction:
+        imagesBinaryDictionary = [
+            bson.loads(imageDBTransaction.get(
+                str(image).encode("utf-8")))["url"]
+            for image in imageVectorIds[0]
+        ]  # [:n_imgs]]
+
+    return jsonify(
+        result={
+            "images": imagesBinaryDictionary,
+        })
+
 @app.route("/sourcery", methods=["GET", "POST"])
 @login_required
 def sourcery():
