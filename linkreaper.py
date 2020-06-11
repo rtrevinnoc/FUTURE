@@ -93,6 +93,13 @@ def getWebpageMeanVector(response) -> list:
         ]
 
 
+def returnDataFromImageTags(someIterable: list) -> list:
+    anotherIterable = []
+    for imageTag in someIterable:
+        anotherIterable.append((imageTag.xpath("@src").get(), imageTag.xpath("@alt").get()))
+    return anotherIterable
+
+
 class Indexer(scrapy.Spider):
     name = "indexer"
     allowed_urls = ["*"]
@@ -126,7 +133,8 @@ class Indexer(scrapy.Spider):
         webPageVector = getWebpageMeanVector(response)
         if webPageVector[0].size == 50:
             webPageSummaryVector = webPageVector[0]
-            listOfImagesAndDescriptions = [(str(urljoin(url, urlparse(url).path) + imageHTMLTagSource), imageHTMLTagAlt) if imageHTMLTagSource.startswith("/") else (imageHTMLTagSource, imageHTMLTagAlt) for imageHTMLTagSource, imageHTMLTagAlt in returnListInPairs(response.xpath("//img/@*[name()='src' or name()='alt']").extract())]
+            listOfImagesAndDescriptions = [(str(urljoin(url, urlparse(url).path) + imageHTMLTagSource), imageHTMLTagAlt) if imageHTMLTagSource.startswith("/") else (imageHTMLTagSource, imageHTMLTagAlt) for imageHTMLTagSource, imageHTMLTagAlt in returnDataFromImageTags(response.xpath("//img"))]
+            print(returnUnpackedListOfTrigrams(enumerate(listOfImagesAndDescriptions)))
             ImageDBTransaction = images.begin(write=True)
             for id, imageLink, imageDescription in returnUnpackedListOfTrigrams(enumerate(listOfImagesAndDescriptions)):
                 imageDescriptionVectorPreliminar = getSentenceMeanVector(imageDescription)
@@ -134,6 +142,7 @@ class Indexer(scrapy.Spider):
                     imageDescriptionVector = np.array([getSentenceMeanVector(imageDescription), webPageSummaryVector]).mean(axis=0)
                 else:
                     imageDescriptionVector = webPageSummaryVector
+                print(imageDescriptionVector.tostring())
                 try:
                     ImageDBTransaction.put(
                         encodeURLAsNumber(imageLink, ":image:" + str(id)),
