@@ -20,5 +20,5 @@
 #########################################################################
 
 cd $(dirname $0)
-ps axf | grep indexer.py | grep -v grep | awk '{print "kill -9 " $1}' | sh
+ps axf | grep linkreaper.py | grep -v grep | awk '{print "kill -9 " $1}' | sh
 /home/god/anaconda3/bin/python create_annoy_index.py

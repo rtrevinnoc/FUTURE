@@ -39,23 +39,19 @@ with imageDBIndex.begin() as imageDBTransaction:
         value = bson.loads(value)
         try:
             hnswImagesLookup.add_items(
-                np.array([np.frombuffer(value["image_vec"], dtype="float32")]),
-                np.array([int(key.decode("utf-8"))]),
-            )
-            hnswImagesLookup.add_items(
-                np.array([np.frombuffer(value["word_vec"], dtype="float32")]),
+                np.array([np.frombuffer(value["vec"], dtype="float32")]),
                 np.array([int(key.decode("utf-8"))]),
             )
         except:
             pass
 
-search = futureURLs.searchIndex(getSentenceMeanVector("web hosting"), 10, 1)
+search = futureURLs.searchIndex(getSentenceMeanVector("web hosting"), 5, 1)
 print(search["vectorIds"])
 print(search["vectorScores"])
 futureURLs.saveIndex()
 
 labels, distances = hnswImagesLookup.knn_query(
-    getSentenceMeanVector("web hosting"), k=10)
+    getSentenceMeanVector("web hosting"), k=5)
 print(labels)
 print(distances)
 hnswImagesLookup.save_index("FUTURE_images_vecs.bin")

@@ -51,7 +51,6 @@ from base64 import b64decode
 from flask_mail import Mail, Message
 from pymongo import MongoClient
 from symspellpy.symspellpy import SymSpell, Verbosity
-from polyglot.detect import Detector
 from bs4 import BeautifulSoup
 from naive_bayes_chatbot_classifier import *
 
@@ -113,11 +112,11 @@ queryClassifier.train(trainData, trainLabels)
 def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
                  page: int):
     search = FUTURE.searchIndex(q_vec, numberOfURLs, page)
+    print(search["results"])
 
     urls = [{
         "url": escapeHTMLString(url["url"]),
-        "domain": escapeHTMLString(url["domain"]),
-        "header": escapeHTMLString(url["sentence"]),
+        "header": escapeHTMLString(url["header"]),
         "body": escapeHTMLString(url["body"]),
         "language": url["language"],
     } for url in search["results"]]
@@ -136,7 +135,7 @@ def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
 def answer(query: str) -> jsonify:
     start = time.time()
     queryBeforePreprocessing = query
-    queryLanguage = Detector(query).language.name
+    queryLanguage = inferLanguage(query)
     if getResourceFromDBPedia(
             queryBeforePreprocessing)["verification"] == False:
         if (
@@ -323,7 +322,7 @@ def index():
             lastPage = request.form.get("last_page", 0, type=bool)
             previousQuery = request.form.get("previous_query", 0, type=str)
             q_vec = getSentenceMeanVector(previousQuery)
-            queryLanguage = Detector(previousQuery).language.name
+            queryLanguage = inferLanguage(previousQuery)
             if nextPage:
                 followingPage = currentPage + 1
             elif lastPage:
@@ -406,7 +405,7 @@ def _updateAnswer():
     query = request.args.get("query", 0, type=str)
     page = request.args.get("page", 0, type=int)
     q_vec = getSentenceMeanVector(query)
-    queryLanguage = Detector(query).language.name
+    queryLanguage = inferLanguage(query)
 
     return jsonify(
         result={

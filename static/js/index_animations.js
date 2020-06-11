@@ -125,7 +125,7 @@ $(function() {
                 links.append('<p id="gathered">Gathered ' + response["n_res"] + ' resources in ' + response["time"] + 's</p>')
                 links.append('<div id="small_summary">' + response["small_summary"] + '</div>')
                 response["urls"].forEach(function(url) {
-                    links.append('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["domain"] + '</a></span> <span class="header">' + '<a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>')
+                    links.append('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>')
                 });
             }
 
@@ -141,7 +141,7 @@ $(function() {
                     console.log(searchbar.val(), (current_page + 1))
                     console.log(response)
                     response["urls"].forEach(function(url) {
-                        $('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["domain"] + '</a></span> <span class="header">' + '<a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>').insertBefore("#load_more_items");
+                        $('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>').insertBefore("#load_more_items");
                     });
                     current_page = current_page + 1;
                 });

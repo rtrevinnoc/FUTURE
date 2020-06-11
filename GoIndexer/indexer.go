@@ -33,6 +33,7 @@ import (
 	"github.com/gocolly/colly/v2/extensions"
 	"gopkg.in/neurosnap/sentences.v1/english"
 	"labix.org/v2/mgo/bson"
+	"github.com/bmatsuo/lmdb-go/lmdb"
 )
 
 func RemoveIndex(s []string, index int) []string {
@@ -106,10 +107,13 @@ func encodeURLAsNumber(url string, id int) (string) {
 var stopWords = readlines("stop_words.txt")
 var gloveModel = loadGloveModel("glove.6B/glove.6B.50d.txt")
 var tokenizer, _ = english.NewSentenceTokenizer(nil)
+var env, err = lmdb.NewEnv()
+var dbi lmdb.DBI
 
 func saveDataFromWebPage(url url.URL, metaSiteName, metaTitle, metaDescription, webPageTitle, webPageHeader, webPageBody string) {
 	hostname := url.Hostname()
 	preliminarVectorElementsList := []string{}
+	urlString := url.String()
 
 	if metaSiteName != "" {
 		preliminarVectorElementsList = append(preliminarVectorElementsList, metaSiteName)
@@ -131,6 +135,26 @@ func saveDataFromWebPage(url url.URL, metaSiteName, metaTitle, metaDescription, 
 
 	preliminarVectorElement := strings.Join(preliminarVectorElementsList, " ")
 	sentences := tokenizer.Tokenize(preliminarVectorElement)
+
+	webPageData := FUTUREIndexedWebpage{
+		urlString,
+		hostname,
+		preliminarVectorElement,
+		"Undefined",
+	}
+
+	webPageDataBinaryDictionary, _ := bson.Marshal(webPageData)
+
+	err := env.Update(func(txn *lmdb.Txn) (err error) {
+		err = txn.Put(dbi, []byte(urlString), webPageDataBinaryDictionary, 0)
+		if err != nil {
+			fmt.Println(err)
+		}
+		return nil
+	})
+	if err != nil {
+		fmt.Println("Couldn't update database")
+	}
 
 	for index, sentence := range sentences {
 		sentence := sentence.Text
@@ -162,6 +186,17 @@ func saveDataFromWebPage(url url.URL, metaSiteName, metaTitle, metaDescription, 
 		}
 
 		webPagePointerBinaryDictionary, _ := bson.Marshal(webPagePointer)
+
+		err = env.Update(func(txn *lmdb.Txn) (err error) {
+			err = txn.Put(dbi, []byte(encodeURLAsNumber(urlString, index)), webPagePointerBinaryDictionary, 0)
+			if err != nil {
+				fmt.Println(err)
+			}
+			return nil
+		})
+		if err != nil {
+			fmt.Println("Couldn't update database")
+		}
 	}
 }
 
@@ -191,6 +226,40 @@ func main() {
 	var metaSiteName, metaTitle, metaDescription, webPageTitle, webPageHeader, webPageBody string
 	var url url.URL
 
+	if err != nil {
+		fmt.Println("Error creating new environment")
+	}
+	defer env.Close()
+
+	err = env.SetMaxDBs(1)
+	if err != nil {
+		fmt.Println("Error setting max dbs")
+	}
+	err = env.SetMapSize(1000 << 30)
+	if err != nil {
+		fmt.Println("Error setting map size")
+	}
+	err = env.Open("future_urls", 0, 0644)
+	if err != nil {
+		fmt.Println("Error opening database")
+	}
+
+	staleReaders, err := env.ReaderCheck()
+	if err != nil {
+		fmt.Println("Error checking for staleReaders")
+	}
+	if staleReaders > 0 {
+		fmt.Println("Cleared ", staleReaders, "reader slots from dead processes")
+	}
+
+	err = env.Update(func(txn *lmdb.Txn) (err error) {
+		dbi, err = txn.CreateDBI("data")
+		return err
+	})
+	if err != nil {
+		fmt.Println("Couldn't create or open database")
+	}
+
 	c := colly.NewCollector(
 		colly.Async(true),
 	)
@@ -204,47 +273,47 @@ func main() {
 	})
 
 	c.OnXML("//meta[@property='og:description']/@content", func(e *colly.XMLElement) {
-		metaDescription = strings.TrimSpace(e.Text)
-	})
+	metaDescription = strings.TrimSpace(e.Text)
+})
 
 
-	c.OnXML("//meta[@property='og:title']/@content", func(e *colly.XMLElement) {
-		metaTitle = strings.TrimSpace(e.Text)
+c.OnXML("//meta[@property='og:title']/@content", func(e *colly.XMLElement) {
+metaTitle = strings.TrimSpace(e.Text)
 	})
 
 	c.OnXML("//meta[@property='og:description']/@content", func(e *colly.XMLElement) {
-		metaSiteName = strings.TrimSpace(e.Text)
-	})
+	metaSiteName = strings.TrimSpace(e.Text)
+})
 
-	c.OnHTML("h1", func(e *colly.HTMLElement) {
-		webPageHeader = strings.TrimSpace(e.Text)
-	})
+c.OnHTML("h1", func(e *colly.HTMLElement) {
+	webPageHeader = strings.TrimSpace(e.Text)
+})
 
-	c.OnHTML("title", func(e *colly.HTMLElement) {
-		webPageTitle = strings.TrimSpace(e.Text)
-	})
+c.OnHTML("title", func(e *colly.HTMLElement) {
+	webPageTitle = strings.TrimSpace(e.Text)
+})
 
-	webPageBodyElement := []string{}
-	c.OnHTML("p", func(e *colly.HTMLElement) {
-		webPageBodyElement = append(webPageBodyElement, e.Text)
-	})
-	webPageBody = strings.Join(webPageBodyElement, " ")
+webPageBodyElement := []string{}
+c.OnHTML("p", func(e *colly.HTMLElement) {
+	webPageBodyElement = append(webPageBodyElement, e.Text)
+})
+webPageBody = strings.Join(webPageBodyElement, " ")
 
-	c.OnHTML("img[src]", func(e *colly.HTMLElement) {
-		fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@")
-		fmt.Println(e.Attr("src"))
-		fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@")
-	})
+c.OnHTML("img[src]", func(e *colly.HTMLElement) {
+	fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@")
+	fmt.Println(e.Attr("src"))
+	fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@")
+})
 
-	// Find and visit all links
-	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
-		e.Request.Visit(e.Attr("href"))
-	})
+// Find and visit all links
+c.OnHTML("a[href]", func(e *colly.HTMLElement) {
+	e.Request.Visit(e.Attr("href"))
+})
 
-	c.OnScraped(func(r *colly.Response) {
-		saveDataFromWebPage(url, metaSiteName, metaTitle, metaDescription, webPageTitle, webPageHeader, webPageBody)
-	})
+c.OnScraped(func(r *colly.Response) {
+	saveDataFromWebPage(url, metaSiteName, metaTitle, metaDescription, webPageTitle, webPageHeader, webPageBody)
+})
 
-	c.Visit("http://rtrevinnoc.github.io/")
-	c.Wait()
+c.Visit("http://rtrevinnoc.github.io/")
+c.Wait()
 }

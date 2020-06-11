@@ -9,6 +9,8 @@ github.com/antchfx/xmlquery v1.0.0 h1:YuEPqexGG2opZKNc9JU3Zw6zFXwC47wNcy6/F8oKsr
 github.com/antchfx/xmlquery v1.0.0/go.mod h1:/+CnyD/DzHRnv2eRxrVbieRU/FIF6N0C+7oTtyUtCKk=
 github.com/antchfx/xpath v1.0.0 h1:Q5gFgh2O40VTSwMOVbFE7nFNRBu3tS21Tn0KAWeEjtk=
 github.com/antchfx/xpath v1.0.0/go.mod h1:Yee4kTMuNiPYJ7nSNorELQMr1J33uOpXDMByNYhvtNk=
+github.com/bmatsuo/lmdb-go v1.8.0 h1:ohf3Q4xjXZBKh4AayUY4bb2CXuhRAI8BYGlJq08EfNA=
+github.com/bmatsuo/lmdb-go v1.8.0/go.mod h1:wWPZmKdOAZsl4qOqkowQ1aCrFie1HU8gWloHMCeAUdM=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=

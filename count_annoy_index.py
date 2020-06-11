@@ -25,10 +25,9 @@ import lmdb
 
 URLDBIndex = lmdb.open("./future_urls", readonly=True)
 imageDBIndex = lmdb.open("./future_images", readonly=True)
-analyticsDBIndex = lmdb.open("./future_analytics", readonly=True)
+# analyticsDBIndex = lmdb.open("./future_analytics", readonly=True)
 
-with URLDBIndex.begin() as urlDBTransaction, imageDBIndex.begin(
-) as imageDBTransaction, analyticsDBIndex.begin() as analyticsDBTransaction:
+with URLDBIndex.begin() as urlDBTransaction, imageDBIndex.begin() as imageDBTransaction:#, analyticsDBIndex.begin() as analyticsDBTransaction:
     print(urlDBTransaction.stat()["entries"])
     print(imageDBTransaction.stat()["entries"])
-    print(analyticsDBTransaction.stat()["entries"])
+    # print(analyticsDBTransaction.stat()["entries"])

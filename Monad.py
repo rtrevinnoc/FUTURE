@@ -31,6 +31,7 @@ from scipy.spatial import distance
 from itertools import tee, islice, chain
 from nltk.corpus import wordnet
 from SPARQLWrapper import SPARQLWrapper, JSON
+from polyglot.detect import Detector
 
 import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, pyqrcode, lmdb, hnswlib, time, bson, requests
 bson.loads = bson.BSON.decode
@@ -43,7 +44,6 @@ sparql.setTimeout(3)
 gloveVectors = KeyedVectors.load_word2vec_format("./glove.6B/glove.6B.50d.txt",
                                                  binary=False)
 gloveVectors.init_sims()
-normalizedGloveVectors: np.ndarray = gloveVectors.vectors_norm
 gloveVocabulary: dict = gloveVectors.vocab
 
 stopWords: List[str] = [
@@ -121,48 +121,13 @@ def decodeToUnicodeString(bytestring: bytes) -> str:
     return base64.b64decode(bytestring).decode("utf-8")
 
 
-def divideInTrigrams(someIterable: Iterable[Any]) -> Iterable[Iterable[Any]]:
-    """
-      Parameters:
-      1. someIterable - an iterable object
-
-      What the function does?
-      -----------------------
-      Divides <<iterable>> in windows of 3, such as [1,2,3] becoming [[None, 1, 2], [1,2,3], [2, 3, None]]
-
-      Returns:
-      ---------
-      A decomposed <<iterable>> as an iterable composed of [previous, current, next] for each <<current> in <<iterable>>
-   """
-
-    prevs, items, nexts = tee(someIterable, 3)
-    return zip(chain([None], prevs), items,
-               chain(islice(nexts, 1, None), [None]))
+def returnListInPairs(someIterable: list) -> list:
+    it = iter(someIterable)
+    return [x for x in zip(it,it)]
 
 
-def returnInPairsIfItemsContainUnderscore(someIterable: Iterable[str]
-                                          ) -> Iterator[str]:
-    """
-      Parameters:
-      1. someIterable - an iterable object
-
-      What the function does?
-      -----------------------
-      Divides <<iterable>> in pairs for each element if the current element contains an underscore (_), such as returning ["hi", ["current_", "hello"], "hello"] for ["hi", "current_", "hello"]
-
-      Returns:
-      ---------
-      An iterable where elements containing an underscore are joined in a list with its next contiguous element.
-   """
-
-    iterator: Iterator[str] = iter(someIterable)
-    for element in iterator:
-        if element.endswith("_"):
-            nextElement: str = next(iterator)
-            yield (element + nextElement.replace(" ", "_",
-                                                 (nextElement.count(" ") - 1)))
-        else:
-            yield element
+def returnUnpackedListOfTrigrams(someIterable: list) -> list:
+    return [(x,y[0],y[1]) for x,y in someIterable]
 
 
 def tokenizeSentence(text: str) -> List[str]:
@@ -179,155 +144,50 @@ def tokenizeSentence(text: str) -> List[str]:
       Returns a list of strings of each token
    """
 
-    parsedText: Any = spacyModel(text)
-    list(parsedText.noun_chunks)
-
-    for nounPhrase in list(parsedText.noun_chunks):
-        nounPhrase.merge(nounPhrase.root.tag_, nounPhrase.root.lemma_,
-                         nounPhrase.root.ent_type_)
-
-    stringAndType: List[Tuple[Any, Any]] = [(token.text, token.pos_)
-                                            for token in parsedText]
-    newTokens: List[str] = []
-    for (previous, current, _) in divideInTrigrams(stringAndType):
-        try:
-            if current[1] == "PROPN" and " " in current[0]:
-                newTokens.append(current[0].replace(" ", "_"))
-            elif current[1] == "PUNCT":
-                pass
-            elif current[1] == "NOUN":
-                newParsedText = spacyModel(current[0])
-                for (innerPrevious, innerCurrent, _) in divideInTrigrams([
-                    (token.text, token.pos_) for token in newParsedText
-                ]):
-                    if innerCurrent[1] == "PROPN" and innerPrevious[
-                            1] == "PROPN":
-                        newTokens.pop(-1)
-                        newTokens.append(innerPrevious[0] + "_" +
-                                         innerCurrent[0])
-                    elif innerCurrent[0] == newTokens[-1]:
-                        newTokens.pop(-1)
-                else:
-                    newTokens.append(innerCurrent[0])
-            elif current[0].startswith("'") or current[0].startswith("n'"):
-                newTokens.pop(-1)
-                newTokens.append(previous[0] + current[0])
-            else:
-                newTokens.append(current[0])
-        except:
-            newTokens.append(current[0])
-
-    newTokensWithoutUnderscore: List[str] = [
-        x.replace(" ", "_")
-        for x in returnInPairsIfItemsContainUnderscore(newTokens)
-    ]
-    lastPass: List[str] = []
-    for (previous, current, _) in divideInTrigrams([
-            token.text
-            for token in spacyModel(" ".join(newTokensWithoutUnderscore))
-    ]):
-        try:
-            if current.startswith(previous) and current != previous:
-                lastPass.append(current.replace(previous + "_", "", 1))
-            else:
-                lastPass.append(current)
-        except:
-            lastPass.append(current)
-    return [word for word in lastPass if not word in stopWords]
+    return [word.text for word in spacyModel(text) if not word.text in stopWords]
 
 
 def getWordChunkVector(sentence: str) -> np.array:
     words: List[str] = tokenizeSentence(sentence)
-    normalizedWordVectors = []
+    wordVectors = []
     for word in words:
         try:
-            normalizedWordVectors.append(
-                normalizedGloveVectors[gloveVocabulary[word].index])
+            wordVectors.append(gloveVectors[word])
         except:
             pass
-    return gensim.matutils.unitvec(
-        np.array(normalizedWordVectors).mean(axis=0)).astype(np.float32)
+    if len(wordVectors) > 0:
+        return np.array(wordVectors).mean(axis=0).astype(np.float32)
+    else:
+        return np.array([])
 
 
 def getSentenceMeanVector(sentence: str) -> np.array:
     words = tokenizeSentence(sentence)
-    normalizedWordVectors = []
+    wordVectors = []
     for word in words:
         word = re.sub(r"\W", "", word)
         try:
-            normalizedWordVectors.append(
-                normalizedGloveVectors[gloveVocabulary[word].index])
+            wordVectors.append(gloveVectors[word])
         except:
             try:
-                internalNormalizedWordVectors = []
-                for x in word.split("_"):
-                    internalNormalizedWordVectors.append(
-                        normalizedGloveVectors[gloveVocabulary[x].index])
-                    normalizedWordVectors.append(
-                        gensim.matutils.unitvec(
-                            np.array(internalNormalizedWordVectors).mean(
-                                axis=0)).astype(np.float32))
+                wordVectors.append(
+                    getWordChunkVector(
+                        wordnet.synsets(word)[0].definition()))
             except:
                 try:
-                    normalizedWordVectors.append(
-                        getWordChunkVector(
-                            wordnet.synsets(word)[0].definition()))
+                    wordVectors.append(
+                        getWordChunkVector(getDefinitionFromDBPedia(word)))
                 except:
-                    try:
-                        normalizedWordVectors.append(
-                            getWordChunkVector(getDefinitionFromDBPedia(word)))
-                    except:
-                        pass
-    return gensim.matutils.unitvec(
-        np.array(normalizedWordVectors).mean(axis=0)).astype(np.float32)
+                    pass
+    if len(wordVectors) > 0:
+        return np.array(wordVectors).mean(axis=0).astype(np.float32)
+    else:
+        return np.array([])
 
 
 locationVector: np.array = getSentenceMeanVector(
     "location country city place landmark land monument sculpture building structure"
 )
-
-
-def getTextVectors(text: str) -> list:
-    sentences: List[str] = sent_tokenize(text)
-    tokenizedSentences: List[List[str]] = [
-        tokenizeSentence(sentence) for sentence in sentences
-    ]
-    normalizedWordVectors = []
-    for words in tokenizedSentences:
-        internalNormalizedWordVectors = []
-        for word in words:
-            word = word.lower()
-            try:
-                internalNormalizedWordVectors.append(
-                    normalizedGloveVectors[gloveVocabulary[word].index])
-            except:
-                try:
-                    moreInternalNormalizedVectors = []
-                    for x in word.split("_"):
-                        moreInternalNormalizedVectors.append(
-                            normalizedGloveVectors[gloveVocabulary[x].index])
-                        internalNormalizedWordVectors.append(
-                            gensim.matutils.unitvec(
-                                np.array(moreInternalNormalizedVectors).mean(
-                                    axis=0)).astype(np.float32))
-                except:
-                    try:
-                        internalNormalizedWordVectors.append(
-                            getSentenceMeanVector(
-                                wordnet.synsets(word)[0].definition()))
-                    except:
-                        try:
-                            internalNormalizedWordVectors.append(
-                                getSentenceMeanVector(
-                                    getDefinitionFromDBPedia(word)))
-                        except:
-                            pass
-        if internalNormalizedWordVectors != []:
-            normalizedWordVectors.append(
-                np.array(internalNormalizedWordVectors).mean(axis=0))
-        else:
-            normalizedWordVectors.append("None")
-    return [normalizedWordVectors, sentences]
 
 
 def encodeURLAsNumber(url: str, id: Any) -> bytes:
@@ -347,9 +207,9 @@ def encodeURLAsNumber(url: str, id: Any) -> bytes:
 
     text = str(id) + ":" + url
     text = [code for code in text.encode("ascii")]
-    return (str(
-        sum([y * (128**x) for x, y in enumerate(text, start=-len(text) + 1)
-             ])).replace(".", "8").encode("utf-8"))
+    return str(
+        sum([y * (128**x) for x, y in enumerate(text, start=-len(text))
+             ])).replace("0.", "8").encode("utf-8")
 
 
 def isLocation(vec: np.array) -> bool:
@@ -548,6 +408,13 @@ def escapeHTMLString(string: str) -> str:
         return None
 
 
+def inferLanguage(string: str) -> str:
+    try:
+        return Detector(query).language.name
+    except:
+        return "Undefined"
+
+
 class Monad():
     def __init__(self, database: str, mapSize=int(1e12)):
         np.random.seed(0)
@@ -582,20 +449,20 @@ class Monad():
             print(databaseTransaction.stat()["entries"])
             databaseSelector = databaseTransaction.cursor()
             for key, value in databaseSelector:
-                try:
-                    self.index.add_items(
-                        np.array([
-                            np.frombuffer(bson.loads(value)["vec"],
-                                          dtype="float32")
-                        ]),
-                        np.array([int(key.decode("utf-8"))]),
-                    )
-                except:
-                    pass
+                print(key.decode("utf-8"))
+                self.index.add_items(
+                    np.array([
+                        np.frombuffer(bson.loads(value)["vec"],
+                                      dtype="float32")
+                    ]),
+                    np.array([int(key.decode("utf-8"))]),
+                )
 
-    def addElementToIndex(self, key, element):
-        with self.database.begin(write=True) as databaseTransaction:
-            databaseTransaction.put(key, element)
+    def beginTransaction(self, writePermission=True):
+        return self.database.begin(write=writePermission)
+
+    def addElementToIndex(self, key, element, databaseTransaction):
+        databaseTransaction.put(key, element)
 
     def searchIndex(self, term: np.ndarray, number, page: int) -> dict:
         with self.database.begin() as databaseTransaction:
@@ -603,6 +470,7 @@ class Monad():
             totalItems = number * page
             if totalItems <= databaseLimit:
                 vectorIds, vectorScores = self.index.knn_query(term, k=totalItems)
+                print(vectorIds)
             else:
                 raise ValueError("Number of items to fetch higher than items in database.")
 

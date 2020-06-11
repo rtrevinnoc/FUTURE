@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/antchfx/htmlquery v1.0.0
+	github.com/bmatsuo/lmdb-go v1.8.0
 	github.com/gocolly/colly/v2 v2.0.1
 	gonum.org/v1/gonum v0.7.0
 	gonum.org/v1/hdf5 v0.0.0-20200504100616-496fefe91614
