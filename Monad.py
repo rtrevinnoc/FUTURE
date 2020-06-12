@@ -131,22 +131,13 @@ def returnUnpackedListOfTrigrams(someIterable: list) -> list:
 
 
 def tokenizeSentence(text: str) -> List[str]:
-    """
-      Parameters:
-      1. text - a string
-
-      What the function does?
-      -----------------------
-      Divides <<text>> in tokens for use in FUTURE, while intelligently joining phrasal nouns, such as "Rage Against The Machine"
-
-      Returns:
-      ---------
-      Returns a list of strings of each token
-   """
-
-    return [
-        word.text for word in spacyModel(text) if not word.text in stopWords
-    ]
+    try:
+        return [
+            word.text for word in spacyModel(text)
+            if not word.text in stopWords
+        ]
+    except:
+        return []
 
 
 def getWordChunkVector(sentence: str) -> np.array:
