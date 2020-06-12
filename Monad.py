@@ -123,11 +123,11 @@ def decodeToUnicodeString(bytestring: bytes) -> str:
 
 def returnListInPairs(someIterable: list) -> list:
     it = iter(someIterable)
-    return [x for x in zip(it,it)]
+    return [x for x in zip(it, it)]
 
 
 def returnUnpackedListOfTrigrams(someIterable: list) -> list:
-    return [(x,y[0],y[1]) for x,y in someIterable]
+    return [(x, y[0], y[1]) for x, y in someIterable]
 
 
 def tokenizeSentence(text: str) -> List[str]:
@@ -144,7 +144,9 @@ def tokenizeSentence(text: str) -> List[str]:
       Returns a list of strings of each token
    """
 
-    return [word.text for word in spacyModel(text) if not word.text in stopWords]
+    return [
+        word.text for word in spacyModel(text) if not word.text in stopWords
+    ]
 
 
 def getWordChunkVector(sentence: str) -> np.array:
@@ -171,8 +173,7 @@ def getSentenceMeanVector(sentence: str) -> np.array:
         except:
             try:
                 wordVectors.append(
-                    getWordChunkVector(
-                        wordnet.synsets(word)[0].definition()))
+                    getWordChunkVector(wordnet.synsets(word)[0].definition()))
             except:
                 try:
                     wordVectors.append(
@@ -469,10 +470,12 @@ class Monad():
             databaseLimit = databaseTransaction.stat()["entries"]
             totalItems = number * page
             if totalItems <= databaseLimit:
-                vectorIds, vectorScores = self.index.knn_query(term, k=totalItems)
+                vectorIds, vectorScores = self.index.knn_query(term,
+                                                               k=totalItems)
                 print(vectorIds)
             else:
-                raise ValueError("Number of items to fetch higher than items in database.")
+                raise ValueError(
+                    "Number of items to fetch higher than items in database.")
 
             if page > 1:
                 lowerLimit = number * (page - 1)
@@ -489,6 +492,7 @@ class Monad():
                 "vectorScores":
                 vectorScores[0][lowerLimit:totalItems]
             }
+
 
 # newTokenizedSentences = []
 

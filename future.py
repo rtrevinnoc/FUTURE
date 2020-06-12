@@ -426,10 +426,10 @@ def _midnightcypher():
             for image in imageVectorIds[0]
         ]  # [:n_imgs]]
 
-    return jsonify(
-        result={
-            "images": imagesBinaryDictionary,
-        })
+    return jsonify(result={
+        "images": imagesBinaryDictionary,
+    })
+
 
 @app.route("/sourcery", methods=["GET", "POST"])
 @login_required

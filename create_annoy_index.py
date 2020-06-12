@@ -57,6 +57,8 @@ print(labels)
 print(distances)
 with imageDBIndex.begin() as imageDBTransaction:
     for image in labels[0]:
-        print(bson.loads(imageDBTransaction.get(str(image).encode("utf-8")))["url"])
+        print(
+            bson.loads(imageDBTransaction.get(
+                str(image).encode("utf-8")))["url"])
 
 hnswImagesLookup.save_index("FUTURE_images_vecs.bin")

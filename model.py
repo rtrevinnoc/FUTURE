@@ -45,12 +45,12 @@ class EncoderCNN(nn.Module):
 
 class DecoderRNN(nn.Module):
     def __init__(
-            self,
-            embeddingLayerSize: int,
-            hiddenLayerSize: int,
-            vocabularySize: int,
-            numberOfLayers: int,
-            MaxSequenceLength: int = 20,
+        self,
+        embeddingLayerSize: int,
+        hiddenLayerSize: int,
+        vocabularySize: int,
+        numberOfLayers: int,
+        MaxSequenceLength: int = 20,
     ):
         """Set the hyper-parameters and build the layers."""
         super(DecoderRNN, self).__init__()

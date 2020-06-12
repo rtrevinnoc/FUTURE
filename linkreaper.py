@@ -35,6 +35,7 @@ import bson
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
 
+
 def getPropertyFromHTMLResponse(response, property: str) -> str:
     if property == "header":
         webPageProperty = response.css("h1 ::text").getall()
@@ -44,11 +45,8 @@ def getPropertyFromHTMLResponse(response, property: str) -> str:
         return " ".join(
             re.split(
                 "\s+",
-                u" ".join(
-                    response.css(
-                        "p ::text"
-                    ).getall()).strip(),
-                 flags=re.UNICODE,
+                u" ".join(response.css("p ::text").getall()).strip(),
+                flags=re.UNICODE,
             ))
     return " ".join(
         re.split("\s+",
@@ -62,8 +60,8 @@ def getWebpageMeanVector(response) -> list:
     if metaDescription:
         metaTitle: str = response.xpath(
             "//meta[@property='og:title']/@content").extract_first()
-        webPageHeader: str = getPropertyFromHTMLResponse(
-            response, "header").strip()
+        webPageHeader: str = getPropertyFromHTMLResponse(response,
+                                                         "header").strip()
         if metaTitle:
             webPageTopic: str = metaTitle
         else:
@@ -86,17 +84,20 @@ def getWebpageMeanVector(response) -> list:
                                                         "title").strip()
         wholeWebPageText: str = webPageBody + ". " + webPageHeader + ". " + webPageTitle
         return [
-            getSentenceMeanVector(wholeWebPageText),
-            webPageBody,
-            inferLanguage(wholeWebPageText),
-            webPageHeader
+            getSentenceMeanVector(wholeWebPageText), webPageBody,
+            inferLanguage(wholeWebPageText), webPageHeader
         ]
 
 
-def returnDataFromImageTags(someIterable: list) -> list:
+def returnDataFromImageTags(url: str, someIterable: list) -> list:
     anotherIterable = []
     for imageTag in someIterable:
-        anotherIterable.append((imageTag.xpath("@src").get(), imageTag.xpath("@alt").get()))
+        src = imageTag.xpath("@src").get()
+        alt = imageTag.xpath("@alt").get()
+        if src.startswith("/"):
+            anotherIterable((str(urljoin(url, urlparse(url).path) + src), alt))
+        else:
+            anotherIterable.append((src, alt))
     return anotherIterable
 
 
@@ -126,20 +127,25 @@ class Indexer(scrapy.Spider):
         "AJAXCRAWL_ENABLED": True
     }
 
-    start_urls = ["https://www.wsj.com/"]
+    start_urls = ["https://www.wired.com/"]
 
     def parse(self, response) -> Iterator:
         url = response.request.url
         webPageVector = getWebpageMeanVector(response)
         if webPageVector[0].size == 50:
             webPageSummaryVector = webPageVector[0]
-            listOfImagesAndDescriptions = [(str(urljoin(url, urlparse(url).path) + imageHTMLTagSource), imageHTMLTagAlt) if imageHTMLTagSource.startswith("/") else (imageHTMLTagSource, imageHTMLTagAlt) for imageHTMLTagSource, imageHTMLTagAlt in returnDataFromImageTags(response.xpath("//img"))]
-            print(returnUnpackedListOfTrigrams(enumerate(listOfImagesAndDescriptions)))
+            listOfImagesAndDescriptions = returnDataFromImageTags(
+                url, response.xpath("//img"))
             ImageDBTransaction = images.begin(write=True)
-            for id, imageLink, imageDescription in returnUnpackedListOfTrigrams(enumerate(listOfImagesAndDescriptions)):
-                imageDescriptionVectorPreliminar = getSentenceMeanVector(imageDescription)
+            for id, imageLink, imageDescription in returnUnpackedListOfTrigrams(
+                    enumerate(listOfImagesAndDescriptions)):
+                imageDescriptionVectorPreliminar = getSentenceMeanVector(
+                    imageDescription)
                 if imageDescriptionVectorPreliminar.size == 50:
-                    imageDescriptionVector = np.array([getSentenceMeanVector(imageDescription), webPageSummaryVector]).mean(axis=0)
+                    imageDescriptionVector = np.array([
+                        getSentenceMeanVector(imageDescription),
+                        webPageSummaryVector
+                    ]).mean(axis=0)
                 else:
                     imageDescriptionVector = webPageSummaryVector
                 print(imageDescriptionVector.tostring())
@@ -147,10 +153,8 @@ class Indexer(scrapy.Spider):
                     ImageDBTransaction.put(
                         encodeURLAsNumber(imageLink, ":image:" + str(id)),
                         bson.dumps({
-                            "vec":
-                            imageDescriptionVector.tostring(),
-                            "url":
-                            imageLink,
+                            "vec": imageDescriptionVector.tostring(),
+                            "url": imageLink,
                         }))
                 except Exception as e:
                     print(e)
@@ -164,8 +168,7 @@ class Indexer(scrapy.Spider):
                     "body": webPageVector[1],
                     "header": webPageVector[3],
                     "url": url
-                }),
-                URLDBTransaction)
+                }), URLDBTransaction)
             URLDBTransaction.commit()
         for href in response.css("a::attr(href)"):
             yield response.follow(href, self.parse)
