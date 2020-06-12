@@ -69,21 +69,20 @@ def getWebpageMeanVector(response) -> list:
 
     if webPageTopic is None:
         wholeWebPageText: str = webPageBody + ". " + webPageHeader + ". " + webPageTitle
-        webPageMeanVector = getSentenceMeanVector(wholeWebPageText)
     else:
-        webPageMeanVector = getSentenceMeanVector(webPageTopic)
-    
+        wholeWebPageText: str = webPageTopic
+
     if metaDescription:
         return [
-            webPageMeanVector,
+            getSentenceMeanVector(wholeWebPageText),
             metaDescription,
-            inferLanguage(metaDescription),
+            inferLanguage(wholeWebPageText),
             webPageHeader,
         ]
     else:
 
         return [
-            webPageMeanVector, webPageBody,
+            getSentenceMeanVector(wholeWebPageText), webPageBody,
             inferLanguage(wholeWebPageText), webPageHeader
         ]
 
@@ -108,7 +107,7 @@ class Indexer(scrapy.Spider):
         "CONCURRENT_REQUESTS_PER_DOMAIN": 25,
         "ROBOTSTXT_OBEY": True,
         "CONCURRENT_ITEMS": 100,
-        "REACTOR_THREADPOOL_MAXSIZE": 400,
+        "REACTOR_THREADPOOL_MAXSIZE": 20,
         # Hides printing item dicts
         "LOG_LEVEL": "INFO",
         "RETRY_ENABLED": False,
@@ -116,13 +115,15 @@ class Indexer(scrapy.Spider):
         # Stops loading page after 5mb
         "DOWNLOAD_MAXSIZE": 100000000,
         # Grabs xpath before site finish loading
-        "DOWNLOAD_FAIL_ON_DATALOSS": False,
-        "DOWNLOAD_DELAY": 2.0,
-        "AUTOTHROTTLE_ENABLED": True,
+        "DOWNLOAD_FAIL_ON_DATALOSS": True,
+        # "DOWNLOAD_DELAY": 2.0,
+        "AUTOTHROTTLE_ENABLED": False,
         # "JOBDIR": "./indexer_state",
-        # "SCHEDULER_PRIORITY_QUEUE": "scrapy.pqueues.DownloaderAwarePriorityQueue",
+        "SCHEDULER_PRIORITY_QUEUE": "scrapy.pqueues.DownloaderAwarePriorityQueue",
         "COOKIES_ENABLED": False,
-        "DOWNLOAD_TIMEOUT": 30,
+        "DOWNLOAD_TIMEOUT": 45,
+        "SCHEDULER_DISK_QUEUE": 'scrapy.squeues.PickleFifoDiskQueue',
+        "SCHEDULER_MEMORY_QUEUE": 'scrapy.squeues.FifoMemoryQueue',
         "AJAXCRAWL_ENABLED": True
     }
 
