@@ -148,9 +148,12 @@ def getWordChunkVector(sentence: str) -> np.array:
             wordVectors.append(gloveVectors[word])
         except:
             pass
-    if len(wordVectors) > 0:
-        return np.array(wordVectors).mean(axis=0).astype(np.float32)
-    else:
+    try:
+        if len(wordVectors) > 0:
+            return np.array(wordVectors).mean(axis=0).astype(np.float32)
+        else:
+            return np.array([])
+    except:
         return np.array([])
 
 
@@ -171,9 +174,12 @@ def getSentenceMeanVector(sentence: str) -> np.array:
                         getWordChunkVector(getDefinitionFromDBPedia(word)))
                 except:
                     pass
-    if len(wordVectors) > 0:
-        return np.array(wordVectors).mean(axis=0).astype(np.float32)
-    else:
+    try:
+        if len(wordVectors) > 0:
+            return np.array(wordVectors).mean(axis=0).astype(np.float32)
+        else:
+            return np.array([])
+    except:
         return np.array([])
 
 

@@ -57,34 +57,33 @@ def getPropertyFromHTMLResponse(response, property: str) -> str:
 def getWebpageMeanVector(response) -> list:
     metaDescription: str = response.xpath(
         "//meta[@property='og:description']/@content").extract_first()
-    if metaDescription:
-        metaTitle: str = response.xpath(
-            "//meta[@property='og:title']/@content").extract_first()
-        webPageHeader: str = getPropertyFromHTMLResponse(response,
-                                                         "header").strip()
-        if metaTitle:
-            webPageTopic: str = metaTitle
-        else:
-            webPageTitle: str = getPropertyFromHTMLResponse(response,
-                                                            "title").strip()
-            webPageTopic: str = webPageHeader + ". " + webPageTitle
+    webPageBody: str = getPropertyFromHTMLResponse(response, "body").strip()
+    webPageHeader: str = getPropertyFromHTMLResponse(response, "header").strip()
+    webPageTitle: str = getPropertyFromHTMLResponse(response, "title").strip()
+    metaTitle: str = response.xpath("//meta[@property='og:title']/@content").extract_first()
 
+    if metaTitle:
+        webPageTopic: str = metaTitle
+    else:
+        webPageTopic: str = webPageHeader + ". " + webPageTitle
+
+    if webPageTopic is None:
+        wholeWebPageText: str = webPageBody + ". " + webPageHeader + ". " + webPageTitle
+        webPageMeanVector = getSentenceMeanVector(wholeWebPageText)
+    else:
+        webPageMeanVector = getSentenceMeanVector(webPageTopic)
+    
+    if metaDescription:
         return [
-            getSentenceMeanVector(webPageTopic),
+            webPageMeanVector,
             metaDescription,
             inferLanguage(metaDescription),
             webPageHeader,
         ]
     else:
-        webPageBody: str = getPropertyFromHTMLResponse(response,
-                                                       "body").strip()
-        webPageHeader: str = getPropertyFromHTMLResponse(response,
-                                                         "header").strip()
-        webPageTitle: str = getPropertyFromHTMLResponse(response,
-                                                        "title").strip()
-        wholeWebPageText: str = webPageBody + ". " + webPageHeader + ". " + webPageTitle
+
         return [
-            getSentenceMeanVector(wholeWebPageText), webPageBody,
+            webPageMeanVector, webPageBody,
             inferLanguage(wholeWebPageText), webPageHeader
         ]
 
@@ -95,7 +94,7 @@ def returnDataFromImageTags(url: str, someIterable: list) -> list:
         src = imageTag.xpath("@src").get()
         alt = imageTag.xpath("@alt").get()
         if src.startswith("/"):
-            anotherIterable((str(urljoin(url, urlparse(url).path) + src), alt))
+            anotherIterable.append((str(urljoin(url, urlparse(url).path) + src), alt))
         else:
             anotherIterable.append((src, alt))
     return anotherIterable
@@ -148,7 +147,6 @@ class Indexer(scrapy.Spider):
                     ]).mean(axis=0)
                 else:
                     imageDescriptionVector = webPageSummaryVector
-                print(imageDescriptionVector.tostring())
                 try:
                     ImageDBTransaction.put(
                         encodeURLAsNumber(imageLink, ":image:" + str(id)),
