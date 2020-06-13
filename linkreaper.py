@@ -121,7 +121,7 @@ class Indexer(scrapy.Spider):
         # "JOBDIR": "./indexer_state",
         "SCHEDULER_PRIORITY_QUEUE": "scrapy.pqueues.DownloaderAwarePriorityQueue",
         "COOKIES_ENABLED": False,
-        "DOWNLOAD_TIMEOUT": 45,
+        "DOWNLOAD_TIMEOUT": 60,
         "SCHEDULER_DISK_QUEUE": 'scrapy.squeues.PickleFifoDiskQueue',
         "SCHEDULER_MEMORY_QUEUE": 'scrapy.squeues.FifoMemoryQueue',
         "AJAXCRAWL_ENABLED": True
