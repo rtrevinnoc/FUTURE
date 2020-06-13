@@ -408,7 +408,7 @@ def escapeHTMLString(string: str) -> str:
 
 def inferLanguage(string: str) -> str:
     try:
-        return Detector(query).language.name
+        return Detector(string).language.name
     except:
         return "Undefined"
 
