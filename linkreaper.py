@@ -143,7 +143,7 @@ class Indexer(scrapy.Spider):
                     imageDescription)
                 if imageDescriptionVectorPreliminar.size == 50:
                     imageDescriptionVector = np.array([
-                        getSentenceMeanVector(imageDescription),
+                        imageDescriptionVectorPreliminar,
                         webPageSummaryVector
                     ]).mean(axis=0)
                 else:
