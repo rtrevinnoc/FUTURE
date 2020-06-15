@@ -250,7 +250,7 @@ class User(UserMixin):
         })
         msg = Message(
             self.name + ", your FUTURE account has been created",
-            sender="rtrevinnoc@hotmail.com",
+            sender="no-reply@wearebuildingthefuture.com",
             recipients=[self.email],
         )
         msg.html = open("./templates/confirmation.html",
