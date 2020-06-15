@@ -54,17 +54,23 @@ def getPropertyFromHTMLResponse(response, property: str) -> str:
                  flags=re.UNICODE))
 
 
-def getWebpageMeanVector(response) -> list:
+def getWebpageMeanVector(response, url) -> list:
     metaDescription: str = response.xpath(
         "//meta[@property='og:description']/@content").extract_first()
     webPageBody: str = getPropertyFromHTMLResponse(response, "body").strip()
     webPageHeader: str = getPropertyFromHTMLResponse(response, "header").strip()
     webPageTitle: str = getPropertyFromHTMLResponse(response, "title").strip()
     metaTitle: str = response.xpath("//meta[@property='og:title']/@content").extract_first()
+    webPageDomain: str = response.xpath("//meta[@property='og:site_name']/@content").extract_first()
 
     if metaTitle:
+        finalWebPageHeader: str = metaTitle
         webPageTopic: str = metaTitle
     else:
+        if webPageHeader:
+            finalWebPageHeader: str = webPageHeader
+        else:
+            finalWebPageHeader: str = webPageTitle
         webPageTopic: str = webPageHeader + ". " + webPageTitle
 
     if webPageTopic is None:
@@ -72,18 +78,23 @@ def getWebpageMeanVector(response) -> list:
     else:
         wholeWebPageText: str = webPageTopic
 
+    if not finalWebPageHeader and webPageDomain:
+        finalWebPageHeader: str = webPageDomain
+    else:
+        finalWebPageHeader: str = tldextract.extract(url).domain.upper()
+
     if metaDescription:
         return [
             getSentenceMeanVector(wholeWebPageText),
             metaDescription,
             inferLanguage(wholeWebPageText),
-            webPageHeader,
+            finalWebPageHeader,
         ]
     else:
 
         return [
             getSentenceMeanVector(wholeWebPageText), webPageBody,
-            inferLanguage(wholeWebPageText), webPageHeader
+            inferLanguage(wholeWebPageText), finalWebPageHeader
         ]
 
 
@@ -131,7 +142,8 @@ class Indexer(scrapy.Spider):
 
     def parse(self, response) -> Iterator:
         url = response.request.url
-        webPageVector = getWebpageMeanVector(response)
+        webPageVector = getWebpageMeanVector(response, url)
+        print(webPageVector[3])
         if webPageVector[0].size == 50:
             webPageSummaryVector = webPageVector[0]
             listOfImagesAndDescriptions = returnDataFromImageTags(

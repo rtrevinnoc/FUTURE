@@ -37,7 +37,6 @@ with imageDBIndex.begin() as imageDBTransaction:
     imageDBSelector = imageDBTransaction.cursor()
     for key, value in imageDBSelector:
         value = bson.loads(value)
-        print(key, value)
         try:
             hnswImagesLookup.add_items(
                 np.array([np.frombuffer(value["vec"], dtype="float32")]),
@@ -47,6 +46,7 @@ with imageDBIndex.begin() as imageDBTransaction:
             pass
 
 search = futureURLs.searchIndex(getSentenceMeanVector("web hosting"), 5, 1)
+print(search["results"])
 print(search["vectorIds"])
 print(search["vectorScores"])
 futureURLs.saveIndex()
@@ -55,10 +55,4 @@ labels, distances = hnswImagesLookup.knn_query(
     getSentenceMeanVector("web hosting"), k=5)
 print(labels)
 print(distances)
-with imageDBIndex.begin() as imageDBTransaction:
-    for image in labels[0]:
-        print(
-            bson.loads(imageDBTransaction.get(
-                str(image).encode("utf-8")))["url"])
-
 hnswImagesLookup.save_index("FUTURE_images_vecs.bin")

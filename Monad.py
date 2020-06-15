@@ -344,19 +344,33 @@ def getAbstractFromDBPedia(query: str) -> str:
         return "We are still working to provide the full FUTURE experience, of which a summary of the information in the webpages retrieved is crucial, however, being at a research stage, we suggest to select the LINKS section in the sidebar, using the button on the upper-right corner."
 
 
-def getDefinitionFromDBPedia(word: str) -> Any:
+def getDefinitionFromDBPedia(word: str, noUrl: bool = True) -> Any:
     try:
-        sparql.setQuery("""
-         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        if noUrl:
+            sparql.setQuery("""
+             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-         select str(?desc)
-            where {
-              <%s> rdfs:comment ?desc
-              FILTER (langMatches(lang(?desc),"en"))
-            }
-         """ % getResourceFromDBPedia(preprocessSentece(word))["resource"])
-        return sparql.query().convert(
-        )[u"results"][u"bindings"][0][u"callret-0"][u"value"]
+             select str(?desc)
+                where {
+                    <%s> rdfs:comment ?desc
+                    FILTER (langMatches(lang(?desc),"en"))
+                }
+             """ % getResourceFromDBPedia(preprocessSentece(word))["resource"])
+            return sparql.query().convert(
+            )[u"results"][u"bindings"][0][u"callret-0"][u"value"]
+        else:
+            sparql.setQuery("""
+             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+             select str(?desc) str(?url)
+                where {
+                    <%s> rdfs:comment ?desc;
+                    foaf:isPrimaryTopicOf ?url.
+                    FILTER (langMatches(lang(?desc),"en")).
+                }
+             """ % getResourceFromDBPedia(preprocessSentece("Statue of Liberty"))["resource"])
+            response = sparql.query().convert()[u"results"][u"bindings"][0]
+            return {"definition": response[u"callret-0"][u"value"], "url": response["callret-1"][u"value"]}
     except:
         return None
 

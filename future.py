@@ -112,7 +112,6 @@ queryClassifier.train(trainData, trainLabels)
 def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
                  page: int):
     search = FUTURE.searchIndex(q_vec, numberOfURLs, page)
-    print(search["results"])
 
     urls = [{
         "url": escapeHTMLString(url["url"]),
