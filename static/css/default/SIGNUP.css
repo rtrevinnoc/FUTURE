@@ -18,50 +18,50 @@ along with FUTURE.  If not, see <https://www.gnu.org/licenses/>. */
 @import "../color/signup.css";
 
 #title {
-  position: absolute;
-  text-align: center;
-  top: 0px;
-  left: 0;
-  right: 0;
-  line-height: 65px;
-  font-family: 'Source Sans Pro Light';
-  font-size: 40px;
-  font-weight: lighter;
-  word-spacing: 25px;
+	position: absolute;
+	text-align: center;
+	top: 0px;
+	left: 0;
+	right: 0;
+	line-height: 65px;
+	font-family: 'Source Sans Pro Light';
+	font-size: 40px;
+	font-weight: lighter;
+	word-spacing: 25px;
 }
 
 #title a {
-  color: inherit;
-  text-decoration: none;
+	color: inherit;
+	text-decoration: none;
 }
 
 form {
-  position:absolute;
-  width:290px;
-  height:40%;
-  right: 0;
-  left:0;
-  top: 130px;
-  margin: auto;
+	position:absolute;
+	width:290px;
+	height:40%;
+	right: 0;
+	left:0;
+	top: 130px;
+	margin: auto;
 }
 
 #name, #password, #confirmPassword, #email, #sendButton {
-  position: relative;
-  left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  border: 0;
-  width: 100%;
-  max-width: 280px;
-  text-align: center;
-  margin-bottom: 25px;
-  font-size: 30px;
-  padding: 5px;
-  font-family: 'Source Sans Pro Light';
-  font-weight: normal;
+	position: relative;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	border: 0;
+	width: 100%;
+	max-width: 280px;
+	text-align: center;
+	margin-bottom: 25px;
+	font-size: 30px;
+	padding: 5px;
+	font-family: 'Source Sans Pro Light';
+	font-weight: normal;
 }
 
 #name, #password, #confirmPassword, #email {
-  border-bottom: 1px solid #EEEEEE;
+	border-bottom: 1px solid #EEEEEE;
 }

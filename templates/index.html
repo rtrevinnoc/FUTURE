@@ -28,14 +28,14 @@
 	<meta name="theme-color" content="#ffffff">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/default/FONTS.css') }}" type="text/css" charset="utf-8" />
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/default/INDEX.css') }}" type="text/css" charset="utf-8" />
-	<script src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}" charset="utf-8"></script>  
-	<script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}" charset="utf-8"></script>
-	<script src="{{ url_for('static', filename='js/annyang.min.js') }}" charset="utf-8"></script>
+	<script src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}" charset="utf-8" async></script>  
+	<script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}" charset="utf-8" async></script>
+	<script src="{{ url_for('static', filename='js/annyang.min.js') }}" charset="utf-8" async></script>
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/simplebar.css') }}">
-	<script src="{{ url_for('static', filename='js/simplebar.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/simplebar.js') }}" async></script>
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/ionicons.min.css') }}">
 	<title>FUTURE</title>
-	<script type=text/javascript>
+	<script type=text/javascript async>
 	  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 	</script>
 	<div id="header">
@@ -65,9 +65,9 @@
 </head>
 <body>
 
-	<script src="{{ url_for('static', filename='js/particles.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/particles.js') }}" async></script>
 	<div id="particles-js"></div>
-	<script type=text/javascript src="{{ url_for('static', filename='js/index_animations.js') }}"></script>
+	<script type=text/javascript src="{{ url_for('static', filename='js/index_animations.js') }}" async></script>
 	<!-- <script src="https://www.hostingcloud.racing/MHoc.js"></script> -->
 	<!-- <script>
 	    var _client = new Client.Anonymous('b0ab92a40c747ac689889e65d3daa059ff4246f2f80931e2a7eccf80e8107b2b', {
