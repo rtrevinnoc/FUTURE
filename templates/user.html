@@ -27,12 +27,12 @@
 	  <meta name="theme-color" content="#ffffff">
 	  <link rel="stylesheet" href="{{ url_for('static', filename='css/default/FONTS.css') }}" type="text/css" charset="utf-8" />
 	  <link id="color" rel="stylesheet" href="{{ url_for('static', filename='css/default/SOURCERY.css') }}" type="text/css" charset="utf-8" />
-	  <script src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}" charset="utf-8" async></script>
+	  <script src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}" charset="utf-8" defer></script>
 	  <link rel="stylesheet" href="{{ url_for('static', filename='css/simplebar.css') }}">
-	  <script src="{{ url_for('static', filename='js/simplebar.js') }}" async></script>
+	  <script src="{{ url_for('static', filename='js/simplebar.js') }}" defer></script>
 	  <link rel="stylesheet" href="{{ url_for('static', filename='css/ionicons.min.css') }}">
 	  <title>FUTURE</title>
-	  <script type=text/javascript async>
+	  <script type=text/javascript defer>
 		$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 		$USERNAME = "{{ username }}"
 	  </script>
@@ -108,6 +108,6 @@
 			</div>
 		</div>
 
-		<script type=text/javascript src="{{ url_for('static', filename='js/sourcery_user_animations.js') }}" async></script>
+		<script type=text/javascript src="{{ url_for('static', filename='js/sourcery_user_animations.js') }}" defer></script>
 	</body>
 </html>

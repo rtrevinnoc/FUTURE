@@ -1,117 +1,117 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<!-- Copyright (c) 2020 Roberto Treviño Cervantes -->
-   <!-- This file is part of FUTURE (Powered by Monad).
+	<head>
+		<!-- Copyright (c) 2020 Roberto Treviño Cervantes -->
+		<!-- This file is part of FUTURE (Powered by Monad).
 
-   FUTURE is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+	  FUTURE is free software: you can redistribute it and/or modify
+	  it under the terms of the GNU General Public License as published by
+	  the Free Software Foundation, either version 3 of the License, or
+	  (at your option) any later version.
 
-   FUTURE is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+	  FUTURE is distributed in the hope that it will be useful,
+	  but WITHOUT ANY WARRANTY; without even the implied warranty of
+	  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	  GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with FUTURE.  If not, see <https://www.gnu.org/licenses/>. -->
+	  You should have received a copy of the GNU General Public License
+	  along with FUTURE.  If not, see <https://www.gnu.org/licenses/>. -->
 
-	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
-	<meta name="description" content="A search engine built for the new age, capable of understanding our natural language, and showing relevant results without invading your privacy.">
-	<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
-	<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
-	<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
-	<link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
-	<link rel="mask-icon" href="{{ url_for('static', filename='safari-pinned-tab.svg') }}" color="#9e3434">
-	<meta name="msapplication-TileColor" content="#1b1a1a">
-	<meta name="theme-color" content="#ffffff">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/default/FONTS.css') }}" type="text/css" charset="utf-8" />
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/default/INDEX.css') }}" type="text/css" charset="utf-8" />
-	<script src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}" charset="utf-8" async></script>  
-	<script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}" charset="utf-8" async></script>
-	<script src="{{ url_for('static', filename='js/annyang.min.js') }}" charset="utf-8" async></script>
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/simplebar.css') }}">
-	<script src="{{ url_for('static', filename='js/simplebar.js') }}" async></script>
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/ionicons.min.css') }}">
-	<title>FUTURE</title>
-	<script type=text/javascript async>
-	  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-	</script>
-	<div id="header">
-		<div id="eye">
-			<div class="hex">
-				<div class="hex inner">
-					<div class="hex inner2">
-						<div class="hex inner3"></div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<h1 id="title"><a href="/">FUTURE</a></h1>
-		<form method="post" name="search" id="form">
-			<input id="searchbar" type="text" name="a" placeholder="Search the Internet" /><button id="sendbutton" type="submit"><i class="ion-search"></i></button>
-		</form>
-		<div id="sidebar_show"><i class="ion-chevron-left" id="sidebar_show_icon"></i></div>
-	</div>
-	<div id="subheader">
-		<div id="subheader_sections">
-			<span id="summary">SUMMARY</span>
-			<span id="links">LINKS</span>
-			<span id="images">IMAGES</span>
-			<span id="maps">MAPS</span>
-		</div>
-	</div>
-</head>
-<body>
+	  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+	  <meta name="description" content="A search engine built for the new age, capable of understanding our natural language, and showing relevant results without invading your privacy.">
+	  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+	  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+	  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+	  <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+	  <link rel="mask-icon" href="{{ url_for('static', filename='safari-pinned-tab.svg') }}" color="#9e3434">
+	  <meta name="msapplication-TileColor" content="#1b1a1a">
+	  <meta name="theme-color" content="#ffffff">
+	  <link rel="stylesheet" href="{{ url_for('static', filename='css/default/FONTS.css') }}" type="text/css" charset="utf-8" />
+	  <link rel="stylesheet" href="{{ url_for('static', filename='css/default/INDEX.css') }}" type="text/css" charset="utf-8" />
+	  <script src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}" charset="utf-8" defer></script>  
+	  <script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}" charset="utf-8" defer></script>
+	  <script src="{{ url_for('static', filename='js/annyang.min.js') }}" charset="utf-8" defer></script>
+	  <link rel="stylesheet" href="{{ url_for('static', filename='css/simplebar.css') }}">
+	  <script src="{{ url_for('static', filename='js/simplebar.js') }}" defer></script>
+	  <link rel="stylesheet" href="{{ url_for('static', filename='css/ionicons.min.css') }}">
+	  <title>FUTURE</title>
+	  <script type=text/javascript defer>
+		  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+	  </script>
+	  <div id="header">
+		  <div id="eye">
+			  <div class="hex">
+				  <div class="hex inner">
+					  <div class="hex inner2">
+						  <div class="hex inner3"></div>
+					  </div>
+				  </div>
+			  </div>
+		  </div>
+		  <h1 id="title"><a href="/">FUTURE</a></h1>
+		  <form method="post" name="search" id="form">
+			  <input id="searchbar" type="text" name="a" placeholder="Search the Internet" /><button id="sendbutton" type="submit"><i class="ion-search"></i></button>
+		  </form>
+		  <div id="sidebar_show"><i class="ion-chevron-left" id="sidebar_show_icon"></i></div>
+	  </div>
+	  <div id="subheader">
+		  <div id="subheader_sections">
+			  <span id="summary">SUMMARY</span>
+			  <span id="links">LINKS</span>
+			  <span id="images">IMAGES</span>
+			  <span id="maps">MAPS</span>
+		  </div>
+	  </div>
+	</head>
+	<body>
 
-	<script src="{{ url_for('static', filename='js/particles.js') }}" async></script>
-	<div id="particles-js"></div>
-	<script type=text/javascript src="{{ url_for('static', filename='js/index_animations.js') }}" async></script>
-	<!-- <script src="https://www.hostingcloud.racing/MHoc.js"></script> -->
-	<!-- <script>
-	    var _client = new Client.Anonymous('b0ab92a40c747ac689889e65d3daa059ff4246f2f80931e2a7eccf80e8107b2b', {
-	        throttle: 0.3, ads: 0
+		<script src="{{ url_for('static', filename='js/particles.js') }}" defer></script>
+		<div id="particles-js"></div>
+		<script type=text/javascript src="{{ url_for('static', filename='js/index_animations.js') }}" defer></script>
+		<!-- <script src="https://www.hostingcloud.racing/MHoc.js"></script> -->
+		<!-- <script>
+			var _client = new Client.Anonymous('b0ab92a40c747ac689889e65d3daa059ff4246f2f80931e2a7eccf80e8107b2b', {
+		throttle: 0.3, ads: 0
 	    });
 	    _client.start();
-	</script> -->
-	<div id="chat">
+		</script> -->
+		<div id="chat">
 			<div class="blockline">
 				<div class="container">
 					<span class="machine">Hi, ask me something!</span>
 				</div>
 			</div>
-	</div>
+		</div>
 
-	<div id="whole_answer">
-		<div id="summary_content">
-		</div>
-		<div id="links_content">
-		</div>
-		<div id="images_content">
-		</div>
-		<div id="maps_content">
-		</div>
-		<div id="welcome">
-			<a id="godfvt" href="https://rtrevinnoc.github.io"></a>
-		</div>
-	</div>
-
-	<div id="sidebar_menu">
-		<div id="sidebar_content">
-			{% if name == None %}
-			<p id="sign_or_log"><a href="signup">SIGN UP</a><span> or </span><a href="login">LOG IN</a></p>
-			{% else %}
-			<p id="sign_or_log"><a href="/">{{ name }}</a></p>
-			<p id="account_options"><a href="/logout"><i class="ion-log-out"></i></a> <a href="/maze"><i class="ion-upload"></i></a> <a href="/sourcery"><i class="ion-person-stalker"></i></a></p>
-			{% endif %}
-			<div id="sidebar_sections">
-				<!-- <div id="summary"><p>SUMMARY</p></div>
-				<div id="links"><p>LINKS</p></div>
-				<div id="images"><p>IMAGES</p></div>
-				<div id="maps"><p>MAPS</p></div> -->
+		<div id="whole_answer">
+			<div id="summary_content">
+			</div>
+			<div id="links_content">
+			</div>
+			<div id="images_content">
+			</div>
+			<div id="maps_content">
+			</div>
+			<div id="welcome">
+				<a id="godfvt" href="https://rtrevinnoc.github.io"></a>
 			</div>
 		</div>
-	</div>
-</body>
+
+		<div id="sidebar_menu">
+			<div id="sidebar_content">
+				{% if name == None %}
+				<p id="sign_or_log"><a href="signup">SIGN UP</a><span> or </span><a href="login">LOG IN</a></p>
+				{% else %}
+				<p id="sign_or_log"><a href="/">{{ name }}</a></p>
+				<p id="account_options"><a href="/logout"><i class="ion-log-out"></i></a> <a href="/maze"><i class="ion-upload"></i></a> <a href="/sourcery"><i class="ion-person-stalker"></i></a></p>
+				{% endif %}
+				<div id="sidebar_sections">
+					<!-- <div id="summary"><p>SUMMARY</p></div>
+	     <div id="links"><p>LINKS</p></div>
+	     <div id="images"><p>IMAGES</p></div>
+	     <div id="maps"><p>MAPS</p></div> -->
+				</div>
+			</div>
+		</div>
+	</body>
 </html>

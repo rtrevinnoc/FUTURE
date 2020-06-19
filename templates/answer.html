@@ -1,85 +1,85 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<!-- Copyright (c) 2020 Roberto Treviño Cervantes -->
-   <!-- This file is part of FUTURE (Powered by Monad).
+	<head>
+		<!-- Copyright (c) 2020 Roberto Treviño Cervantes -->
+		<!-- This file is part of FUTURE (Powered by Monad).
 
-   FUTURE is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+	  FUTURE is free software: you can redistribute it and/or modify
+	  it under the terms of the GNU General Public License as published by
+	  the Free Software Foundation, either version 3 of the License, or
+	  (at your option) any later version.
 
-   FUTURE is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+	  FUTURE is distributed in the hope that it will be useful,
+	  but WITHOUT ANY WARRANTY; without even the implied warranty of
+	  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	  GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with FUTURE.  If not, see <https://www.gnu.org/licenses/>. -->
+	  You should have received a copy of the GNU General Public License
+	  along with FUTURE.  If not, see <https://www.gnu.org/licenses/>. -->
 
-	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
-	<meta name="description" content="A search engine built for the new age, capable of understanding our natural language, and showing relevant results without invading your privacy.">
-	<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
-	<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
-	<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
-	<link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
-	<link rel="mask-icon" href="{{ url_for('static', filename='safari-pinned-tab.svg') }}" color="#9e3434">
-	<meta name="msapplication-TileColor" content="#1b1a1a">
-	<meta name="theme-color" content="#ffffff">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/default/FONTS.css') }}" type="text/css" charset="utf-8" />
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/default/INDEX.css') }}" type="text/css" charset="utf-8" />
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/simplebar.css') }}">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/ionicons.min.css') }}">
-	<title>FUTURE</title>
-	<script type=text/javascript async>
-	  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-	</script>
-	<div id="header">
-		<div id="eye">
-			<div class="hex">
-				<div class="hex inner">
-					<div class="hex inner2">
-						<div class="hex inner3"></div>
-					</div>
-				</div>
+	  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+	  <meta name="description" content="A search engine built for the new age, capable of understanding our natural language, and showing relevant results without invading your privacy.">
+	  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+	  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+	  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+	  <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+	  <link rel="mask-icon" href="{{ url_for('static', filename='safari-pinned-tab.svg') }}" color="#9e3434">
+	  <meta name="msapplication-TileColor" content="#1b1a1a">
+	  <meta name="theme-color" content="#ffffff">
+	  <link rel="stylesheet" href="{{ url_for('static', filename='css/default/FONTS.css') }}" type="text/css" charset="utf-8" />
+	  <link rel="stylesheet" href="{{ url_for('static', filename='css/default/INDEX.css') }}" type="text/css" charset="utf-8" />
+	  <link rel="stylesheet" href="{{ url_for('static', filename='css/simplebar.css') }}">
+	  <link rel="stylesheet" href="{{ url_for('static', filename='css/ionicons.min.css') }}">
+	  <title>FUTURE</title>
+	  <script type=text/javascript defer>
+		  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+	  </script>
+	  <div id="header">
+		  <div id="eye">
+			  <div class="hex">
+				  <div class="hex inner">
+					  <div class="hex inner2">
+						  <div class="hex inner3"></div>
+					  </div>
+				  </div>
+			  </div>
+		  </div>
+		  <h1 id="title"><a href="/">FUTURE</a></h1>
+		  <form method="post" name="search" id="form">
+			  <input id="searchbar" type="text" name="a" placeholder="Search the Internet" value="{{ previousQuery }}"/>
+			  <button type="submit" name="summary" value="True" id="sendbutton">SUMMARY</button>
+			  <button type="submit" name="links" value="True" id="sendbutton">LINKS</button>
+			  <button type="submit" name="images" value="True" id="sendbutton">IMAGES</button>
+			  <button type="submit" name="maps" value="True" id="sendbutton">MAPS</button>
+		  </form>
+	  </div>
+	</head>
+	<body>
+
+		<div id="whole_answer">
+			<div id="summary_content">
+				{% if section == "summary" %}
+				{{ answer }}
+				{% elif section == "links" %}
+				{% for link in answer %}
+				<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="{{ link['url'] }}">{{ link['domain'] }}</a></span> <span class="header"><a href="{{ link['url'] }}">{{ link['header'] }}</a></span></p><p class="link_paragraph2"><span class="link"><a href="{{ link['url'] }}">{{ link['url'] }}</a></span></p><p>{{ link['body'] }}<p></div>
+				{% endfor %}
+				<form method="post" name="load_more_items">
+					<input type="hidden" name="previous_query" value="{{ previousQuery }}" />
+					<input type="hidden" name="current_page" value="{{ currentPage }}" />
+					<button type="submit" name="last_page" value="True">Last Page</button>
+					<span>{{ currentPage }}</span>
+					<button type="submit" name="next_page" value="True">Next Page</button>
+				</form>
+				{% elif section == "images" %}
+				{% for image in answer %}
+				<div class="grid-item"><img class="image-item" src="{{ image['url'] }}" alt="{{ image['url'] }}"></div>
+				{% endfor %}
+				{% elif section == "maps" %}
+				{{ answer }}
+				{% endif %}
 			</div>
 		</div>
-		<h1 id="title"><a href="/">FUTURE</a></h1>
-		<form method="post" name="search" id="form">
-			<input id="searchbar" type="text" name="a" placeholder="Search the Internet" value="{{ previousQuery }}"/>
-			<button type="submit" name="summary" value="True" id="sendbutton">SUMMARY</button>
-			<button type="submit" name="links" value="True" id="sendbutton">LINKS</button>
-			<button type="submit" name="images" value="True" id="sendbutton">IMAGES</button>
-			<button type="submit" name="maps" value="True" id="sendbutton">MAPS</button>
-		</form>
-	</div>
-</head>
-<body>
 
-	<div id="whole_answer">
-		<div id="summary_content">
-			{% if section == "summary" %}
-			{{ answer }}
-			{% elif section == "links" %}
-			{% for link in answer %}
-			<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="{{ link['url'] }}">{{ link['domain'] }}</a></span> <span class="header"><a href="{{ link['url'] }}">{{ link['header'] }}</a></span></p><p class="link_paragraph2"><span class="link"><a href="{{ link['url'] }}">{{ link['url'] }}</a></span></p><p>{{ link['body'] }}<p></div>
-			{% endfor %}
-			<form method="post" name="load_more_items">
-				<input type="hidden" name="previous_query" value="{{ previousQuery }}" />
-				<input type="hidden" name="current_page" value="{{ currentPage }}" />
-				<button type="submit" name="last_page" value="True">Last Page</button>
-				<span>{{ currentPage }}</span>
-				<button type="submit" name="next_page" value="True">Next Page</button>
-			</form>
-			{% elif section == "images" %}
-			{% for image in answer %}
-			<div class="grid-item"><img class="image-item" src="{{ image['url'] }}" alt="{{ image['url'] }}"></div>
-			{% endfor %}
-			{% elif section == "maps" %}
-			{{ answer }}
-			{% endif %}
-		</div>
-	</div>
-
-</body>
+	</body>
 </html>
