@@ -138,13 +138,13 @@ class Indexer(scrapy.Spider):
         "SCHEDULER_PRIORITY_QUEUE":
         "scrapy.pqueues.DownloaderAwarePriorityQueue",
         "COOKIES_ENABLED": False,
-        "DOWNLOAD_TIMEOUT": 120,
+        "DOWNLOAD_TIMEOUT": 60,
         "SCHEDULER_DISK_QUEUE": 'scrapy.squeues.PickleFifoDiskQueue',
         "SCHEDULER_MEMORY_QUEUE": 'scrapy.squeues.FifoMemoryQueue',
         "AJAXCRAWL_ENABLED": True
     }
 
-    start_urls = ["https://techcrunch.com/"]
+    start_urls = ["https://www.wsj.com/"]
 
     def parse(self, response) -> Iterator:
         url = response.request.url

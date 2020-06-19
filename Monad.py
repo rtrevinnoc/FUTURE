@@ -404,10 +404,7 @@ def createMap(query: str) -> str:
     return mapObject._repr_html_().replace(
         '<div style="position:relative;width:100%;height:0;padding-bottom:60%;">',
         ''
-    ).replace("</iframe></div>", "</iframe>").replace(
-        "atob(this.getAttribute('data-html'))",
-        "atob(this.getAttribute('data-html')).replace('marker-icon.png', 'https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/images/marker-icon.png')"
-    )
+    ).replace("</iframe></div>", "</iframe>")
 
 
 def getMap(alternateQuery: str, query: str) -> str:
