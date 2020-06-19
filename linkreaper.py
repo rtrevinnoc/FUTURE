@@ -131,7 +131,7 @@ class Indexer(scrapy.Spider):
         # Stops loading page after 5mb
         "DOWNLOAD_MAXSIZE": 100000000,
         # Grabs xpath before site finish loading
-        "DOWNLOAD_FAIL_ON_DATALOSS": True,
+        "DOWNLOAD_FAIL_ON_DATALOSS": False,
         # "DOWNLOAD_DELAY": 2.0,
         "AUTOTHROTTLE_ENABLED": False,
         # "JOBDIR": "./indexer_state",
