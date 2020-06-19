@@ -58,10 +58,13 @@ def getWebpageMeanVector(response, url) -> list:
     metaDescription: str = response.xpath(
         "//meta[@property='og:description']/@content").extract_first()
     webPageBody: str = getPropertyFromHTMLResponse(response, "body").strip()
-    webPageHeader: str = getPropertyFromHTMLResponse(response, "header").strip()
+    webPageHeader: str = getPropertyFromHTMLResponse(response,
+                                                     "header").strip()
     webPageTitle: str = getPropertyFromHTMLResponse(response, "title").strip()
-    metaTitle: str = response.xpath("//meta[@property='og:title']/@content").extract_first()
-    webPageDomain: str = response.xpath("//meta[@property='og:site_name']/@content").extract_first()
+    metaTitle: str = response.xpath(
+        "//meta[@property='og:title']/@content").extract_first()
+    webPageDomain: str = response.xpath(
+        "//meta[@property='og:site_name']/@content").extract_first()
 
     if metaTitle:
         finalWebPageHeader: str = metaTitle
@@ -104,7 +107,9 @@ def returnDataFromImageTags(url: str, someIterable: list) -> list:
         src = imageTag.xpath("@src").get()
         alt = imageTag.xpath("@alt").get()
         if src.startswith("/"):
-            anotherIterable.append((str(urljoin(url, urlparse(url).path) + src), alt))
+            anotherIterable.append(
+                (str(urljoin(url,
+                             urlparse(url).path) + src), alt))
         else:
             anotherIterable.append((src, alt))
     return anotherIterable
@@ -130,7 +135,8 @@ class Indexer(scrapy.Spider):
         # "DOWNLOAD_DELAY": 2.0,
         "AUTOTHROTTLE_ENABLED": False,
         # "JOBDIR": "./indexer_state",
-        "SCHEDULER_PRIORITY_QUEUE": "scrapy.pqueues.DownloaderAwarePriorityQueue",
+        "SCHEDULER_PRIORITY_QUEUE":
+        "scrapy.pqueues.DownloaderAwarePriorityQueue",
         "COOKIES_ENABLED": False,
         "DOWNLOAD_TIMEOUT": 120,
         "SCHEDULER_DISK_QUEUE": 'scrapy.squeues.PickleFifoDiskQueue',
@@ -155,8 +161,7 @@ class Indexer(scrapy.Spider):
                     imageDescription)
                 if imageDescriptionVectorPreliminar.size == 50:
                     imageDescriptionVector = np.array([
-                        imageDescriptionVectorPreliminar,
-                        webPageSummaryVector
+                        imageDescriptionVectorPreliminar, webPageSummaryVector
                     ]).mean(axis=0)
                 else:
                     imageDescriptionVector = webPageSummaryVector

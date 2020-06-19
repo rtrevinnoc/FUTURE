@@ -368,9 +368,13 @@ def getDefinitionFromDBPedia(word: str, noUrl: bool = True) -> Any:
                     foaf:isPrimaryTopicOf ?url.
                     FILTER (langMatches(lang(?desc),"en")).
                 }
-             """ % getResourceFromDBPedia(preprocessSentece("Statue of Liberty"))["resource"])
+             """ % getResourceFromDBPedia(
+                preprocessSentece("Statue of Liberty"))["resource"])
             response = sparql.query().convert()[u"results"][u"bindings"][0]
-            return {"definition": response[u"callret-0"][u"value"], "url": response["callret-1"][u"value"]}
+            return {
+                "definition": response[u"callret-0"][u"value"],
+                "url": response["callret-1"][u"value"]
+            }
     except:
         return None
 
@@ -399,7 +403,11 @@ def createMap(query: str) -> str:
                       popup=location.address))
     return mapObject._repr_html_().replace(
         '<div style="position:relative;width:100%;height:0;padding-bottom:60%;">',
-        '').replace("</iframe></div>", "</iframe>").replace("marker-icon.png", "/marker-icon.png")
+        ''
+    ).replace("</iframe></div>", "</iframe>").replace(
+        "atob(this.getAttribute('data-html'))",
+        "atob(this.getAttribute('data-html')).replace('marker-icon.png', 'https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/images/marker-icon.png')"
+    )
 
 
 def getMap(alternateQuery: str, query: str) -> str:
