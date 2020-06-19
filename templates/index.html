@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<!-- Copyright (c) 2020 Roberto Treviño Cervantes -->
 		<!-- This file is part of FUTURE (Powered by Monad).
@@ -50,7 +50,8 @@
 		  </div>
 		  <h1 id="title"><a href="/">FUTURE</a></h1>
 		  <form method="post" name="search" id="form">
-			  <input id="searchbar" type="text" name="a" placeholder="Search the Internet" /><button id="sendbutton" type="submit"><i class="ion-search"></i></button>
+			  <input id="searchbar" type="text" name="a" placeholder="Search the Internet" /><button id="sendbutton" type="submit" aria-label="Perform query"><i class="ion-search"></i></button>
+			  <label for="a">Search bar</label>
 		  </form>
 		  <div id="sidebar_show"><i class="ion-chevron-left" id="sidebar_show_icon"></i></div>
 	  </div>
@@ -113,5 +114,12 @@
 				</div>
 			</div>
 		</div>
+		<script>
+			if('serviceWorker' in navigator) {
+				navigator.serviceWorker
+					.register('/sw.js')
+					.then(function() { console.log("Service Worker Registered"); });
+			}
+		</script>
 	</body>
 </html>

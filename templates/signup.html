@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<!-- Copyright (c) 2020 Roberto Treviño Cervantes -->
 		<!-- This file is part of FUTURE (Powered by Monad).
@@ -53,7 +53,7 @@
 			{{ login.password(size=65, id="password", class="loginInput", placeholder="Password") }}
 			{{ login.confirmPassword(size=65, id="confirmPassword", class="loginInput", placeholder="Confirm password") }}
 			{{ login.email(size=65, id="email", class="loginInput", placeholder="Email") }}
-			<button id="sendButton" type="submit"><i id="login" class="ion-log-in"></i></button>
+			<button id="sendButton" type="submit" aria-label="Sign Up"><i id="login" class="ion-log-in"></i></button>
 			{% endblock %}
 		</form>
 

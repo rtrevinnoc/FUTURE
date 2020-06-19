@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<!-- Copyright (c) 2020 Roberto Treviño Cervantes -->
 		<!-- This file is part of FUTURE (Powered by Monad).
@@ -52,7 +52,7 @@
 			{{ login.hidden_tag() }}
 			{{ login.name(size=65, id="name", class="login_input", placeholder="Name") }}
 			{{ login.password(size=65, id="password", class="login_input", placeholder="Password") }}
-			<button id="sendbutton" type="submit"><i id="login" class="ion-log-in"></i></button>
+			<button id="sendbutton" type="submit" aria-label="Login"><i id="login" class="ion-log-in"></i></button>
 			{% if error %}
 			<script type="text/javascript">
 				document.getElementById("name").placeholder = "{{ error }}";

@@ -300,6 +300,11 @@ class User(UserMixin):
         return redirect("/")
 
 
+@app.route('/sw.js', methods=['GET'])
+def sw():
+    return app.send_static_file('sw.js')
+
+
 @app.route("/particles_white.json")
 def particlesWhite():
     return send_from_directory("static/js/", "particles_white.json")

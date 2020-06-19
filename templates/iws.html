@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<!-- Copyright (c) 2020 Roberto Treviño Cervantes -->
 		<!-- This file is part of FUTURE (Powered by Monad).
@@ -46,7 +46,7 @@
 		  <h1 id="title"><a href="/">FUTURE<blink>_<blink></a></h1>
 		  <form method="post" name="search" id="form">
 			  {{ iws.hidden_tag() }}
-			  {{ iws.search(size=55, id="searchbar", placeholder="Search for friends") }}<button id="sendbutton" type="submit"><i class="ion-search"></i></button>
+			  {{ iws.search(size=55, id="searchbar", placeholder="Search for friends") }}<button id="sendbutton" type="submit" aria-label="Perform Query"><i class="ion-search"></i></button>
 		  </form>
 		  <!-- <div id="sidebar_show"><i class="ion-navicon" id="sidebar_show_icon"></i></div> -->
 	  </div>

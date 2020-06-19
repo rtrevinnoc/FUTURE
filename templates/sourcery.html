@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<!-- Copyright (c) 2020 Roberto Treviño Cervantes -->
 		<!-- This file is part of FUTURE (Powered by Monad).
@@ -46,7 +46,7 @@
 		  <h1 id="title"><a href="/">FUTURE<blink>_<blink></a></h1>
 		  <form method="post" name="search" id="form">
 			  {{ iws.hidden_tag() }}
-			  {{ iws.search(size=55, id="searchbar", placeholder="Search for friends") }}<button id="sendbutton" type="submit"><i class="ion-search"></i></button>
+			  {{ iws.search(size=55, id="searchbar", placeholder="Search for friends") }}<button id="sendbutton" type="submit" aria-label="Perform query"><i class="ion-search"></i></button>
 		  </form>
 	  </div>
 	</head>
@@ -55,7 +55,7 @@
 			<p id="upload_phrase">Write something!<p>
 			<form id="publication_form" method="post" enctype="multipart/form-data">
 				<div id="text_uploader">
-					<input id="publication" name="publication" type="text" placeholder="Write something" /><button id="writebutton"><i class="ion-compose"></i></button>
+					<input id="publication" name="publication" type="text" placeholder="Write something" /><button id="writebutton" aria-label="Publish"><i class="ion-compose"></i></button>
 				</div>
 				<div id="file_uploader">
 					<input type="file" name="file" id="file_input" class="file_inputs" data-multiple-caption="{count} files selected" multiple /><label for="file_input">Choose a file</label>
