@@ -302,7 +302,7 @@ class User(UserMixin):
 
 @app.route('/sw.js', methods=['GET'])
 def sw():
-    return app.send_static_file('sw.js')
+    return send_from_directory(".", "sw.js")
 
 
 @app.route("/particles_white.json")

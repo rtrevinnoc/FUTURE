@@ -403,8 +403,7 @@ def createMap(query: str) -> str:
                       popup=location.address))
     return mapObject._repr_html_().replace(
         '<div style="position:relative;width:100%;height:0;padding-bottom:60%;">',
-        ''
-    ).replace("</iframe></div>", "</iframe>")
+        '').replace("</iframe></div>", "</iframe>")
 
 
 def getMap(alternateQuery: str, query: str) -> str:
