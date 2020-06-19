@@ -17,6 +17,10 @@ along with FUTURE.  If not, see <https://www.gnu.org/licenses/>. */
 
 @import "../color/index.css";
 
+label {
+	display: none;
+}
+
 .ui-autocomplete {
 	z-index:1001 !important;
 	float: left;
