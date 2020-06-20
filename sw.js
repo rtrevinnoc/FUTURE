@@ -6,9 +6,9 @@ var CACHED_FILES = [
 	'/favicon-32x32.png',
 	'/favicon-16x16.png',
 	'/site.webmanifest',
-	'/safari-pinned-tab.svg'
-	'/css/default/FONTS.css'
-	'/css/default/OFFLINE.css'
+	'/safari-pinned-tab.svg',
+	'/css/default/FONTS.css',
+	'/css/default/OFFLINE.css',
 	'/fonts/sourceSansPro/Light/SourceSansPro-Light.otf',
 	'/fonts/sourceSansPro/Light/SourceSansPro-Light.otf.woff',
 	'/fonts/sourceSansPro/Light/SourceSansPro-Light.ttf',
