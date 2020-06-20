@@ -17,7 +17,7 @@ var CACHED_FILES = [
 
 this.addEventListener('install', event => {
 	event.waitUntil(
-		caches.open(currentCache.offline).then(function(cache) {
+		caches.open(CACHE_NAME).then(function(cache) {
 			return cache.addAll(CACHED_FILES);
 		})
 	);
