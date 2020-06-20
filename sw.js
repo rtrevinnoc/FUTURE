@@ -42,6 +42,7 @@ self.addEventListener('fetch', (event) => {
 	// for an HTML page.
 	if (event.request.mode === 'navigate') {
 		event.respondWith((async () => {
+			const cache = await caches.open(CACHE_NAME);
 			try {
 				try {
 					// First, try to use the navigation preload response if it's supported.
@@ -59,16 +60,10 @@ self.addEventListener('fetch', (event) => {
 					// the 4xx or 5xx range, the catch() will NOT be called.
 					console.log('Fetch failed; returning offline page instead.', error);
 
-					const cache = await caches.open(CACHE_NAME);
-					const cachedResponse = await cache.match(OFFLINE_URL);
-					return cachedResponse;
+					return await cache.match(OFFLINE_URL);
 				}
 			} catch (error) {
-				event.respondWith(
-					caches.match(event.request).then(function(response) {
-						return response || fetch(event.request);
-					})
-				);
+				return await cache.match(event.request);
 			}
 		})());
 	}
