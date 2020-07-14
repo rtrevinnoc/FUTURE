@@ -22,7 +22,7 @@
 #########################################################################
 
 from Monad import *
-from translator_esp_eng import *
+#from translator_esp_eng import *
 from flask_login import (
     LoginManager,
     UserMixin,
@@ -137,15 +137,6 @@ def answer(query: str) -> jsonify:
     queryLanguage = inferLanguage(query)
     if getResourceFromDBPedia(
             queryBeforePreprocessing)["verification"] == False:
-        if (
-                queryLanguage == "Spanish" or queryLanguage != "English"
-        ):  # HACK: AS LONG AS THERE IS ONLY SUPPORT FOR SPANISH-ENGLISH TRANSLATION, KEEP THIS LINE
-            query = translate(query)
-            queryList = query.split(" ")[:-2]
-            if queryList[0] == "the":
-                queryList.pop(0)
-            del query
-            query = " ".join(queryList)
         spellCheckerSuggestions = spellChecker.lookup_compound(
             query, 2)  # LAST PARAMETER INDICATES MAX EDIT DISTANCE LOOKUP
         query = " ".join(
