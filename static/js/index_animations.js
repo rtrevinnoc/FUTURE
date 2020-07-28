@@ -148,7 +148,7 @@ $(function() {
 			});
 
 			summary.text(response["answer"]);
-			$('#chat .simplebar-content').append('<div class="blockline"><div class="container"><span class="machine">' + response["reply"] + '</span></div><i class="ion-close" id="close_chat"></i></div>');
+			$('#chat .simplebar-content').append('<div class="blockline"><div class="container"><span class="machine">' + response["reply"] + '</span></div></div>');
 			$('#particles-js').fadeOut("slow");
 
 			if (response["n_res"] === 0 || response["chatbot"] === 0) {
