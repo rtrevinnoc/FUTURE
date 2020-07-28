@@ -148,7 +148,7 @@ $(function() {
 			});
 
 			summary.text(response["answer"]);
-			$('#chat .simplebar-content').append('<div class="blockline"><div class="container"><span class="machine">' + response["reply"] + '</span></div></div>');
+			$('#chat .simplebar-content').append('<div class="blockline"><div class="container"><span class="machine">' + response["reply"] + '</span></div><i class="ion-close" id="close_chat"></i></div>');
 			$('#particles-js').fadeOut("slow");
 
 			if (response["n_res"] === 0 || response["chatbot"] === 0) {
@@ -171,6 +171,10 @@ $(function() {
 			chat.slideUp("slow")
 		}
 	});
+
+	$("#close_chat").click(function(e) {
+		chat.slideUp("slow")
+	})
 
 	links_button.click(function(e) {
 		links_button.animate({

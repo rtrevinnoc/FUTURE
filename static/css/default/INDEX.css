@@ -338,6 +338,18 @@ p#gathered {
 	margin-bottom: 1vh;
 }
 
+#close_chat {
+	float: right;
+	position: relative;
+	max-width: 50%;
+	margin-left: 1.1vh;
+	border-radius: 8px;
+	padding: 1vh;
+	margin-top: 15px;
+	margin-bottom: 1vh;
+	padding-right: 3vh;
+}
+
 .container2 {
 	float: right;
 	position: relative;
