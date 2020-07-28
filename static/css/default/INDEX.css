@@ -348,6 +348,7 @@ p#gathered {
 	margin-top: 15px;
 	margin-bottom: 1vh;
 	padding-right: 3vh;
+	cursor: pointer;
 }
 
 .container2 {
