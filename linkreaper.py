@@ -86,6 +86,13 @@ def getWebpageMeanVector(response, url) -> list:
     else:
         finalWebPageHeader: str = tldextract.extract(url).domain.upper()
 
+    print("URL: ", url)
+    print("DOMAIN: ", webPageDomain)
+    print("TITLE: ", webPageTitle)
+    print("META TITLE: ", metaTitle)
+    print("META DESCRIPTION: ", metaDescription)
+    print("HEADER:", webPageHeader)
+
     if metaDescription:
         return [
             getSentenceMeanVector(wholeWebPageText),
