@@ -51,7 +51,7 @@ stopWords: List[str] = [
     for x in list(h5py.File("stoplist.hdf5", "r")["words"])
 ]
 
-spacyModel: Callable = spacy.load("en_core_web_sm")
+spacyModel: Callable = spacy.load("en_core_web_sm", disable=["parser"])
 
 
 def cleanDBPediaResourceName(name: str) -> str:
@@ -132,10 +132,22 @@ def returnUnpackedListOfTrigrams(someIterable: list) -> list:
 
 def tokenizeSentence(text: str) -> List[str]:
     try:
-        return [
-            word.text for word in spacyModel(text)
-            if not word.text in stopWords
+        doc = spacyModel(text)
+
+        offset = 0
+        words = []
+        for ent in doc.ents:
+            for token in spacyModel(text[offset:ent.start_char].strip()):
+                words.append(token.text)
+            words.append(ent.text)
+            offset = ent.end_char
+
+        words = [
+            word.replace("the", "", 1).replace("'s", "",
+                                               1).replace("'", "", 1).lower()
+            for word in words if word not in stopWords
         ]
+        return words
     except:
         return []
 
