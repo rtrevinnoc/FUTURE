@@ -136,18 +136,23 @@ def tokenizeSentence(text: str) -> List[str]:
 
         offset = 0
         words = []
-        for ent in doc.ents:
-            for token in spacyModel(text[offset:ent.start_char].strip()):
-                words.append(token.text)
-            words.append(ent.text)
-            offset = ent.end_char
+        if len(doc.ents) > 0:
+            for ent in doc.ents:
+                for token in spacyModel(text[offset:ent.start_char].strip()):
+                    words.append(token.text)
+                words.append(ent.text)
+                offset = ent.end_char
+        else:
+            return [
+                word.text for word in spacyModel(text)
+                if not word.text in stopWords
+            ]
 
-        words = [
+        return [
             word.replace("the", "", 1).replace("'s", "",
                                                1).replace("'", "", 1).lower()
             for word in words if word not in stopWords
         ]
-        return words
     except:
         return []
 
