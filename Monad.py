@@ -49,7 +49,7 @@ gloveVocabulary: dict = gloveVectors.vocab
 stopWords: List[str] = [
     x.decode("utf-8").rstrip()
     for x in list(h5py.File("stoplist.hdf5", "r")["words"])
-]
+] + [" "]
 
 spacyModel: Callable = spacy.load("en_core_web_sm", disable=["parser"])
 
@@ -134,23 +134,20 @@ def tokenizeSentence(text: str) -> List[str]:
     try:
         doc = spacyModel(text)
 
-        offset = 0
         words = []
-        if len(doc.ents) > 0:
-            for ent in doc.ents:
-                for token in spacyModel(text[offset:ent.start_char].strip()):
-                    words.append(token.text)
-                words.append(ent.text)
-                offset = ent.end_char
-        else:
-            return [
-                word.text for word in spacyModel(text)
-                if not word.text in stopWords
-            ]
+        for ent in doc.ents:
+            words.append(ent.text)
+            text = text.replace(ent.text, "")
+
+        for token in spacyModel(text.strip()):
+            words.append(token.text)
 
         return [
-            word.replace("the", "", 1).replace("'s", "",
-                                               1).replace("'", "", 1).lower()
+            re.sub(
+                '\d', '#',
+                word.replace("the", "", 1).replace("'s", "",
+                                                   1).replace("'", "",
+                                                              1).lower())
             for word in words if word not in stopWords
         ]
     except:
