@@ -171,7 +171,7 @@ def answer(query: str) -> jsonify:
                     queryBytes,
                     str(int(analyticsPreviousValue.decode("utf-8")) +
                         1).encode("utf-8"))
-    imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=numberOfURLs)
+    imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=50)
 
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
 
@@ -412,7 +412,7 @@ def _updateAnswer():
 def _midnightcypher():
     query = request.args.get("query", 0, type=str)
     q_vec = getSentenceMeanVector(query)
-    imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=numberOfURLs)
+    imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=50)
 
     with imageDBIndex.begin() as imageDBTransaction:
         imagesBinaryDictionary = [
