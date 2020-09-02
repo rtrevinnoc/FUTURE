@@ -151,7 +151,7 @@ class Indexer(scrapy.Spider):
         "AJAXCRAWL_ENABLED": True
     }
 
-    start_urls = ["https://techcrunch.com/"]
+    start_urls = ["https://www.wired.com/"]
 
     def parse(self, response) -> Iterator:
         url = response.request.url
