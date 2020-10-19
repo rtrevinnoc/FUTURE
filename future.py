@@ -33,8 +33,8 @@ from flask_login import (
     confirm_login,
     fresh_login_required,
 )
-from chatbot import *
-import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, pyqrcode, lmdb, hnswlib, time, bson, requests
+# from chatbot import *
+import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, pyqrcode, lmdb, hnswlib, time, bson, requests, socket
 from flask import (Flask, render_template, request, redirect, send_file,
                    url_for, send_from_directory, flash, abort, jsonify, escape,
                    Response)
@@ -57,7 +57,10 @@ from naive_bayes_chatbot_classifier import *
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
 
-global app, mail, accounts, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, queryClassifier, numberOfURLs
+global port, hostIP, app, mail, accounts, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, queryClassifier, numberOfURLs
+port = int("3000")
+hostname = socket.gethostname()    
+hostIP = str(socket.gethostbyname(hostname)) + ":" + str(port)
 numberOfURLs = 5  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
 dirname = os.path.dirname(__file__)
 client = MongoClient("localhost", 27017)
@@ -72,6 +75,11 @@ hnswImagesLookup = hnswlib.Index(space="cosine", dim=50)
 hnswImagesLookup.load_index("FUTURE_images_vecs.bin", max_elements=100000)
 hnswImagesLookup.set_ef(100)
 imageDBIndex = lmdb.open("future_images", map_size=int(1e12), writemap=True)
+peerRegistry = lmdb.open("peer_registry", map_size=int(1e12), writemap=True)
+peerRegistryTransaction = peerRegistry.begin(write=True)
+peerRegistryTransaction.put("wearebuildingthefuture.com".encode('utf-8') , "".encode('utf-8'), overwrite=False)
+peerRegistryTransaction.put(hostIP.encode('utf-8') , "".encode('utf-8'), overwrite=False)
+peerRegistryTransaction.commit()
 analyticsDBIndex = lmdb.open("future_analytics",
                              map_size=int(1e12),
                              writemap=True)
@@ -107,6 +115,30 @@ trainData = [
 trainLabels = [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0]
 queryClassifier = QueryClassifier(np.unique(trainLabels))
 queryClassifier.train(trainData, trainLabels)
+
+
+def sendRegisterRequestToPeer(url):
+    r = requests.get(url + "/_registerPeer", params={'ip': hostIP})
+    return r.json()
+
+with peerRegistry.begin() as peerRegistryDBTransaction:
+    peerRegistryDBSelector = peerRegistryDBTransaction.cursor()
+    for key, value in peerRegistryDBSelector:
+        sendRegisterRequestToPeer(key)
+
+# peerRegistryDB = lmdb.open("./future_images", readonly=True)
+# with imageDBIndex.begin() as imageDBTransaction:
+    # imageDBSelector = imageDBTransaction.cursor()
+    # for key, value in imageDBSelector:
+        # value = bson.loads(value)
+        # try:
+            # hnswImagesLookup.add_items(
+                # np.array([np.frombuffer(value["vec"], dtype="float32")]),
+                # np.array([int(key.decode("utf-8"))]),
+            # )
+        # except:
+            # pass
+
 
 
 def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
@@ -289,6 +321,19 @@ class User(UserMixin):
     def logout():
         logout_user()
         return redirect("/")
+
+
+@app.route('/_registerPeer')
+def _registerPeer():
+    peerIP = request.args.get("ip", 0, type=str)
+    peerRegistryTransaction = peerRegistry.begin(write=True)
+    peerRegistryTransaction.put(str(peerIP).encode('utf-8'), "".encode('utf-8'), overwrite=False)
+    peerRegistryTransaction.commit()
+
+    return jsonify(
+        result={
+            "registeredIP": peerIP
+        })
 
 
 @app.route('/sw.js', methods=['GET'])
@@ -803,4 +848,4 @@ def share(filename, recipient):
 
 if __name__ == "__main__":
     app.wsgi_app = ProxyFix(app.wsgi_app)
-    app.run(host="0.0.0.0", port=int("3000"), debug=True)
+    app.run(host="0.0.0.0", port=port, debug=True)
