@@ -121,7 +121,7 @@ def sendRegisterRequestToPeer(url):
         requests.get("http://" + url.decode("utf-8") + "/_registerPeer", params={'ip': hostIP})
     except:
         try:
-            requests.get("http://" + url.decode("utf-8") + "/_registerPeer", params={'ip': hostIP})
+            requests.get("https://" + url.decode("utf-8") + "/_registerPeer", params={'ip': hostIP})
         except:
             return "Could not connect with peer"
 
