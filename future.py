@@ -118,7 +118,8 @@ queryClassifier.train(trainData, trainLabels)
 
 def sendRegisterRequestToPeer(url):
     try:
-        requests.get("http://" + url.decode("utf-8") + "/_registerPeer", params={'ip': hostIP})
+        r = requests.get("http://" + url.decode("utf-8") + "/_registerPeer", params={'ip': hostIP})
+        print(r.json())
     except:
         return "Could not connect with peer"
 

@@ -45,6 +45,7 @@ pip install -U tldextract
 pip install -U scikit-learn
 pip install -U pandas
 pip install -U torchvision
+pip install -U h5py
 
 python -m spacy download en_core_web_sm
 python -c "import nltk; nltk.download('punkt')"
