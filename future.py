@@ -57,10 +57,11 @@ from naive_bayes_chatbot_classifier import *
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
 
-global port, hostIP, motherHostname, app, mail, accounts, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, queryClassifier, numberOfURLs
+global port, hostIP, hostname, listOfPeers, app, mail, accounts, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, queryClassifier, numberOfURLs
 port = int("3000")
 hostIP = requests.get("https://api.ipify.org?format=json").json()["ip"]
-motherHostname = socket.getfqdn()
+hostname = socket.getfqdn()
+listOfPeers = []
 numberOfURLs = 5  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
 dirname = os.path.dirname(__file__)
 client = MongoClient("localhost", 27017)
@@ -123,17 +124,27 @@ def sendRegisterRequestToPeer(url):
     print("host:, ", hostIP)
     print("peer:, ", peer)
     print("#######################")
-    if peer == hostIP or peer == motherHostname:
+    if peer == hostIP or peer == hostname:
         print("Same as origin")
         return "Same as origin"
     else:
         try:
-            requests.get("http://" + peer + "/_registerPeer", params={'ip': hostIP}, timeout=10)
+            r = requests.get("http://" + peer + "/_registerPeer", params={'ip': hostIP}, timeout=10)
+            if peer == "wearebuildingthefuture.com":
+                peerRegistryTransaction = peerRegistry.begin(write=True)
+                for newPeer in r.json()["results"]["listOfPeers"]:
+                    peerRegistryTransaction.put(newPeer.encode('utf-8') , "".encode('utf-8'), overwrite=False)
+                peerRegistryTransaction.commit()
             print("Registered with http")
             return "Registered with http"
         except:
             try:
-                requests.get("https://" + peer + "/_registerPeer", params={'ip': hostIP}, timeout=10)
+                r = requests.get("https://" + peer + "/_registerPeer", params={'ip': hostIP}, timeout=10)
+                if peer == "wearebuildingthefuture.com":
+                    peerRegistryTransaction = peerRegistry.begin(write=True)
+                    for newPeer in r.json()["results"]["listOfPeers"]:
+                        peerRegistryTransaction.put(newPeer.encode('utf-8') , "".encode('utf-8'), overwrite=False)
+                    peerRegistryTransaction.commit()
                 print("Registered with https")
                 return "Registered with https"
             except:
@@ -144,6 +155,7 @@ def sendRegisterRequestToPeer(url):
 with peerRegistry.begin() as peerRegistryDBTransaction:
     peerRegistryDBSelector = peerRegistryDBTransaction.cursor()
     for key, value in peerRegistryDBSelector:
+        listOfPeers.append(key)
         sendRegisterRequestToPeer(key)
 
 
@@ -339,7 +351,7 @@ def _registerPeer():
 
     return jsonify(
         result={
-            "registeredIP": peerIP
+            "listOfPeers": listOfPeers
         })
 
 
