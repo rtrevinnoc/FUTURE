@@ -130,21 +130,19 @@ def sendRegisterRequestToPeer(url):
     else:
         try:
             r = requests.get("http://" + peer + "/_registerPeer", params={'ip': hostIP}, timeout=10)
-            if peer == "wearebuildingthefuture.com":
-                peerRegistryTransaction = peerRegistry.begin(write=True)
-                for newPeer in r.json()["results"]["listOfPeers"]:
-                    peerRegistryTransaction.put(newPeer.encode('utf-8') , "".encode('utf-8'), overwrite=False)
-                peerRegistryTransaction.commit()
+            peerRegistryTransaction = peerRegistry.begin(write=True)
+            for newPeer in r.json()["result"]["listOfPeers"]:
+                peerRegistryTransaction.put(newPeer.encode('utf-8'), "".encode('utf-8'), overwrite=False)
+            peerRegistryTransaction.commit()
             print("Registered with http")
             return "Registered with http"
         except:
             try:
                 r = requests.get("https://" + peer + "/_registerPeer", params={'ip': hostIP}, timeout=10)
-                if peer == "wearebuildingthefuture.com":
-                    peerRegistryTransaction = peerRegistry.begin(write=True)
-                    for newPeer in r.json()["results"]["listOfPeers"]:
-                        peerRegistryTransaction.put(newPeer.encode('utf-8') , "".encode('utf-8'), overwrite=False)
-                    peerRegistryTransaction.commit()
+                peerRegistryTransaction = peerRegistry.begin(write=True)
+                for newPeer in r.json()["result"]["listOfPeers"]:
+                    peerRegistryTransaction.put(newPeer.encode('utf-8'), "".encode('utf-8'), overwrite=False)
+                peerRegistryTransaction.commit()
                 print("Registered with https")
                 return "Registered with https"
             except:
