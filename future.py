@@ -57,10 +57,10 @@ from naive_bayes_chatbot_classifier import *
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
 
-global port, hostIP, motherIP, app, mail, accounts, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, queryClassifier, numberOfURLs
+global port, hostIP, motherHostname, app, mail, accounts, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, queryClassifier, numberOfURLs
 port = int("3000")
 hostIP = requests.get("https://api.ipify.org?format=json").json()["ip"]
-motherIP = socket.gethostbyname('wearebuildingthefuture.com')
+motherHostname = socket.getfqdn()
 numberOfURLs = 5  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
 dirname = os.path.dirname(__file__)
 client = MongoClient("localhost", 27017)
@@ -121,16 +121,11 @@ def sendRegisterRequestToPeer(url):
     peer = url.decode("utf-8")
     print("#######################")
     print("host:, ", hostIP)
-    print("mother:, ", motherIP)
     print("peer:, ", peer)
     print("#######################")
-    if peer == hostIP:
-        if peer == motherIP:
-            print("Same as origin")
-            return "Same as origin"
-        else:
-            print("Same as origin")
-            return "Same as origin"
+    if peer == hostIP or peer == motherHostname:
+        print("Same as origin")
+        return "Same as origin"
     else:
         try:
             requests.get("http://" + peer + "/_registerPeer", params={'ip': hostIP}, timeout=10)
