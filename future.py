@@ -57,9 +57,10 @@ from naive_bayes_chatbot_classifier import *
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
 
-global port, hostIP, app, mail, accounts, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, queryClassifier, numberOfURLs
+global port, hostIP, motherIP, app, mail, accounts, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, queryClassifier, numberOfURLs
 port = int("3000")
 hostIP = requests.get("https://api.ipify.org?format=json").json()["ip"]
+motherIP = socket.gethostbyname('wearebuildingthefuture.com')
 numberOfURLs = 5  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
 dirname = os.path.dirname(__file__)
 client = MongoClient("localhost", 27017)
@@ -115,15 +116,19 @@ trainLabels = [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0]
 queryClassifier = QueryClassifier(np.unique(trainLabels))
 queryClassifier.train(trainData, trainLabels)
 
-
 def sendRegisterRequestToPeer(url):
-    try:
-        requests.get("http://" + url.decode("utf-8") + "/_registerPeer", params={'ip': hostIP})
-    except:
+    peer = url.decode("utf-8")
+    if peer == hostIP or peer == motherIP:
+        print("Same as origin")
+    else:
         try:
-            requests.get("https://" + url.decode("utf-8") + "/_registerPeer", params={'ip': hostIP})
+            requests.get("http://" + peer + "/_registerPeer", params={'ip': hostIP})
         except:
-            return "Could not connect with peer"
+            try:
+                requests.get("https://" + peer + "/_registerPeer", params={'ip': hostIP})
+            except:
+                print("Could not connect with peer")
+
 
 with peerRegistry.begin() as peerRegistryDBTransaction:
     peerRegistryDBSelector = peerRegistryDBTransaction.cursor()
