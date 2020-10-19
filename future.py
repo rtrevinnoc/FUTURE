@@ -310,6 +310,7 @@ class User(UserMixin):
 @app.route('/_registerPeer')
 def _registerPeer():
     peerIP = request.args.get("ip", 0, type=str)
+    print("gotten")
     peerRegistryTransaction = peerRegistry.begin(write=True)
     peerRegistryTransaction.put(str(peerIP).encode('utf-8'), "".encode('utf-8'), overwrite=False)
     peerRegistryTransaction.commit()
