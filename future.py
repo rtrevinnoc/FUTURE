@@ -118,27 +118,13 @@ queryClassifier.train(trainData, trainLabels)
 
 
 def sendRegisterRequestToPeer(url):
-    r = requests.get(url + "/_registerPeer", params={'ip': hostIP})
+    r = requests.get(str(url) + "/_registerPeer", params={'ip': hostIP})
     return r.json()
 
 with peerRegistry.begin() as peerRegistryDBTransaction:
     peerRegistryDBSelector = peerRegistryDBTransaction.cursor()
     for key, value in peerRegistryDBSelector:
         sendRegisterRequestToPeer(key)
-
-# peerRegistryDB = lmdb.open("./future_images", readonly=True)
-# with imageDBIndex.begin() as imageDBTransaction:
-    # imageDBSelector = imageDBTransaction.cursor()
-    # for key, value in imageDBSelector:
-        # value = bson.loads(value)
-        # try:
-            # hnswImagesLookup.add_items(
-                # np.array([np.frombuffer(value["vec"], dtype="float32")]),
-                # np.array([int(key.decode("utf-8"))]),
-            # )
-        # except:
-            # pass
-
 
 
 def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
