@@ -116,18 +116,34 @@ trainLabels = [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0]
 queryClassifier = QueryClassifier(np.unique(trainLabels))
 queryClassifier.train(trainData, trainLabels)
 
+
 def sendRegisterRequestToPeer(url):
     peer = url.decode("utf-8")
-    if peer == hostIP or peer == motherIP:
-        print("Same as origin")
+    print("#######################")
+    print("host:, ", hostIP)
+    print("mother:, ", motherIP)
+    print("peer:, ", peer)
+    print("#######################")
+    if peer == hostIP:
+        if peer == motherIP:
+            print("Same as origin")
+            return "Same as origin"
+        else:
+            print("Same as origin")
+            return "Same as origin"
     else:
         try:
-            requests.get("http://" + peer + "/_registerPeer", params={'ip': hostIP})
+            requests.get("http://" + peer + "/_registerPeer", params={'ip': hostIP}, timeout=10)
+            print("Registered with http")
+            return "Registered with http"
         except:
             try:
-                requests.get("https://" + peer + "/_registerPeer", params={'ip': hostIP})
+                requests.get("https://" + peer + "/_registerPeer", params={'ip': hostIP}, timeout=10)
+                print("Registered with https")
+                return "Registered with https"
             except:
                 print("Could not connect with peer")
+                return "Could not connect with peer"
 
 
 with peerRegistry.begin() as peerRegistryDBTransaction:
