@@ -59,8 +59,7 @@ bson.dumps = bson.BSON.encode
 
 global port, hostIP, app, mail, accounts, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, queryClassifier, numberOfURLs
 port = int("3000")
-hostname = socket.gethostname()    
-hostIP = str(socket.gethostbyname(hostname)) + ":" + str(port)
+hostIP = requests.get("https://api.ipify.org?format=json").json()["ip"]
 numberOfURLs = 5  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
 dirname = os.path.dirname(__file__)
 client = MongoClient("localhost", 27017)
