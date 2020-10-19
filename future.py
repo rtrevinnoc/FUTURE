@@ -118,7 +118,7 @@ queryClassifier.train(trainData, trainLabels)
 
 
 def sendRegisterRequestToPeer(url):
-    r = requests.get(str(url) + "/_registerPeer", params={'ip': hostIP})
+    r = requests.get(url.decode("utf-8") + "/_registerPeer", params={'ip': hostIP})
     return r.json()
 
 with peerRegistry.begin() as peerRegistryDBTransaction:
