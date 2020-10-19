@@ -155,7 +155,7 @@ def sendRegisterRequestToPeer(url):
 with peerRegistry.begin() as peerRegistryDBTransaction:
     peerRegistryDBSelector = peerRegistryDBTransaction.cursor()
     for key, value in peerRegistryDBSelector:
-        listOfPeers.append(key)
+        listOfPeers.append(key.decode("utf-8"))
         sendRegisterRequestToPeer(key)
 
 
