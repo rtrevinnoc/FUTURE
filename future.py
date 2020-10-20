@@ -248,7 +248,7 @@ def answer(query: str) -> jsonify:
                         1).encode("utf-8"))
     imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=50)
 
-    urls, _ = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
+    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)["urls"]
 
     print("####################################")
     for peer in listOfPeers:
@@ -292,7 +292,7 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str) -> jsonify:
 
     imageVectorIds, imageVectorScores = hnswImagesLookup.knn_query(q_vec, k=50)
 
-    urls, url_scores = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
+    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
 
     with imageDBIndex.begin() as imageDBTransaction:
         imagesBinaryDictionary = [
@@ -302,19 +302,19 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str) -> jsonify:
         ]  # [:n_imgs]]
         
     print("#######################################")
-    print(urls)
-    print(url_scores)
+    print(urls["urls"])
+    print(urls["scores"])
     print(imagesBinaryDictionary)
     print(imageVectorScores)
     print("#######################################")
-    print(type(urls))
-    print(type(url_scores))
+    print(type(urls["urls"]))
+    print(type(urls["scores"]))
     print(type(imagesBinaryDictionary))
     print(type(imageVectorScores))
 
     return {
-        "urls": urls,
-        "url_scores": url_scores.tolist(),
+        "urls": urls["urls"],
+        "url_scores": urls["scores"],
         "images": imagesBinaryDictionary,
         "images_scores": imageVectorScores.tolist()
     }
