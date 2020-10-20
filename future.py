@@ -35,6 +35,7 @@ from flask_login import (
 )
 # from chatbot import *
 import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, pyqrcode, lmdb, hnswlib, time, bson, requests, socket
+import numpy as np
 from flask import (Flask, render_template, request, redirect, send_file,
                    url_for, send_from_directory, flash, abort, jsonify, escape,
                    Response)
@@ -150,6 +151,32 @@ def sendRegisterRequestToPeer(url):
                 return "Could not connect with peer"
 
 
+def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage):
+    peer = url.decode("utf-8")
+    print("#######################")
+    print("host:, ", hostIP)
+    print("peer:, ", peer)
+    print("#######################")
+    if peer == hostIP or peer == hostname:
+        print("Same as origin")
+        return {}
+    else:
+        try:
+            r = requests.get("http://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage}, timeout=15)
+            result = r.json()["result"]
+            print("Obtained with http")
+            return {"urls": zip(result["urls"], result["url_scores"]), "images": zip(result["images"], result["images_scores"])}
+        except:
+            try:
+                r = requests.get("https://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage}, timeout=15)
+                result = r.json()["result"]
+                print("Obtained with https")
+                return {"urls": zip(result["urls"], result["url_scores"]), "images": zip(result["images"], result["images_scores"])}
+            except:
+                print("Could not connect with peer")
+                return {}
+
+
 with peerRegistry.begin() as peerRegistryDBTransaction:
     peerRegistryDBSelector = peerRegistryDBTransaction.cursor()
     for key, value in peerRegistryDBSelector:
@@ -176,7 +203,7 @@ def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
             urlsInOtherLanguages.append(url)
     urls = urlsInPreferedLanguage + urlsInOtherLanguages
 
-    return urls
+    return {"urls": urls, "scores": search["vectorScores"]}
 
 
 def answer(query: str) -> jsonify:
@@ -221,7 +248,12 @@ def answer(query: str) -> jsonify:
                         1).encode("utf-8"))
     imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=50)
 
-    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
+    urls, _ = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
+
+    print("####################################")
+    for peer in listOfPeers:
+        print(sendAnswerRequestToPeer(peer, query, q_vec, queryLanguage))
+        print("####################################")
 
     with imageDBIndex.begin() as imageDBTransaction:
         imagesBinaryDictionary = [
@@ -241,6 +273,38 @@ def answer(query: str) -> jsonify:
         "n_res": numberOfURLs,
         "map": getMap(queryBeforePreprocessing, query),
         "chatbot": queryClassifier.test(query),
+    }
+
+
+def answerPeer(query: str, q_vec: bytes, queryLanguage: str) -> jsonify:
+    if len(query) <= 160:
+        with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
+            queryBytes = query.encode("utf-8")
+            analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
+            if analyticsPreviousValue == None:
+                analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
+            else:
+                analyticsDBTransaction.put(
+                    queryBytes,
+                    str(int(analyticsPreviousValue.decode("utf-8")) +
+                        1).encode("utf-8"))
+
+    imageVectorIds, imageVectorScores = hnswImagesLookup.knn_query(q_vec, k=50)
+
+    urls, url_scores = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
+
+    with imageDBIndex.begin() as imageDBTransaction:
+        imagesBinaryDictionary = [
+            bson.loads(imageDBTransaction.get(
+                str(image).encode("utf-8")))["url"]
+            for image in imageVectorIds[0]
+        ]  # [:n_imgs]]
+
+    return {
+        "urls": urls,
+        "url_scores": url_scores,
+        "images": imagesBinaryDictionary,
+        "images_scores": imageVectorScores
     }
 
 
@@ -392,7 +456,7 @@ def index():
                                    section="links",
                                    answer=loadMoreUrls(q_vec, queryLanguage,
                                                        numberOfURLs,
-                                                       followingPage),
+                                                       followingPage)["urls"],
                                    currentPage=followingPage)
 
         query = request.form.get("a", 0, type=str)
@@ -457,6 +521,20 @@ def _answer():
     return jsonify(result=answer(query))
 
 
+@app.route("/_answerPeer")
+def _answerPeer():
+    """The method for processing form data and answering."""
+    query = request.args.get("query", 0, type=str)
+    q_vec = request.args.get("q_vec", 0, type=bytes)
+    queryLanguage = request.args.get("queryLanguage", 0, type=str)
+    print("#########################################")
+    print(query)
+    print(q_vec)
+    print(queryLanguage)
+    print("#########################################")
+    return jsonify(result=answerPeer(query, q_vec, queryLanguage))
+
+
 @app.route("/_updateAnswer", methods=["GET", "POST"])
 def _updateAnswer():
     query = request.args.get("query", 0, type=str)
@@ -466,7 +544,7 @@ def _updateAnswer():
 
     return jsonify(
         result={
-            "urls": loadMoreUrls(q_vec, queryLanguage, numberOfURLs, page)
+            "urls": loadMoreUrls(q_vec, queryLanguage, numberOfURLs, page)["urls"]
         })
 
 
