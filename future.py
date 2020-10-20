@@ -276,7 +276,8 @@ def answer(query: str) -> jsonify:
     }
 
 
-def answerPeer(query: str, q_vec: bytes, queryLanguage: str) -> jsonify:
+def answerPeer(query: str, q_vec: list, queryLanguage: str) -> jsonify:
+    q_vec = np.array(q_vec)
     if len(query) <= 160:
         with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
             queryBytes = query.encode("utf-8")
@@ -525,7 +526,7 @@ def _answer():
 def _answerPeer():
     """The method for processing form data and answering."""
     query = request.args.get("query", 0, type=str)
-    q_vec = request.args.get("q_vec", 0, type=bytes)
+    q_vec = request.args.get("q_vec", 0, type=list)
     queryLanguage = request.args.get("queryLanguage", 0, type=str)
     print("#########################################")
     print(query)
