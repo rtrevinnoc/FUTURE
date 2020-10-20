@@ -300,6 +300,17 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str) -> jsonify:
                 str(image).encode("utf-8")))["url"]
             for image in imageVectorIds[0]
         ]  # [:n_imgs]]
+        
+    print("#######################################")
+    print(urls)
+    print(url_scores)
+    print(imagesBinaryDictionary)
+    print(imageVectorScores)
+    print("#######################################")
+    print(type(urls))
+    print(type(url_scores))
+    print(type(imagesBinaryDictionary))
+    print(type(imageVectorScores))
 
     return {
         "urls": urls,
