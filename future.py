@@ -303,18 +303,18 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str) -> jsonify:
         
     print("#######################################")
     print(urls["urls"])
-    print(urls["scores"])
+    print(urls["scores"].tolist())
     print(imagesBinaryDictionary)
-    print(imageVectorScores)
+    print(imageVectorScores.tolist())
     print("#######################################")
     print(type(urls["urls"]))
-    print(type(urls["scores"]))
+    print(type(urls["scores"].tolist()))
     print(type(imagesBinaryDictionary))
-    print(type(imageVectorScores))
+    print(type(imageVectorScores.tolist()))
 
     return {
         "urls": urls["urls"],
-        "url_scores": urls["scores"],
+        "url_scores": urls["scores"].tolist(),
         "images": imagesBinaryDictionary,
         "images_scores": imageVectorScores.tolist()
     }
