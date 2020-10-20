@@ -277,7 +277,7 @@ def answer(query: str) -> jsonify:
 
 
 def answerPeer(query: str, q_vec: list, queryLanguage: str) -> jsonify:
-    q_vec = np.array(ast.literal_eval(q_vec))
+    q_vec = np.array(ast.literal_eval("".join(q_vec)))
     if len(query) <= 160:
         with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
             queryBytes = query.encode("utf-8")
