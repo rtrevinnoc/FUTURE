@@ -530,7 +530,7 @@ def _answerPeer():
     queryLanguage = request.args.get("queryLanguage", 0, type=str)
     print("#########################################")
     print(query)
-    print(q_vec)
+    print("".join(q_vec))
     print(queryLanguage)
     print("#########################################")
     return jsonify(result=answerPeer(query, q_vec, queryLanguage))
