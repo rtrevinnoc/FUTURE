@@ -152,7 +152,7 @@ def sendRegisterRequestToPeer(url):
 
 
 def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage):
-    peer = url.decode("utf-8")
+    peer = url
     print("#######################")
     print("host:, ", hostIP)
     print("peer:, ", peer)
