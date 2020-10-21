@@ -34,7 +34,7 @@ from flask_login import (
     fresh_login_required,
 )
 # from chatbot import *
-import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, pyqrcode, lmdb, hnswlib, time, bson, requests, socket, ast
+import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, pyqrcode, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures
 import numpy as np
 from flask import (Flask, render_template, request, redirect, send_file,
                    url_for, send_from_directory, flash, abort, jsonify, escape,
@@ -176,13 +176,26 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage):
                 print("Could not connect with peer")
                 return {}
 
-
 with peerRegistry.begin() as peerRegistryDBTransaction:
     peerRegistryDBSelector = peerRegistryDBTransaction.cursor()
     for key, value in peerRegistryDBSelector:
         listOfPeers.append(key.decode("utf-8"))
         sendRegisterRequestToPeer(key)
 
+async def getDataFromPeers(query, queryVector, queryLanguage):
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        loop = asyncio.get_event_loop()
+        futures = [
+            loop.run_in_executor(
+                executor, 
+                functools.partial(sendAnswerRequestToPeer, peer, query, queryVector, queryLanguage)
+            )
+            for peer in listOfPeers
+        ]
+        listOfResponses = []
+        for response in await asyncio.gather(*futures):
+            listOfResponses.append(response)
+        return listOfResponses
 
 def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
                  page: int):
@@ -246,14 +259,8 @@ def answer(query: str) -> jsonify:
                     queryBytes,
                     str(int(analyticsPreviousValue.decode("utf-8")) +
                         1).encode("utf-8"))
-    imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=50)
-
-    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)["urls"]
-
-    print("####################################")
-    for peer in listOfPeers:
-        print(sendAnswerRequestToPeer(peer, query, q_vec, queryLanguage))
-        print("####################################")
+    imageVectorIds, imageVectorScores = hnswImagesLookup.knn_query(q_vec, k=50)
+    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
 
     with imageDBIndex.begin() as imageDBTransaction:
         imagesBinaryDictionary = [
@@ -262,15 +269,30 @@ def answer(query: str) -> jsonify:
             for image in imageVectorIds[0]
         ]  # [:n_imgs]]
 
+    loop = asyncio.get_event_loop()
+    listOfDataFromPeers = loop.run_until_complete(getDataFromPeers(query, q_vec, queryLanguage))
+
+    listOfUrlsFromHost = zip(urls["urls"], urls["scores"])
+    listOfImagesFromHost = zip(imagesBinaryDictionary, imageVectorScores.tolist())
+
+    listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers]
+    listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers]
+
+    bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
+    bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
+
+    finalUrls = [x[0] for x in bigListOfUrls.sort(key = lambda x: x[1], reverse=True)]
+    finalImages = [x[0] for x in bigListOfImages.sort(key = lambda x: x[1], reverse=True)]
+
     return {
         "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
         "small_summary": escapeHTMLString(getDefinitionFromDBPedia(query)),
         "reply": escapeHTMLString(predict_chatbot_response(query)),
         "time": time.time() - start,
         "corrected": escapeHTMLString(query),
-        "urls": urls,
-        "images": imagesBinaryDictionary,
-        "n_res": numberOfURLs,
+        "urls": finalUrls,
+        "images": finalImages,
+        "n_res": len(finalUrls),
         "map": getMap(queryBeforePreprocessing, query),
         "chatbot": queryClassifier.test(query),
     }
@@ -291,7 +313,6 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str) -> jsonify:
                         1).encode("utf-8"))
 
     imageVectorIds, imageVectorScores = hnswImagesLookup.knn_query(q_vec, k=50)
-
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
 
     with imageDBIndex.begin() as imageDBTransaction:
@@ -300,18 +321,7 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str) -> jsonify:
                 str(image).encode("utf-8")))["url"]
             for image in imageVectorIds[0]
         ]  # [:n_imgs]]
-        
-    print("#######################################")
-    print(urls["urls"])
-    print(urls["scores"].tolist())
-    print(imagesBinaryDictionary)
-    print(imageVectorScores.tolist())
-    print("#######################################")
-    print(type(urls["urls"]))
-    print(type(urls["scores"].tolist()))
-    print(type(imagesBinaryDictionary))
-    print(type(imageVectorScores.tolist()))
-
+ 
     return {
         "urls": urls["urls"],
         "url_scores": urls["scores"].tolist(),
