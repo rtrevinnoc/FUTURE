@@ -59,8 +59,8 @@ bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
 
 global port, hostIP, hostname, listOfPeers, app, mail, accounts, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, queryClassifier, numberOfURLs
-port = int("3000")
-hostIP = requests.get("https://api.ipify.org?format=json").json()["ip"]
+port = int("80")
+hostIP = requests.get("https://api.ipify.org?format=json").json()["ip"] + str(port)
 hostname = socket.getfqdn()
 listOfPeers = []
 numberOfURLs = 5  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
