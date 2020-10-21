@@ -33,7 +33,7 @@ from flask_login import (
     confirm_login,
     fresh_login_required,
 )
-# from chatbot import *
+from chatbot import *
 import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, pyqrcode, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures
 import numpy as np
 from flask import (Flask, render_template, request, redirect, send_file,
