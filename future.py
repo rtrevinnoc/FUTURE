@@ -289,7 +289,6 @@ def answer(query: str) -> jsonify:
     print(type(listOfUrlsFromPeers))
     print(type(listOfImagesFromPeers))
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-    print(bigListOfUrls[0])
     print(bigListOfUrls)
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     print(type(bigListOfImages))
