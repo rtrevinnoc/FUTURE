@@ -326,7 +326,7 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str) -> jsonify:
         "urls": urls["urls"],
         "url_scores": urls["scores"].tolist(),
         "images": imagesBinaryDictionary,
-        "images_scores": imageVectorScores.tolist()
+        "images_scores": imageVectorScores[0].tolist()
     }
 
 
