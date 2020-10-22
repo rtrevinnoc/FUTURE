@@ -290,6 +290,13 @@ def answer(query: str) -> jsonify:
     print(type(listOfImagesFromPeers))
     print(type(bigListOfUrls))
     print(type(bigListOfImages))
+    
+    print(type(sorted(bigListOfUrls, key=lambda x: x[1], reverse=True))
+    print(sorted(bigListOfUrls, key=lambda x: x[1], reverse=True))
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    print(type(sorted(bigListOfUrls, key=lambda x: x[1], reverse=True)[0]))
+    print(sorted(bigListOfUrls, key=lambda x: x[1], reverse=True)[0])
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
 
     bigListOfUrls = [x[1] for x in sorted(bigListOfUrls, key=lambda x: x[1], reverse=True)]
     bigListOfUrls = [x[1] for x in sorted(bigListOfImages, key=lambda x: x[1], reverse=True)]
