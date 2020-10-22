@@ -276,22 +276,25 @@ def answer(query: str) -> jsonify:
     listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
     listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores.tolist()))
 
-    print(type(listOfDataFromPeers))
-    print(type(listOfUrlsFromHost))
-    print(type(listOfImagesFromHost))
-    print(type(listOfUrlsFromPeers))
-    print(type(listOfImagesFromPeers))
-    print(type(bigListOfUrls))
-    print(type(bigListOfImages))
-
     listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers if len(pack) != 0]
     listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers if len(pack) != 0]
 
     bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
     bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
 
+    print("*******************************")
+    print(type(listOfDataFromPeers))
+    print(type(listOfUrlsFromHost))
+    print(type(listOfImagesFromHost))
+    print(type(listOfUrlsFromPeers))
+    print(type(listOfImagesFromPeers))
+
     bigListOfUrls = [x[1] for x in sorted(bigListOfUrls, key=lambda x: x[1], reverse=True)]
     bigListOfUrls = [x[1] for x in sorted(bigListOfImages, key=lambda x: x[1], reverse=True)]
+
+    print(type(bigListOfUrls))
+    print(type(bigListOfImages))
+    print("*******************************")
 
     return {
         "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
