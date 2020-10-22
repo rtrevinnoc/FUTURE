@@ -292,17 +292,13 @@ def answer(query: str) -> jsonify:
     print(listOfUrlsFromPeers)
     print("************LIST OF IMAGES FROM PEERS*******************")
     print(listOfImagesFromPeers)
-    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-    print(bigListOfUrls)
-    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-    print(type(bigListOfImages))
     
-    bigListOfUrls = [x[1] for x in sorted(bigListOfUrls, key=lambda x: x[1], reverse=True)]
-    bigListOfUrls = [x[1] for x in sorted(bigListOfImages, key=lambda x: x[1], reverse=True)]
+    # bigListOfUrls = [x[1] for x in sorted(bigListOfUrls, key=lambda x: x[1], reverse=True)]
+    # bigListOfUrls = [x[1] for x in sorted(bigListOfImages, key=lambda x: x[1], reverse=True)]
 
-    print(type(bigListOfUrls))
-    print(type(bigListOfImages))
-    print("*******************************")
+    # print(type(bigListOfUrls))
+    # print(type(bigListOfImages))
+    # print("*******************************")
 
     return {
         "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
