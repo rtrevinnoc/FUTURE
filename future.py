@@ -273,10 +273,16 @@ def answer(query: str) -> jsonify:
     loop = asyncio.get_event_loop()
     listOfDataFromPeers = loop.run_until_complete(getDataFromPeers(query, q_vec, queryLanguage))
 
-    listOfUrlsFromHost = [x for x in zip(urls["urls"], urls["scores"])]
-    listOfImagesFromHost = [x for x in zip(imagesBinaryDictionary, imageVectorScores.tolist())]
+    listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
+    listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores.tolist()))
 
-    print(listOfDataFromPeers)
+    print(type(listOfDataFromPeers))
+    print(type(listOfUrlsFromHost))
+    print(type(listOfImagesFromHost))
+    print(type(listOfUrlsFromPeers))
+    print(type(listOfImagesFromPeers))
+    print(type(bigListOfUrls))
+    print(type(bigListOfImages))
 
     listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers if len(pack) != 0]
     listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers if len(pack) != 0]
@@ -284,8 +290,8 @@ def answer(query: str) -> jsonify:
     bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
     bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
 
-    finalUrls = [x[0] for x in bigListOfUrls.sort(key = lambda x: x[1], reverse=True)]
-    finalImages = [x[0] for x in bigListOfImages.sort(key = lambda x: x[1], reverse=True)]
+    bigListOfUrls = [x[1] for x in sorted(bigListOfUrls, key=lambda x: x[1], reverse=True)]
+    bigListOfUrls = [x[1] for x in sorted(bigListOfImages, key=lambda x: x[1], reverse=True)]
 
     return {
         "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
