@@ -153,6 +153,7 @@ def sendRegisterRequestToPeer(url):
 
 def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage):
     peer = url
+    queryVector = json.dumps(queryVector.tolist())
     print("#######################")
     print("host:, ", hostIP)
     print("peer:, ", peer)

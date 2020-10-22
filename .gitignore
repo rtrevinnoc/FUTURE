@@ -24,3 +24,4 @@ test.sh
 indexer
 nohup.out
 peer_registry/
+ex.py
