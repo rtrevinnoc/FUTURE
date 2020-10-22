@@ -282,12 +282,16 @@ def answer(query: str) -> jsonify:
     bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
     bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
 
-    print("*******************************")
-    print(type(listOfDataFromPeers))
-    print(type(listOfUrlsFromHost))
-    print(type(listOfImagesFromHost))
-    print(type(listOfUrlsFromPeers))
-    print(type(listOfImagesFromPeers))
+    print("************LIST OF DATA FROM PEERS*******************")
+    print(listOfDataFromPeers)
+    print("**********LIST OF URLS FROM HOST *********************")
+    print(listOfUrlsFromHost)
+    print("**********LIST OF IMAGES FROM HOST*********************")
+    print(listOfImagesFromHost)
+    print("**********LIST OF URLS FROM PEERS*********************")
+    print(listOfUrlsFromPeers)
+    print("************LIST OF IMAGES FROM PEERS*******************")
+    print(listOfImagesFromPeers)
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     print(bigListOfUrls)
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
