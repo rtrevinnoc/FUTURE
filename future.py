@@ -272,33 +272,16 @@ def answer(query: str) -> jsonify:
 
     loop = asyncio.get_event_loop()
     listOfDataFromPeers = loop.run_until_complete(getDataFromPeers(query, q_vec, queryLanguage))
-
-    listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
-    listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores.tolist()))
-
-    listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers if len(pack) != 0]
-    listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers if len(pack) != 0]
-
-    bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
-    bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
-
-    print("************LIST OF DATA FROM PEERS*******************")
     print(listOfDataFromPeers)
-    print("**********LIST OF URLS FROM HOST *********************")
-    print(listOfUrlsFromHost)
-    print("**********LIST OF IMAGES FROM HOST*********************")
-    print(listOfImagesFromHost)
-    print("**********LIST OF URLS FROM PEERS*********************")
-    print(listOfUrlsFromPeers)
-    print("************LIST OF IMAGES FROM PEERS*******************")
-    print(listOfImagesFromPeers)
-    
-    # bigListOfUrls = [x[1] for x in sorted(bigListOfUrls, key=lambda x: x[1], reverse=True)]
-    # bigListOfUrls = [x[1] for x in sorted(bigListOfImages, key=lambda x: x[1], reverse=True)]
 
-    # print(type(bigListOfUrls))
-    # print(type(bigListOfImages))
-    # print("*******************************")
+    # listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
+    # listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores.tolist()))
+
+    # listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers if len(pack) != 0]
+    # listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers if len(pack) != 0]
+
+    # bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
+    # bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
 
     return {
         "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
