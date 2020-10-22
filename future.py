@@ -165,13 +165,13 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage):
             r = requests.get("http://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage}, timeout=15)
             result = r.json()["result"]
             print("Obtained with http")
-            return {"urls": [x for x in zip(result["urls"], result["url_scores"])], "images": [x for x in zip(result["images"], result["images_scores"])]}
+            return {"urls": list(zip(result["urls"], result["url_scores"])), "images": list(zip(result["images"], result["images_scores"]))}
         except:
             try:
                 r = requests.get("https://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage}, timeout=15)
                 result = r.json()["result"]
                 print("Obtained with https")
-                return {"urls": [x for x in zip(result["urls"], result["url_scores"])], "images": [x for x in zip(result["images"], result["images_scores"])]}
+                return {"urls": list(zip(result["urls"], result["url_scores"])), "images": list(zip(result["images"], result["images_scores"]))}
             except:
                 print("Could not connect with peer")
 
@@ -270,16 +270,15 @@ def answer(query: str) -> jsonify:
 
     loop = asyncio.get_event_loop()
     listOfDataFromPeers = loop.run_until_complete(getDataFromPeers(query, q_vec, queryLanguage))
-    print(listOfDataFromPeers)
 
-    # listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
-    # listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores.tolist()))
+    listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
+    listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores.tolist()))
 
-    # listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers if len(pack) != 0]
-    # listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers if len(pack) != 0]
+    listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers if len(pack) != 0]
+    listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers if len(pack) != 0]
 
-    # bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
-    # bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
+    bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
+    bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
 
     return {
         "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
@@ -289,7 +288,7 @@ def answer(query: str) -> jsonify:
         "corrected": escapeHTMLString(query),
         "urls": bigListOfUrls,
         "images": bigListOfImages,
-        "n_res": len(finalUrls),
+        "n_res": len(bigListOfUrls),
         "map": getMap(queryBeforePreprocessing, query),
         "chatbot": queryClassifier.test(query),
     }
