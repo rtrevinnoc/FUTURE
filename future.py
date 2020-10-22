@@ -274,8 +274,8 @@ def answer(query: str) -> jsonify:
     listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
     listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores.tolist()))
 
-    listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers if len(pack) != 0]
-    listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers if len(pack) != 0]
+    listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers]
+    listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers]
 
     bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
     bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
