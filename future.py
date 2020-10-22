@@ -278,8 +278,8 @@ def answer(query: str) -> jsonify:
 
     print(listOfDataFromPeers)
 
-    listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers]
-    listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers]
+    listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers if len(pack) != 0]
+    listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers if len(pack) != 0]
 
     bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
     bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
