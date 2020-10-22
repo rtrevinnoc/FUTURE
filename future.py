@@ -273,8 +273,8 @@ def answer(query: str) -> jsonify:
     loop = asyncio.get_event_loop()
     listOfDataFromPeers = loop.run_until_complete(getDataFromPeers(query, q_vec, queryLanguage))
 
-    listOfUrlsFromHost = zip(urls["urls"], urls["scores"])
-    listOfImagesFromHost = zip(imagesBinaryDictionary, imageVectorScores.tolist())
+    listOfUrlsFromHost = [x for x in zip(urls["urls"], urls["scores"])]
+    listOfImagesFromHost = [x for x in zip(imagesBinaryDictionary, imageVectorScores.tolist())]
 
     print(listOfDataFromPeers)
 
