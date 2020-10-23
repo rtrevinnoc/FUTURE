@@ -164,12 +164,14 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage):
         try:
             r = requests.get("http://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage}, timeout=15)
             result = r.json()["result"]
+            print(result["urls"])
             print("Obtained with http")
             return {"urls": list(zip(result["urls"], result["url_scores"])), "images": list(zip(result["images"], result["images_scores"]))}
         except:
             try:
                 r = requests.get("https://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage}, timeout=15)
                 result = r.json()["result"]
+                print(result["urls"])
                 print("Obtained with https")
                 return {"urls": list(zip(result["urls"], result["url_scores"])), "images": list(zip(result["images"], result["images_scores"]))}
             except:
@@ -296,6 +298,9 @@ def answer(query: str) -> jsonify:
 
 def answerPeer(query: str, q_vec: list, queryLanguage: str) -> jsonify:
     q_vec = np.array(ast.literal_eval("".join(q_vec)))
+    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+    print(q_vec)
+    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     if len(query) <= 160:
         with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
             queryBytes = query.encode("utf-8")
@@ -543,7 +548,7 @@ def _answer():
 def _answerPeer():
     """The method for processing form data and answering."""
     query = request.args.get("query", 0, type=str)
-    q_vec = request.args.get("q_vec", 0, type=list)
+    q_vec = request.args.get("q_vec", 0, type=str)
     queryLanguage = request.args.get("queryLanguage", 0, type=str)
     print("#########################################")
     print(query)
