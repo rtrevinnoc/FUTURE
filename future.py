@@ -165,12 +165,20 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage):
             r = requests.get("http://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage}, timeout=200)
             result = r.json()["result"]
             print("Obtained with http")
+            try:
+                print(result["urls"])
+            except:
+                pass
             return {"urls": list(zip(result["urls"], result["url_scores"])), "images": list(zip(result["images"], result["images_scores"]))}
         except:
             try:
                 r = requests.get("https://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage}, timeout=200)
                 result = r.json()["result"]
                 print("Obtained with https")
+                try:
+                    print(result["urls"])
+                except:
+                    pass
                 return {"urls": list(zip(result["urls"], result["url_scores"])), "images": list(zip(result["images"], result["images_scores"]))}
             except:
                 print("Could not connect with peer")
