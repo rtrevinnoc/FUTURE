@@ -276,8 +276,7 @@ def answer(query: str) -> jsonify:
             for image in imageVectorIds[0]
         ]  # [:n_imgs]]
 
-    loop = asyncio.get_event_loop()
-    listOfDataFromPeers = loop.run_until_complete(getDataFromPeers(query, q_vec, queryLanguage))
+    listOfDataFromPeers = asyncio.run(getDataFromPeers(query, q_vec, queryLanguage))
     if len(listOfDataFromPeers) > 0:
         try:
             print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
