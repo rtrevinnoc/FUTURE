@@ -45,7 +45,7 @@ pip3 install -U tldextract
 pip3 install -U scikit-learn
 pip3 install -U pandas
 pip3 install -U torchvision
-pip install -U h5py
+pip3 install -U h5py
 
 python3 -m spacy download en_core_web_sm
 python3 -c "import nltk; nltk.download('punkt')"
@@ -62,11 +62,11 @@ read -p "Otherwise, press enter to continue"
 ################################################################### TRAIN THE MODELS #####
 
 sh download_coco_dataset.sh
-python image_tagger_build_vocab.py   
-python resize_coco_dataset.py
-python train_image_captioning.py
-python chatbot.py
-python translator_esp_eng.py
+python3 image_tagger_build_vocab.py   
+python3 resize_coco_dataset.py
+python3 train_image_captioning.py
+python3 chatbot.py
+python3 translator_esp_eng.py
 
 ##########################################################################################
 
@@ -77,9 +77,9 @@ python translator_esp_eng.py
 echo "Building index..."
 echo "Terminate at any time with CTRL+C and proceed to execute ./save_index.sh"
 echo "The process can be resumed later by running ./build_index.sh again"
-chmod +x save_index.sh
-chmod +x build_index.sh
-./build_index.sh
+chmod +x save_index_google.sh
+chmod +x build_index_google.sh
+./build_index_google.sh
 
 ##########################################################################################
 

@@ -33,7 +33,7 @@ from flask_login import (
     confirm_login,
     fresh_login_required,
 )
-from chatbot import *
+#from chatbot import *
 import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, pyqrcode, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures
 import numpy as np
 from flask import (Flask, render_template, request, redirect, send_file,
@@ -117,6 +117,13 @@ trainData = [
 trainLabels = [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0]
 queryClassifier = QueryClassifier(np.unique(trainLabels))
 queryClassifier.train(trainData, trainLabels)
+
+
+def predict_chatbot_response_helper(q):
+    try:
+        return predict_chatbot_response(q)
+    except:
+        return q
 
 
 def sendRegisterRequestToPeer(url):
@@ -245,7 +252,7 @@ def answer(query: str) -> jsonify:
         return {
             "answer": "No relevant information available.",
             "small_summary": "No relevant information available.",
-            "reply": escapeHTMLString(predict_chatbot_response(query)),
+            "reply": escapeHTMLString(predict_chatbot_response_helper(query)),
             "time": time.time() - start,
             "corrected": query,
             "urls": [],
@@ -297,7 +304,7 @@ def answer(query: str) -> jsonify:
     return {
         "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
         "small_summary": escapeHTMLString(getDefinitionFromDBPedia(query)),
-        "reply": escapeHTMLString(predict_chatbot_response(query)),
+        "reply": escapeHTMLString(predict_chatbot_response_helper(query)),
         "time": time.time() - start,
         "corrected": escapeHTMLString(query),
         "urls": bigListOfUrls,
