@@ -300,7 +300,7 @@ def answer(query: str) -> jsonify:
         "reply": escapeHTMLString(predict_chatbot_response_helper(query)),
         "time": time.time() - start,
         "corrected": escapeHTMLString(query),
-        "urls": {frozenset(item.items()) : item for item in bigListOfUrls}.values(),
+        "urls": list({frozenset(item.items()) : item for item in bigListOfUrls}.values()),
         "images": list(set(bigListOfImages)),
         "n_res": len(bigListOfUrls),
         "map": getMap(queryBeforePreprocessing, query),
