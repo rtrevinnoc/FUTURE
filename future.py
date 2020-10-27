@@ -286,7 +286,6 @@ def answer(query: str) -> jsonify:
         listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers][0]
         bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
         bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
-        bigListOfUrls = {frozenset(item.items()) : item for item in bigListOfUrls}.values()
         bigListOfUrls.sort(key = lambda x: x[1])
         bigListOfImages.sort(key = lambda x: x[1])
         bigListOfUrls = [url[0] for url in bigListOfUrls]
@@ -301,7 +300,7 @@ def answer(query: str) -> jsonify:
         "reply": escapeHTMLString(predict_chatbot_response_helper(query)),
         "time": time.time() - start,
         "corrected": escapeHTMLString(query),
-        "urls": bigListOfUrls,
+        "urls": {frozenset(item.items()) : item for item in bigListOfUrls}.values(),
         "images": list(set(bigListOfImages)),
         "n_res": len(bigListOfUrls),
         "map": getMap(queryBeforePreprocessing, query),
