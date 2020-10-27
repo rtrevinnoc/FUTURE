@@ -281,13 +281,15 @@ def answer(query: str) -> jsonify:
     print([x for x in listOfDataFromPeers[0]["urls"]])
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
-        listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores.tolist()))
-        listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers]
-        listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers]
+        listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores[0].tolist()))
+        listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers][0]
+        listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers][0]
         bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
         bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
-        bigListOfUrls = [url[0] for url in bigListOfUrls.sort(key = lambda x: x[1], reverse=True)]
-        bigListOfImages = [image[0] for image in bigListOfImages.sort(key = lambda x: x[1], reverse=True)]
+        bigListOfUrls.sort(key = lambda x: x[1])
+        bigListOfImages.sort(key = lambda x: x[1])
+        bigListOfUrls = [url[0] for url in bigListOfUrls]
+        bigListOfImages = [image[0] for image in bigListOfImages if image[0] != '']
     else:
         bigListOfUrls = urls["urls"]
         bigListOfImages = imagesBinaryDictionary
