@@ -277,22 +277,16 @@ def answer(query: str) -> jsonify:
 
     listOfDataFromPeers = asyncio.run(getDataFromPeers(query, q_vec, queryLanguage))
     print([x for x in listOfDataFromPeers[0]["urls"]])
-    # if len(listOfDataFromPeers) > 0:
-        # try:
-            # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-            # print(listOfDataFromPeers[0]["urls"])
-            # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-        # except:
-            # pass
-        # listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
-        # listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores.tolist()))
-        # listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers]
-        # listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers]
-        # bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
-        # bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
-    # else:
-        # bigListOfUrls = urls["urls"]
-        # bigListOfImages = imagesBinaryDictionary
+    if len(listOfDataFromPeers) > 0:
+        listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
+        listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores.tolist()))
+        listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers]
+        listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers]
+        bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
+        bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
+    else:
+        bigListOfUrls = urls["urls"]
+        bigListOfImages = imagesBinaryDictionary
 
     return {
         "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
