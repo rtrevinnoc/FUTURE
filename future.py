@@ -286,7 +286,7 @@ def answer(query: str) -> jsonify:
         listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers][0]
         bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
         bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
-        bigListOfUrls = [dict(t) for t in {tuple(sorted(d.items())) for d in bigListOfUrls}]
+        bigListOfUrls = {frozenset(item.items()) : item for item in bigListOfUrls}.values()
         bigListOfUrls.sort(key = lambda x: x[1])
         bigListOfImages.sort(key = lambda x: x[1])
         bigListOfUrls = [url[0] for url in bigListOfUrls]
