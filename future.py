@@ -158,7 +158,7 @@ def sendRegisterRequestToPeer(url):
                 return "Could not connect with peer"
 
 
-def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage):
+def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage, numberOfURLs, numberOfPage):
     peer = url
     queryVector = json.dumps(queryVector.tolist())
     print("#######################")
@@ -170,13 +170,13 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage):
         return {"urls": [], "images": []}
     else:
         try:
-            r = requests.get("http://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage}, timeout=200)
+            r = requests.get("http://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage, 'numberOfURLs': numberOfURLs, 'numberOfPage': numberOfPage}, timeout=200)
             result = r.json()["result"]
             print("Obtained with http")
             return {"urls": list(zip(result["urls"], result["url_scores"])), "images": list(zip(result["images"], result["images_scores"]))}
         except:
             try:
-                r = requests.get("https://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage}, timeout=200)
+                r = requests.get("https://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage, 'numberOfURLs': numberOfURLs, 'numberOfPage': numberOfPage}, timeout=200)
                 result = r.json()["result"]
                 print("Obtained with https")
                 return {"urls": list(zip(result["urls"], result["url_scores"])), "images": list(zip(result["images"], result["images_scores"]))}
@@ -190,13 +190,13 @@ with peerRegistry.begin() as peerRegistryDBTransaction:
         listOfPeers.append(key.decode("utf-8"))
         sendRegisterRequestToPeer(key)
 
-async def getDataFromPeers(query, queryVector, queryLanguage):
+async def getDataFromPeers(query, queryVector, queryLanguage, numberOfURLs, numberOfPage):
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         loop = asyncio.get_event_loop()
         futures = [
             loop.run_in_executor(
                 executor, 
-                functools.partial(sendAnswerRequestToPeer, peer, query, queryVector, queryLanguage)
+                functools.partial(sendAnswerRequestToPeer, peer, query, queryVector, queryLanguage, numberOfURLs, numberOfPage)
             )
             for peer in listOfPeers
         ]
@@ -277,7 +277,7 @@ def answer(query: str) -> jsonify:
             for image in imageVectorIds[0]
         ]  # [:n_imgs]]
 
-    listOfDataFromPeers = asyncio.run(getDataFromPeers(query, q_vec, queryLanguage))
+    listOfDataFromPeers = asyncio.run(getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, 1))
     print([x for x in listOfDataFromPeers[0]["urls"]])
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
@@ -300,15 +300,15 @@ def answer(query: str) -> jsonify:
         "reply": escapeHTMLString(predict_chatbot_response_helper(query)),
         "time": time.time() - start,
         "corrected": escapeHTMLString(query),
-        "urls": bigListOfUrls,
-        "images": bigListOfImages,
+        "urls": list(set(bigListOfUrls)),
+        "images": list(set(bigListOfImages)),
         "n_res": len(bigListOfUrls),
         "map": getMap(queryBeforePreprocessing, query),
         "chatbot": queryClassifier.test(query),
     }
 
 
-def answerPeer(query: str, q_vec: list, queryLanguage: str) -> jsonify:
+def answerPeer(query: str, q_vec: list, queryLanguage: str, numberOfURLs: int, numberOfPage: int) -> jsonify:
     q_vec = np.array(ast.literal_eval("".join(q_vec)))
     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     print(q_vec)
@@ -326,7 +326,7 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str) -> jsonify:
                         1).encode("utf-8"))
 
     imageVectorIds, imageVectorScores = hnswImagesLookup.knn_query(q_vec, k=50)
-    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
+    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, numberOfPage)
 
     with imageDBIndex.begin() as imageDBTransaction:
         imagesBinaryDictionary = [
@@ -562,6 +562,8 @@ def _answerPeer():
     query = request.args.get("query", 0, type=str)
     q_vec = request.args.get("q_vec", 0, type=str)
     queryLanguage = request.args.get("queryLanguage", 0, type=str)
+    queryLanguage = request.args.get("numberOfURLs", 0, type=int)
+    queryLanguage = request.args.get("numberOfPage", 1, type=int)
     print("#########################################")
     print(query)
     print("".join(q_vec))
