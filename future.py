@@ -167,6 +167,7 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage):
     print("#######################")
     if peer == hostIP or peer == hostname:
         print("Same as origin")
+        return {"urls": [], "images": []}
     else:
         try:
             r = requests.get("http://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage}, timeout=200)
@@ -181,6 +182,7 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage):
                 return {"urls": list(zip(result["urls"], result["url_scores"])), "images": list(zip(result["images"], result["images_scores"]))}
             except:
                 print("Could not connect with peer")
+                return {"urls": [], "images": []}
 
 with peerRegistry.begin() as peerRegistryDBTransaction:
     peerRegistryDBSelector = peerRegistryDBTransaction.cursor()
@@ -280,24 +282,12 @@ def answer(query: str) -> jsonify:
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
         listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores.tolist()))
-        try:
-            for pack in listOfDataFromPeers:
-                print(pack)
-                try:
-                    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-                    print(pack["urls"])
-                    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-                except:
-                    print("##############################\nNot working\n##############################################")
-            try:
-                listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers]
-                listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers]
-                bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
-                bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
-            except:
-                pass
-        except:
-            pass
+        listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers]
+        listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers]
+        bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
+        bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
+        bigListOfUrls = [url[0] for url in bigListOfUrls.sort(key = lambda x: x[1], reverse=True)]
+        bigListOfImages = [image[0] for image in bigListOfImages.sort(key = lambda x: x[1], reverse=True)]
     else:
         bigListOfUrls = urls["urls"]
         bigListOfImages = imagesBinaryDictionary
