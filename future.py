@@ -286,6 +286,7 @@ def answer(query: str) -> jsonify:
         listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers][0]
         bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
         bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
+        bigListOfUrls = [dict(t) for t in {tuple(sorted(d.items())) for d in bigListOfUrls}]
         bigListOfUrls.sort(key = lambda x: x[1])
         bigListOfImages.sort(key = lambda x: x[1])
         bigListOfUrls = [url[0] for url in bigListOfUrls]
@@ -300,7 +301,7 @@ def answer(query: str) -> jsonify:
         "reply": escapeHTMLString(predict_chatbot_response_helper(query)),
         "time": time.time() - start,
         "corrected": escapeHTMLString(query),
-        "urls": list(set(bigListOfUrls)),
+        "urls": bigListOfUrls,
         "images": list(set(bigListOfImages)),
         "n_res": len(bigListOfUrls),
         "map": getMap(queryBeforePreprocessing, query),
@@ -562,14 +563,9 @@ def _answerPeer():
     query = request.args.get("query", 0, type=str)
     q_vec = request.args.get("q_vec", 0, type=str)
     queryLanguage = request.args.get("queryLanguage", 0, type=str)
-    queryLanguage = request.args.get("numberOfURLs", 0, type=int)
-    queryLanguage = request.args.get("numberOfPage", 1, type=int)
-    print("#########################################")
-    print(query)
-    print("".join(q_vec))
-    print(queryLanguage)
-    print("#########################################")
-    return jsonify(result=answerPeer(query, q_vec, queryLanguage))
+    numberOfURLs = request.args.get("numberOfURLs", 0, type=int)
+    numberOfPage = request.args.get("numberOfPage", 1, type=int)
+    return jsonify(result=answerPeer(query, q_vec, queryLanguage, numberOfURLs, numberOfPage))
 
 
 @app.route("/_updateAnswer", methods=["GET", "POST"])
