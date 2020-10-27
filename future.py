@@ -297,12 +297,12 @@ def answer(query: str) -> jsonify:
     images = loadMoreImages(q_vec, 50, 1)
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
 
-    with imageDBIndex.begin() as imageDBTransaction:
-        imagesBinaryDictionary = [
-            bson.loads(imageDBTransaction.get(
-                str(image).encode("utf-8")))["url"]
-            for image in imageVectorIds[0]
-        ]  # [:n_imgs]]
+    # with imageDBIndex.begin() as imageDBTransaction:
+        # imagesBinaryDictionary = [
+            # bson.loads(imageDBTransaction.get(
+                # str(image).encode("utf-8")))["url"]
+            # for image in imageVectorIds[0]
+        # ]  # [:n_imgs]]
 
     listOfDataFromPeers = asyncio.run(getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, 1))
     if len(listOfDataFromPeers) > 0:
@@ -355,12 +355,12 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str, numberOfURLs: int, n
     images = loadMoreImages(q_vec, 50, numberOfPage)
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, numberOfPage)
 
-    with imageDBIndex.begin() as imageDBTransaction:
-        imagesBinaryDictionary = [
-            bson.loads(imageDBTransaction.get(
-                str(image).encode("utf-8")))["url"]
-            for image in imageVectorIds[0]
-        ]  # [:n_imgs]]
+    # with imageDBIndex.begin() as imageDBTransaction:
+        # imagesBinaryDictionary = [
+            # bson.loads(imageDBTransaction.get(
+                # str(image).encode("utf-8")))["url"]
+            # for image in imageVectorIds[0]
+        # ]  # [:n_imgs]]
  
     return {
         "urls": urls["urls"],
