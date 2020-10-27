@@ -244,7 +244,7 @@ def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
 
         return {
             "images": [
-                bson.loads(imageDBTransaction.get(str(image).encode("utf-8")))["url"] for image in imageVectorIds[0][lowerLimit:totalItems]
+                bson.loads(imageDBTransaction.get(str(image).encode("utf-8")))["url"] for image in vectorIds[0][lowerLimit:totalItems]
             ],
             "vectorIds":
             vectorIds[0][lowerLimit:totalItems],
