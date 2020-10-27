@@ -280,10 +280,24 @@ def answer(query: str) -> jsonify:
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
         listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores.tolist()))
-        listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers]
-        listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers]
-        bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
-        bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
+        try:
+            for pack in listOfDataFromPeers:
+                print(pack)
+                try:
+                    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+                    print(pack["urls"])
+                    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+                except:
+                    pass
+            try:
+                listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers]
+                listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers]
+                bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
+                bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
+            except:
+                pass
+        except:
+            pass
     else:
         bigListOfUrls = urls["urls"]
         bigListOfImages = imagesBinaryDictionary
