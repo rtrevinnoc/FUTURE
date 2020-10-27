@@ -172,20 +172,12 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage):
             r = requests.get("http://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage}, timeout=200)
             result = r.json()["result"]
             print("Obtained with http")
-            try:
-                print(result["urls"])
-            except:
-                pass
             return {"urls": list(zip(result["urls"], result["url_scores"])), "images": list(zip(result["images"], result["images_scores"]))}
         except:
             try:
                 r = requests.get("https://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage}, timeout=200)
                 result = r.json()["result"]
                 print("Obtained with https")
-                try:
-                    print(result["urls"])
-                except:
-                    pass
                 return {"urls": list(zip(result["urls"], result["url_scores"])), "images": list(zip(result["images"], result["images_scores"]))}
             except:
                 print("Could not connect with peer")
@@ -284,22 +276,23 @@ def answer(query: str) -> jsonify:
         ]  # [:n_imgs]]
 
     listOfDataFromPeers = asyncio.run(getDataFromPeers(query, q_vec, queryLanguage))
-    if len(listOfDataFromPeers) > 0:
-        try:
-            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-            print(listOfDataFromPeers[0]["urls"])
-            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-        except:
-            pass
-        listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
-        listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores.tolist()))
-        listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers]
-        listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers]
-        bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
-        bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
-    else:
-        bigListOfUrls = urls["urls"]
-        bigListOfImages = imagesBinaryDictionary
+    print([x for x in listOfDataFromPeers[0]["urls"]])
+    # if len(listOfDataFromPeers) > 0:
+        # try:
+            # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+            # print(listOfDataFromPeers[0]["urls"])
+            # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+        # except:
+            # pass
+        # listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
+        # listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores.tolist()))
+        # listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers]
+        # listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers]
+        # bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
+        # bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
+    # else:
+        # bigListOfUrls = urls["urls"]
+        # bigListOfImages = imagesBinaryDictionary
 
     return {
         "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
