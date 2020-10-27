@@ -143,6 +143,9 @@ $(function() {
 					response["urls"].forEach(function(url) {
 						$('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>').insertBefore("#load_more_items");
 					});
+					response["images"].forEach(function(url) {
+						images.append('<div class="grid-item"><img class="image-item" src="' + url + '" alt="Not available"></div>')
+					});
 					current_page = current_page + 1;
 				});
 			});

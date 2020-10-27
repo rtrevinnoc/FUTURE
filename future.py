@@ -227,6 +227,32 @@ def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
     return {"urls": urls, "scores": search["vectorScores"]}
 
 
+def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
+    with imageDBIndex.begin() as imageDBTransaction:
+        databaseLimit = imageDBTransaction.stat()["entries"]
+        totalItems = number * page
+        if totalItems <= databaseLimit:
+            vectorIds, vectorScores = hnswImagesLookup.knn_query(term, k=totalItems)
+        else:
+            raise ValueError(
+                "Number of items to fetch higher than items in database.")
+
+        if page > 1:
+            lowerLimit = number * (page - 1)
+        elif page == 1:
+            lowerLimit = 0
+
+        return {
+            "images": [
+                bson.loads(imageDBTransaction.get(str(image).encode("utf-8")))["url"] for image in imageVectorIds[0][lowerLimit:totalItems]
+            ],
+            "vectorIds":
+            vectorIds[0][lowerLimit:totalItems],
+            "scores":
+            vectorScores[0][lowerLimit:totalItems]
+        }
+
+
 def answer(query: str) -> jsonify:
     start = time.time()
     queryBeforePreprocessing = query
@@ -267,7 +293,8 @@ def answer(query: str) -> jsonify:
                     queryBytes,
                     str(int(analyticsPreviousValue.decode("utf-8")) +
                         1).encode("utf-8"))
-    imageVectorIds, imageVectorScores = hnswImagesLookup.knn_query(q_vec, k=50)
+    # imageVectorIds, imageVectorScores = hnswImagesLookup.knn_query(q_vec, k=50)
+    images = loadMoreImages(q_vec, 50, 1)
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
 
     with imageDBIndex.begin() as imageDBTransaction:
@@ -280,7 +307,7 @@ def answer(query: str) -> jsonify:
     listOfDataFromPeers = asyncio.run(getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, 1))
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
-        listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores[0].tolist()))
+        listOfImagesFromHost = list(zip(images["images"], images["scores"]))
         listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers][0]
         listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers][0]
         bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
@@ -291,7 +318,7 @@ def answer(query: str) -> jsonify:
         bigListOfImages = [image[0] for image in bigListOfImages if image[0] != '']
     else:
         bigListOfUrls = urls["urls"]
-        bigListOfImages = imagesBinaryDictionary
+        bigListOfImages = images["images"]
 
     return {
         "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
@@ -324,7 +351,8 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str, numberOfURLs: int, n
                     str(int(analyticsPreviousValue.decode("utf-8")) +
                         1).encode("utf-8"))
 
-    imageVectorIds, imageVectorScores = hnswImagesLookup.knn_query(q_vec, k=50)
+    # imageVectorIds, imageVectorScores = hnswImagesLookup.knn_query(q_vec, k=50)
+    images = loadMoreImages(q_vec, 50, numberOfPage)
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, numberOfPage)
 
     with imageDBIndex.begin() as imageDBTransaction:
@@ -337,8 +365,8 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str, numberOfURLs: int, n
     return {
         "urls": urls["urls"],
         "url_scores": urls["scores"].tolist(),
-        "images": imagesBinaryDictionary,
-        "images_scores": imageVectorScores[0].tolist()
+        "images": images["images"],
+        "images_scores": images["scores"].tolist()
     }
 
 
@@ -574,26 +602,28 @@ def _updateAnswer():
     queryLanguage = inferLanguage(query)
 
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, page)
+    images = loadMoreImages(q_vec, 50, page)
 
     listOfDataFromPeers = asyncio.run(getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, page))
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
-        # listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores[0].tolist()))
+        listOfImagesFromHost = list(zip(images["images"], images["scores"]))
         listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers][0]
-        # listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers][0]
+        listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers][0]
         bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
-        # bigListOfImages = list(set(listOfImagesFromHost + listOfImagesFromPeers))
+        bigListOfImages = list(set(listOfImagesFromHost + listOfImagesFromPeers))
         bigListOfUrls.sort(key = lambda x: x[1])
-        # bigListOfImages.sort(key = lambda x: x[1])
+        bigListOfImages.sort(key = lambda x: x[1])
         bigListOfUrls = [url[0] for url in bigListOfUrls]
-        # bigListOfImages = [image[0] for image in bigListOfImages if image[0] != '']
+        bigListOfImages = [image[0] for image in bigListOfImages if image[0] != '']
     else:
         bigListOfUrls = urls["urls"]
-        # bigListOfImages = imagesBinaryDictionary
+        bigListOfImages = images["images"]
 
     return jsonify(
         result={
-            "urls": list({frozenset(item.items()) : item for item in bigListOfUrls}.values())
+            "urls": list({frozenset(item.items()) : item for item in bigListOfUrls}.values()),
+            "images": bigListOfImages
         })
 
 
