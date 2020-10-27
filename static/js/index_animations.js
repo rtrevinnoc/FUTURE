@@ -114,6 +114,10 @@ $(function() {
 			maps.empty()
 			summary.empty()
 
+			response["images"].forEach(function(url) {
+				images.append('<div class="grid-item"><img class="image-item" src="' + url + '" alt="Not available"></div>')
+			});
+
 			section = "links"
 			changeSection();
 			summary.fadeOut("fast");
@@ -243,11 +247,11 @@ $(function() {
 		links.fadeOut("fast");
 		maps.fadeOut("fast");
 		images.fadeIn("fast");
-		if (images.html().length == 0) {
-			response["images"].forEach(function(url) {
-				images.append('<div class="grid-item"><img class="image-item" src="' + url + '" alt="Not available"></div>')
-			});
-		}
+		//if (images.html().length == 0) {
+			//response["images"].forEach(function(url) {
+				//images.append('<div class="grid-item"><img class="image-item" src="' + url + '" alt="Not available"></div>')
+			//});
+		//}
 	})
 
 	maps_button.click(function(e) {
