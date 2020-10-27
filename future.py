@@ -288,7 +288,7 @@ def answer(query: str) -> jsonify:
                     print(pack["urls"])
                     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
                 except:
-                    pass
+                    print("##############################\nNot working\n##############################################")
             try:
                 listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers]
                 listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers]
