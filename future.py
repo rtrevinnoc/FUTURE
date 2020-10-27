@@ -278,7 +278,6 @@ def answer(query: str) -> jsonify:
         ]  # [:n_imgs]]
 
     listOfDataFromPeers = asyncio.run(getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, 1))
-    print([x for x in listOfDataFromPeers[0]["urls"]])
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
         listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores[0].tolist()))
@@ -574,9 +573,27 @@ def _updateAnswer():
     q_vec = getSentenceMeanVector(query)
     queryLanguage = inferLanguage(query)
 
+    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, page)
+
+    listOfDataFromPeers = asyncio.run(getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, page))
+    if len(listOfDataFromPeers) > 0:
+        listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
+        # listOfImagesFromHost = list(zip(imagesBinaryDictionary, imageVectorScores[0].tolist()))
+        listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers][0]
+        # listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers][0]
+        bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
+        # bigListOfImages = list(set(listOfImagesFromHost + listOfImagesFromPeers))
+        bigListOfUrls.sort(key = lambda x: x[1])
+        # bigListOfImages.sort(key = lambda x: x[1])
+        bigListOfUrls = [url[0] for url in bigListOfUrls]
+        # bigListOfImages = [image[0] for image in bigListOfImages if image[0] != '']
+    else:
+        bigListOfUrls = urls["urls"]
+        # bigListOfImages = imagesBinaryDictionary
+
     return jsonify(
         result={
-            "urls": loadMoreUrls(q_vec, queryLanguage, numberOfURLs, page)["urls"]
+            "urls": list({frozenset(item.items()) : item for item in bigListOfUrls}.values())
         })
 
 
