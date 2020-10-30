@@ -14,7 +14,6 @@ It was written with Python for backend, using Tensorflow and PyTorch and web tec
 In order to get FUTURE working, first you will need to install the appropiate tensorflow and pytorch packages for your system. After that, it is only necessary that you run the following commands, which have been tested on Arch Linux, Open SuSe and Ubuntu:
 
 ```bash
-chmod +x bootstrap.sh
 ./bootstrap.sh
 ```
 
