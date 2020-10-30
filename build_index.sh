@@ -20,4 +20,4 @@
 #########################################################################
 
 cd $(dirname $0)
-nohup /home/god/anaconda3/bin/python linkreaper.py &
+nohup python3 linkreaper.py &

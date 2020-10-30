@@ -27,6 +27,7 @@ from urllib.parse import urljoin, urlparse
 from scrapy.crawler import CrawlerProcess
 from nltk.tokenize import word_tokenize
 from gensim.models import KeyedVectors
+from config import SEED_URLS
 from Monad import *
 import numpy as np
 
@@ -151,7 +152,7 @@ class Indexer(scrapy.Spider):
         "AJAXCRAWL_ENABLED": True
     }
 
-    start_urls = ["https://www.wired.com/"]
+    start_urls = SEED_URLS
 
     def parse(self, response) -> Iterator:
         url = response.request.url
