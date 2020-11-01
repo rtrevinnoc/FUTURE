@@ -1,4 +1,6 @@
 ![Website](https://img.shields.io/website?down_color=red&down_message=offline&up_color=green&up_message=online&url=https%3A%2F%2Fwearebuildingthefuture.com) ![GitHub](https://img.shields.io/github/license/rtrevinnoc/FUTURE) ![Keybase BTC](https://img.shields.io/keybase/btc/rtrevinnoc)
+[Buy Me A Book!](https://www.buymeacoffee.com/searchatfuture)
+
 # FUTURE
 
 ![Screenshot_20200517_192300](https://user-images.githubusercontent.com/7103315/82164538-bea0e600-9876-11ea-8d42-c8a1b126d8fb.png)
@@ -42,7 +44,6 @@ Out of the box, **FUTURE** is designed as a web search engine, which means that 
 If you were to modify the data that is saved into the database, you may also need to change how it is served in an HTML template, and for that refer to the lines **240-327** of `future.py`, where you can adapt the code that manages the database to whatever suits your needs.
 
 For further modifications, feel free to fork the project, but bear in mind the terms of the GPL v3 license.
-
 
 
 ## DEPENDENCIES
