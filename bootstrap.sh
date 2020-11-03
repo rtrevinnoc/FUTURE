@@ -5,12 +5,12 @@ then
    sudo apt-get install nvidia-cuda-toolkit
    sudo zypper addrepo --refresh https://download.nvidia.com/opensuse/tumbleweed NVIDIA
    sudo zypper install x11-video-nvidiaG05 nvidia-computeG05
-   pip install -U torch torchvision
+   # pip install -U torch torchvision
    pip install -U tensorflow-gpu
 else
    echo "NO CUDA-CAPABLE GPU AVAILABLE";
    pip install -U tensorflow
-   pip install -U torch==1.5.0+cpu torchvision==0.6.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+   # pip install -U torch==1.5.0+cpu torchvision==0.6.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
 fi
 
 sudo apt-get install libssl-dev python3-icu libicu-dev
@@ -18,7 +18,6 @@ sudo zypper install gcc-c++ openssl-devel
 sudo pacman -S python-pyopenssl
 
 pip3 install -U pybind11
-pip3 install -U PyICU
 pip3 install -U pycld2
 pip3 install -U flask
 pip3 install -U SPARQLWrapper
@@ -46,7 +45,7 @@ pip3 install -U scrapy
 pip3 install -U tldextract
 pip3 install -U scikit-learn
 pip3 install -U pandas
-pip3 install -U torchvision
+# pip3 install -U torchvision
 pip3 install -U h5py
 
 python3 -m spacy download en_core_web_sm
