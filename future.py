@@ -34,7 +34,7 @@ from flask_login import (
     fresh_login_required,
 )
 #from chatbot import *
-import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, pyqrcode, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures
+import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, pyqrcode, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools
 import numpy as np
 from flask import (Flask, render_template, request, redirect, send_file,
                    url_for, send_from_directory, flash, abort, jsonify, escape,
@@ -309,8 +309,8 @@ def answer(query: str) -> jsonify:
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
         listOfImagesFromHost = list(zip(images["images"], images["scores"]))
-        listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers][0]
-        listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers][0]
+        listOfUrlsFromPeers = list(itertools.chain(*[pack["urls"] for pack in listOfDataFromPeers]))
+        listOfImagesFromPeers = list(itertools.chain(*[pack["images"] for pack in listOfDataFromPeers]))
         bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
         bigListOfImages = list(set(listOfImagesFromHost + listOfImagesFromPeers))
         bigListOfUrls.sort(key = lambda x: x[1])
