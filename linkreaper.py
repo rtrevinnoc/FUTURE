@@ -113,6 +113,8 @@ def returnDataFromImageTags(url: str, someIterable: list) -> list:
     anotherIterable = []
     for imageTag in someIterable:
         src = imageTag.xpath("@src").get()
+        if src == None:
+            continue
         alt = imageTag.xpath("@alt").get()
         if src.startswith("/"):
             anotherIterable.append(

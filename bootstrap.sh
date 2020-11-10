@@ -2,20 +2,20 @@
 
 if sudo hwinfo --gfxcard | grep nvidia
 then 
-   sudo apt-get install nvidia-cuda-toolkit
-   sudo zypper addrepo --refresh https://download.nvidia.com/opensuse/tumbleweed NVIDIA
-   sudo zypper install x11-video-nvidiaG05 nvidia-computeG05
-   # pip install -U torch torchvision
-   pip install -U tensorflow-gpu
+	sudo apt-get install nvidia-cuda-toolkit
+	sudo zypper addrepo --refresh https://download.nvidia.com/opensuse/tumbleweed NVIDIA
+	sudo zypper install x11-video-nvidiaG05 nvidia-computeG05
+	# pip install -U torch torchvision
+	pip install -U tensorflow-gpu
 else
-   echo "NO CUDA-CAPABLE GPU AVAILABLE";
-   pip install -U tensorflow
-   # pip install -U torch==1.5.0+cpu torchvision==0.6.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+	echo "NO CUDA-CAPABLE GPU AVAILABLE";
+	pip install -U tensorflow
+	# pip install -U torch==1.5.0+cpu torchvision==0.6.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
 fi
 
-sudo apt-get install libssl-dev python3-icu libicu-dev
-sudo zypper install gcc-c++ openssl-devel
-sudo pacman -S python-pyopenssl
+sudo apt-get install -y libssl-dev python3-icu libicu-dev wget
+sudo zypper install gcc-c++ openssl-devel wget
+sudo pacman -S python-pyopenssl wget
 
 pip3 install -U pybind11
 pip3 install -U pycld2
@@ -51,11 +51,21 @@ pip3 install -U h5py
 python3 -m spacy download en_core_web_sm
 python3 -c "import nltk; nltk.download('punkt')"
 
+wget http://nlp.stanford.edu/data/glove.6B.zip
+unzip -d "glove.6B" glove.6B.zip
+rm -rf glove.6B/glove.6B.100d.txt glove.6B/glove.6B.200d.txt glove.6B/glove.6B.300d.txt
+GLOVE_SIZE=$(du glove.6B/glove.6B.50d.txt | cut -f1)
+
+if [ "$GLOVE_SIZE" == "167336" ]
+then
+	sed -i '1i 400000 50' glove.6B/glove.6B.50d.txt
+fi
+
 chmod +x future.py
 chmod +x save_index.sh
 chmod +x build_index.sh
 
-echo "All dependencies installed. You can now proceed to build the index with <<build_index.sh>> and later pause the process with <<save_index.sh>>. Run future with <<python3 future.py>>"
+echo "All dependencies installed. You can now proceed to build the index with <<build_index.sh>> and later pause the process with <<save_index.sh>>. Run FUTURE with <<python3 future.py>>"
 # echo "Terminate now with CTRL+C if you do not want to train any machine learning model"
 # read -p "Otherwise, press enter to continue"
 
