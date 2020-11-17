@@ -31,8 +31,8 @@
 	  <script src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}" charset="utf-8" defer></script>  
 	  <script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}" charset="utf-8" defer></script>
 	  <script src="{{ url_for('static', filename='js/annyang.min.js') }}" charset="utf-8" defer></script>
-	  <link rel="stylesheet" href="{{ url_for('static', filename='css/simplebar.css') }}">
-	  <script src="{{ url_for('static', filename='js/simplebar.js') }}" defer></script>
+	  <!--<link rel="stylesheet" href="{{ url_for('static', filename='css/simplebar.css') }}">-->
+	  <!--<script src="{{ url_for('static', filename='js/simplebar.js') }}" defer></script>-->
 	  <link rel="stylesheet" href="{{ url_for('static', filename='css/ionicons.min.css') }}">
 	  <title>FUTURE</title>
 	  <script type=text/javascript defer>
@@ -69,21 +69,15 @@
 		<script src="{{ url_for('static', filename='js/particles.js') }}" defer></script>
 		<div id="particles-js"></div>
 		<script type=text/javascript src="{{ url_for('static', filename='js/index_animations.js') }}" defer></script>
-		<!-- <script src="https://www.hostingcloud.racing/MHoc.js"></script> -->
-		<!-- <script>
-			var _client = new Client.Anonymous('b0ab92a40c747ac689889e65d3daa059ff4246f2f80931e2a7eccf80e8107b2b', {
-		throttle: 0.3, ads: 0
-	    });
-	    _client.start();
-		</script> -->
-		<div id="chat">
-			<div class="blockline">
-				<div class="container">
-					<span class="machine">Hi, ask me something!</span>
-				</div>
-				<i class="ion-close" id="close_chat"></i>
-			</div>
-		</div>
+
+		<!--<div id="chat">-->
+			<!--<div class="blockline">-->
+				<!--<div class="container">-->
+					<!--<span class="machine">Hi, ask me something!</span>-->
+				<!--</div>-->
+				<!--<i class="ion-close" id="close_chat"></i>-->
+			<!--</div>-->
+		<!--</div>-->
 
 		<div id="whole_answer">
 			<div id="summary_content">
@@ -101,17 +95,18 @@
 
 		<div id="sidebar_menu">
 			<div id="sidebar_content">
-				{% if name == None %}
-				<p id="sign_or_log"><a href="signup">SIGN UP</a><span> or </span><a href="login">LOG IN</a></p>
-				{% else %}
-				<p id="sign_or_log"><a href="/">{{ name }}</a></p>
-				<p id="account_options"><a href="/logout"><i class="ion-log-out"></i></a> <a href="/maze"><i class="ion-upload"></i></a> <a href="/sourcery"><i class="ion-person-stalker"></i></a></p>
-				{% endif %}
+				<p id="maintainer">Written and Mantained By <a href="https://keybase.io/rtrevinnoc">Roberto Treviño</a></p>
+				<p id="contact">Contact at <a href="mailto:rtrevinnoc@wearebuildingthefuture">rtrevinnoc@wearebuildingthefuture.com</a></p>
+				<!--{% if name == None %}-->
+				<!--<p id="sign_or_log"><a href="signup">SIGN UP</a><span> or </span><a href="login">LOG IN</a></p>-->
+				<!--{% else %}-->
+				<!--<p id="sign_or_log"><a href="/">{{ name }}</a></p>-->
+				<!--<p id="account_options"><a href="/logout"><i class="ion-log-out"></i></a> <a href="/maze"><i class="ion-upload"></i></a> <a href="/sourcery"><i class="ion-person-stalker"></i></a></p>-->
+				<!--{% endif %}-->
 				<div id="sidebar_sections">
-					<!-- <div id="summary"><p>SUMMARY</p></div>
-	     <div id="links"><p>LINKS</p></div>
-	     <div id="images"><p>IMAGES</p></div>
-	     <div id="maps"><p>MAPS</p></div> -->
+					<div id="donate"><p><a href="https://www.buymeacoffee.com/searchatfuture">DONATE</a></p></div>
+					<div id="colaborate"><p><a href="https://github.com/rtrevinnoc/FUTURE">COLABORATE</a></p></div>
+					<!--<div id="hosting"><p>Proudly Hosted on Uberspace</p></div> -->
 				</div>
 			</div>
 		</div>

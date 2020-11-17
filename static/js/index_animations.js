@@ -17,8 +17,8 @@
 
 $(function() {
 	// DECLARE RELEVANT VARIABLES
-	var chat = $("#chat")
-	var scroll_element = new SimpleBar(chat[0]);
+	//var chat = $("#chat")
+	//var scroll_element = new SimpleBar(chat[0]);
 	var searchbar = $('#searchbar')
 	var sidebar_menu = $("#sidebar_menu")
 	var summary = $("#summary_content")
@@ -37,7 +37,7 @@ $(function() {
 	var section = "initial"
 
 	// HIDE ALL SECTIONS WITH NO INFORMATION
-	chat.hide();
+	//chat.hide();
 	sidebar_menu.hide();
 	summary.hide();
 	links.hide();
@@ -67,11 +67,11 @@ $(function() {
 	});
 
 	$('#sidebar_content').hide();
-	scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
+	//scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
 	var submit_form = function(e) {
 		$("#welcome").fadeOut("fast");
 		$(".hex").addClass("rotate");
-		scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
+		//scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
 		$.getJSON($SCRIPT_ROOT + '/_answer', {
 			query: searchbar.val()
 		}, function(data) {
@@ -108,7 +108,7 @@ $(function() {
 				}, "fast");
 			}
 			$(".hex").removeClass("rotate")
-			$('#chat .simplebar-content').append('<div class="blockline"><div class="container2"><span class="you">' + response["corrected"] + '</span></div></div>');
+			//$('#chat .simplebar-content').append('<div class="blockline"><div class="container2"><span class="you">' + response["corrected"] + '</span></div></div>');
 			links.empty()
 			images.empty()
 			maps.empty()
@@ -155,33 +155,33 @@ $(function() {
 			});
 
 			summary.text(response["answer"]);
-			$('#chat .simplebar-content').append('<div class="blockline"><div class="container"><span class="machine">' + response["reply"] + '</span></div></div>');
+			//$('#chat .simplebar-content').append('<div class="blockline"><div class="container"><span class="machine">' + response["reply"] + '</span></div></div>');
 			$('#particles-js').fadeOut("slow");
 
-			if (response["n_res"] === 0 || response["chatbot"] === 0) {
-				chat.slideDown("slow")
-			}
+			//if (response["n_res"] === 0 || response["chatbot"] === 0) {
+			//	chat.slideDown("slow")
+			//}
 		});
 		return false;
 	};
 
 	searchbar.focus()
 
-	$('#eye').click(function(e) {
-		if (chat.is(':hidden')) {
-			chat.slideDown("slow")
-			if ($(window).height() <= 768 && $(window).width() <= 960) {
-				sidebar_menu.hide()
-				$('#sidebar_show_icon').attr("class", "ion-chevron-left")
-			}
-		} else {
-			chat.slideUp("slow")
-		}
-	});
+	//$('#eye').click(function(e) {
+		//if (chat.is(':hidden')) {
+			//chat.slideDown("slow")
+			//if ($(window).height() <= 768 && $(window).width() <= 960) {
+				//sidebar_menu.hide()
+				//$('#sidebar_show_icon').attr("class", "ion-chevron-left")
+			//}
+		//} else {
+			//chat.slideUp("slow")
+		//}
+	//});
 
-	$("#close_chat").click(function(e) {
-		chat.slideUp("slow")
-	})
+	//$("#close_chat").click(function(e) {
+		//chat.slideUp("slow")
+	//})
 
 	links_button.click(function(e) {
 		links_button.animate({
@@ -324,9 +324,9 @@ $(function() {
 		});
 		switch ($('#sidebar_show_icon').attr("class")) {
 			case 'ion-chevron-left':
-				if ($(window).height() <= 768 && $(window).width() <= 960) {
-					chat.hide()
-				}
+				//if ($(window).height() <= 768 && $(window).width() <= 960) {
+					//chat.hide()
+				//}
 				$('#sidebar_show_icon').attr("class", "ion-chevron-right")
 				$('#particles-js').animate({
 					width: ($(window).width() - ($(window).width() / 4.1))

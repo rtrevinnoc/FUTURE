@@ -291,8 +291,9 @@ p#gathered {
 	border-bottom-left-radius: 0px;
 }
 
-#sidebar_sections a {
+#sidebar_sections p a {
 	text-decoration: none;
+	color: #DDDDDD;
 }
 
 #searchbar, #sendbutton {
@@ -446,25 +447,27 @@ p#gathered {
 	z-index: 0;
 }
 
-#sign_or_log {
+#maintainer, #contact {
 	text-align: center;
 	font-family: 'Source Sans Pro';
-	font-size: 2vw;
+	font-size: 1vw;
+	line-height: 0.5vw;
+}
+
+#maintainer {
 	margin-top: 2vw;
-	line-height: 1vw;
 }
 
-#sign_or_log a, #account_options a {
-	text-decoration: none;
+#contact {
+	margin-bottom: 2vw;
 }
 
-#account_options {
-	text-align: center;
-	font-size: calc(4.5vh - 0.2vw);
-	word-spacing: calc(10vh - 2.5vw);
+#contact a {
+	text-decoration: underline;
+	color: #DAA520;
 }
 
-#sign_or_log span {
+#maintainer span {
 	font-family: 'Source Sans Pro';
 	font-size: 1vw;
 	word-spacing: 1vw;
@@ -650,13 +653,13 @@ p.body, p.link_paragraph, p.link_paragraph2 {
 		height: calc(100% - 125px);
 	}
 
-	#sign_or_log {
+	#maintainer {
 		font-size: calc(5vh - 0.2vw);
 		margin-top: calc(5vh - 0.2vw);
 		line-height: 2vw;
 	}
 
-	#sign_or_log span {
+	#maintainer span {
 		font-size: calc(2.7vh - 0.2vw);
 		word-spacing: 4vw;
 	}
@@ -665,7 +668,7 @@ p.body, p.link_paragraph, p.link_paragraph2 {
 		font-size: 3vh;
 	}
 
-	#account_options {
+	#contact {
 		text-align: center;
 		font-size: calc(4.5vh - 0.2vw);
 		word-spacing: calc(10vh - 2.5vw);

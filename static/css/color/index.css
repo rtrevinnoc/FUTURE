@@ -111,7 +111,7 @@ p#gathered {
     border-top: 11px solid #1b1a1a;
 }
 
-#title, #sidebar_show, #sendbutton, #searchbar, #account_options a, #sign_or_log, #sign_or_log a, #sidebar_bottom {
+#title, #sidebar_show, #sendbutton, #searchbar, #contact, #maintainer, #maintainer a, #sidebar_bottom {
   color: #DDDDDD;
 }
 
