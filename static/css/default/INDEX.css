@@ -654,14 +654,9 @@ p.body, p.link_paragraph, p.link_paragraph2 {
 	}
 
 	#maintainer {
-		font-size: calc(5vh - 0.2vw);
-		margin-top: calc(5vh - 0.2vw);
-		line-height: 2vw;
-	}
-
-	#maintainer span {
-		font-size: calc(2.7vh - 0.2vw);
-		word-spacing: 4vw;
+		font-size: calc(2vh - 0.2vw);
+		margin-top: calc(3vh - 0.2vw);
+		line-height: 0.5vh;
 	}
 
 	#sidebar_sections div p {
@@ -670,8 +665,9 @@ p.body, p.link_paragraph, p.link_paragraph2 {
 
 	#contact {
 		text-align: center;
-		font-size: calc(4.5vh - 0.2vw);
-		word-spacing: calc(10vh - 2.5vw);
+		font-size: calc(2vh - 0.2vw);
+		margin-bottom: calc(3vh - 0.2vw);
+		line-height: 0.5vh;
 	}
 
 	#maps_content, iframe {
