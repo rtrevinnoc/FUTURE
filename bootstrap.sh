@@ -26,17 +26,11 @@ pip3 install -U gensim
 pip3 install -U spacy
 pip3 install -U folium
 pip3 install -U geopy
-pip3 install -U tensorflow-datasets
-pip3 install -U flask_login
-pip3 install -U pyqrcode
 pip3 install -U bson
 pip3 install -U lmdb
 pip3 install -U hnswlib
-pip3 install -U flask_scrypt
-pip3 install -U flask_mail
 pip3 install -U nltk
 pip3 install -U bs4
-pip3 install -U pymongo
 pip3 install -U symspellpy
 pip3 install -U polyglot
 pip3 install -U flask_wtf
@@ -46,7 +40,6 @@ pip3 install -U scrapy
 pip3 install -U tldextract
 pip3 install -U scikit-learn
 pip3 install -U pandas
-# pip3 install -U torchvision
 pip3 install -U h5py
 pip3 install -U uWSGI
 
