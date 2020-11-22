@@ -54,7 +54,7 @@ from pymongo import MongoClient
 from symspellpy.symspellpy import SymSpell, Verbosity
 from bs4 import BeautifulSoup
 from naive_bayes_chatbot_classifier import *
-from config import HOST_NAME PEER_PORT
+from config import HOST_NAME, PEER_PORT
 
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
