@@ -24,7 +24,9 @@
 from Monad import *
 import os.path, os, shutil, json, random, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools
 import numpy as np
-from flask import (Flask, render_template, request, redirect, send_from_directory, flash, abort, jsonify, escape, Response)
+from flask import (Flask, render_template, request, redirect,
+                   send_from_directory, flash, abort, jsonify, escape,
+                   Response)
 from forms import *
 # from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.contrib.fixers import ProxyFix
@@ -39,7 +41,8 @@ bson.dumps = bson.BSON.encode
 
 global port, hostIP, hostname, listOfPeers, app, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, numberOfURLs
 port = int(PEER_PORT)
-hostIP = requests.get("https://api.ipify.org?format=json").json()["ip"] + ":" + str(port)
+hostIP = requests.get(
+    "https://api.ipify.org?format=json").json()["ip"] + ":" + str(port)
 hostname = HOST_NAME
 listOfPeers = []
 numberOfURLs = 5  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
@@ -53,8 +56,12 @@ hnswImagesLookup.set_ef(100)
 imageDBIndex = lmdb.open("future_images", map_size=int(1e12), writemap=True)
 peerRegistry = lmdb.open("peer_registry", map_size=int(1e12), writemap=True)
 peerRegistryTransaction = peerRegistry.begin(write=True)
-peerRegistryTransaction.put("wearebuildingthefuture.com".encode('utf-8') , "".encode('utf-8'), overwrite=False)
-peerRegistryTransaction.put(hostIP.encode('utf-8') , "".encode('utf-8'), overwrite=False)
+peerRegistryTransaction.put("wearebuildingthefuture.com".encode('utf-8'),
+                            "".encode('utf-8'),
+                            overwrite=False)
+peerRegistryTransaction.put(hostIP.encode('utf-8'),
+                            "".encode('utf-8'),
+                            overwrite=False)
 peerRegistryTransaction.commit()
 analyticsDBIndex = lmdb.open("future_analytics",
                              map_size=int(1e12),
@@ -68,6 +75,7 @@ spellChecker.load_dictionary(
     "./frequency_dictionary_en_82_765.txt", 0, 1
 )  # LAST TWO PARAMETERS ARE (COLUMN TERM, FREQUENCY TERM) LOCATIONS IN DICTIONARY FILE
 
+
 def sendRegisterRequestToPeer(url):
     peer = url.decode("utf-8")
     print("#######################")
@@ -79,19 +87,27 @@ def sendRegisterRequestToPeer(url):
         return "Same as origin"
     else:
         try:
-            r = requests.get("http://" + peer + "/_registerPeer", params={'ip': hostIP}, timeout=10)
+            r = requests.get("http://" + peer + "/_registerPeer",
+                             params={'ip': hostIP},
+                             timeout=10)
             peerRegistryTransaction = peerRegistry.begin(write=True)
             for newPeer in r.json()["result"]["listOfPeers"]:
-                peerRegistryTransaction.put(newPeer.encode('utf-8'), "".encode('utf-8'), overwrite=False)
+                peerRegistryTransaction.put(newPeer.encode('utf-8'),
+                                            "".encode('utf-8'),
+                                            overwrite=False)
             peerRegistryTransaction.commit()
             print("Registered with http")
             return "Registered with http"
         except:
             try:
-                r = requests.get("https://" + peer + "/_registerPeer", params={'ip': hostIP}, timeout=10)
+                r = requests.get("https://" + peer + "/_registerPeer",
+                                 params={'ip': hostIP},
+                                 timeout=10)
                 peerRegistryTransaction = peerRegistry.begin(write=True)
                 for newPeer in r.json()["result"]["listOfPeers"]:
-                    peerRegistryTransaction.put(newPeer.encode('utf-8'), "".encode('utf-8'), overwrite=False)
+                    peerRegistryTransaction.put(newPeer.encode('utf-8'),
+                                                "".encode('utf-8'),
+                                                overwrite=False)
                 peerRegistryTransaction.commit()
                 print("Registered with https")
                 return "Registered with https"
@@ -100,7 +116,8 @@ def sendRegisterRequestToPeer(url):
                 return "Could not connect with peer"
 
 
-def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage, numberOfURLs, numberOfPage):
+def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
+                            numberOfURLs, numberOfPage):
     peer = url
     queryVector = json.dumps(queryVector.tolist())
     print("#######################")
@@ -112,19 +129,43 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage, numberOfURLs
         return {"urls": [], "images": []}
     else:
         try:
-            r = requests.get("http://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage, 'numberOfURLs': numberOfURLs, 'numberOfPage': numberOfPage}, timeout=10)
+            r = requests.get("http://" + peer + "/_answerPeer",
+                             params={
+                                 'query': query,
+                                 'q_vec': queryVector,
+                                 'queryLanguage': queryLanguage,
+                                 'numberOfURLs': numberOfURLs,
+                                 'numberOfPage': numberOfPage
+                             },
+                             timeout=10)
             result = r.json()["result"]
             print("Obtained with http")
-            return {"urls": list(zip(result["urls"], result["url_scores"])), "images": list(zip(result["images"], result["images_scores"]))}
+            return {
+                "urls": list(zip(result["urls"], result["url_scores"])),
+                "images": list(zip(result["images"], result["images_scores"]))
+            }
         except:
             try:
-                r = requests.get("https://" + peer + "/_answerPeer", params={'query': query, 'q_vec': queryVector, 'queryLanguage': queryLanguage, 'numberOfURLs': numberOfURLs, 'numberOfPage': numberOfPage}, timeout=10)
+                r = requests.get("https://" + peer + "/_answerPeer",
+                                 params={
+                                     'query': query,
+                                     'q_vec': queryVector,
+                                     'queryLanguage': queryLanguage,
+                                     'numberOfURLs': numberOfURLs,
+                                     'numberOfPage': numberOfPage
+                                 },
+                                 timeout=10)
                 result = r.json()["result"]
                 print("Obtained with https")
-                return {"urls": list(zip(result["urls"], result["url_scores"])), "images": list(zip(result["images"], result["images_scores"]))}
+                return {
+                    "urls": list(zip(result["urls"], result["url_scores"])),
+                    "images":
+                    list(zip(result["images"], result["images_scores"]))
+                }
             except:
                 print("Could not connect with peer")
                 return {"urls": [], "images": []}
+
 
 with peerRegistry.begin() as peerRegistryDBTransaction:
     peerRegistryDBSelector = peerRegistryDBTransaction.cursor()
@@ -132,20 +173,23 @@ with peerRegistry.begin() as peerRegistryDBTransaction:
         listOfPeers.append(key.decode("utf-8"))
         sendRegisterRequestToPeer(key)
 
-async def getDataFromPeers(query, queryVector, queryLanguage, numberOfURLs, numberOfPage):
+
+async def getDataFromPeers(query, queryVector, queryLanguage, numberOfURLs,
+                           numberOfPage):
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         loop = asyncio.get_event_loop()
         futures = [
             loop.run_in_executor(
-                executor, 
-                functools.partial(sendAnswerRequestToPeer, peer, query, queryVector, queryLanguage, numberOfURLs, numberOfPage)
-            )
-            for peer in listOfPeers
+                executor,
+                functools.partial(sendAnswerRequestToPeer, peer, query,
+                                  queryVector, queryLanguage, numberOfURLs,
+                                  numberOfPage)) for peer in listOfPeers
         ]
         listOfResponses = []
         for response in await asyncio.gather(*futures):
             listOfResponses.append(response)
         return listOfResponses
+
 
 def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
                  page: int):
@@ -174,7 +218,8 @@ def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
         databaseLimit = imageDBTransaction.stat()["entries"]
         totalItems = number * page
         if totalItems <= databaseLimit:
-            vectorIds, vectorScores = hnswImagesLookup.knn_query(term, k=totalItems)
+            vectorIds, vectorScores = hnswImagesLookup.knn_query(term,
+                                                                 k=totalItems)
         else:
             raise ValueError(
                 "Number of items to fetch higher than items in database.")
@@ -186,7 +231,9 @@ def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
 
         return {
             "images": [
-                bson.loads(imageDBTransaction.get(str(image).encode("utf-8")))["url"] for image in vectorIds[0][lowerLimit:totalItems]
+                bson.loads(imageDBTransaction.get(
+                    str(image).encode("utf-8")))["url"]
+                for image in vectorIds[0][lowerLimit:totalItems]
             ],
             "vectorIds":
             vectorIds[0][lowerLimit:totalItems],
@@ -239,41 +286,57 @@ def answer(query: str) -> jsonify:
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
 
     # with imageDBIndex.begin() as imageDBTransaction:
-        # imagesBinaryDictionary = [
-            # bson.loads(imageDBTransaction.get(
-                # str(image).encode("utf-8")))["url"]
-            # for image in imageVectorIds[0]
-        # ]  # [:n_imgs]]
+    # imagesBinaryDictionary = [
+    # bson.loads(imageDBTransaction.get(
+    # str(image).encode("utf-8")))["url"]
+    # for image in imageVectorIds[0]
+    # ]  # [:n_imgs]]
 
-    listOfDataFromPeers = asyncio.run(getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, 1))
+    listOfDataFromPeers = asyncio.run(
+        getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, 1))
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
         listOfImagesFromHost = list(zip(images["images"], images["scores"]))
-        listOfUrlsFromPeers = list(itertools.chain(*[pack["urls"] for pack in listOfDataFromPeers]))
-        listOfImagesFromPeers = list(itertools.chain(*[pack["images"] for pack in listOfDataFromPeers]))
+        listOfUrlsFromPeers = list(
+            itertools.chain(*[pack["urls"] for pack in listOfDataFromPeers]))
+        listOfImagesFromPeers = list(
+            itertools.chain(*[pack["images"] for pack in listOfDataFromPeers]))
         bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
-        bigListOfImages = list(set(listOfImagesFromHost + listOfImagesFromPeers))
-        bigListOfUrls.sort(key = lambda x: x[1])
-        bigListOfImages.sort(key = lambda x: x[1])
+        bigListOfImages = list(
+            set(listOfImagesFromHost + listOfImagesFromPeers))
+        bigListOfUrls.sort(key=lambda x: x[1])
+        bigListOfImages.sort(key=lambda x: x[1])
         bigListOfUrls = [url[0] for url in bigListOfUrls]
-        bigListOfImages = [image[0] for image in bigListOfImages if image[0] != '']
+        bigListOfImages = [
+            image[0] for image in bigListOfImages if image[0] != ''
+        ]
     else:
         bigListOfUrls = urls["urls"]
         bigListOfImages = images["images"]
 
     return {
-        "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
-        "small_summary": escapeHTMLString(getDefinitionFromDBPedia(query)),
-        "time": time.time() - start,
-        "corrected": escapeHTMLString(query),
-        "urls": list({frozenset(item.items()) : item for item in bigListOfUrls}.values()),
-        "images": bigListOfImages,
-        "n_res": len(bigListOfUrls),
-        "map": getMap(queryBeforePreprocessing, query),
+        "answer":
+        escapeHTMLString(getAbstractFromDBPedia(query)),
+        "small_summary":
+        escapeHTMLString(getDefinitionFromDBPedia(query)),
+        "time":
+        time.time() - start,
+        "corrected":
+        escapeHTMLString(query),
+        "urls":
+        list({frozenset(item.items()): item
+              for item in bigListOfUrls}.values()),
+        "images":
+        bigListOfImages,
+        "n_res":
+        len(bigListOfUrls),
+        "map":
+        getMap(queryBeforePreprocessing, query),
     }
 
 
-def answerPeer(query: str, q_vec: list, queryLanguage: str, numberOfURLs: int, numberOfPage: int) -> jsonify:
+def answerPeer(query: str, q_vec: list, queryLanguage: str, numberOfURLs: int,
+               numberOfPage: int) -> jsonify:
     q_vec = np.array(ast.literal_eval("".join(q_vec)))
     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     print(q_vec)
@@ -295,12 +358,12 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str, numberOfURLs: int, n
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, numberOfPage)
 
     # with imageDBIndex.begin() as imageDBTransaction:
-        # imagesBinaryDictionary = [
-            # bson.loads(imageDBTransaction.get(
-                # str(image).encode("utf-8")))["url"]
-            # for image in imageVectorIds[0]
-        # ]  # [:n_imgs]]
- 
+    # imagesBinaryDictionary = [
+    # bson.loads(imageDBTransaction.get(
+    # str(image).encode("utf-8")))["url"]
+    # for image in imageVectorIds[0]
+    # ]  # [:n_imgs]]
+
     return {
         "urls": urls["urls"],
         "url_scores": urls["scores"].tolist(),
@@ -314,13 +377,12 @@ def _registerPeer():
     peerIP = request.args.get("ip", 0, type=str)
     print("gotten")
     peerRegistryTransaction = peerRegistry.begin(write=True)
-    peerRegistryTransaction.put(str(peerIP).encode('utf-8'), "".encode('utf-8'), overwrite=False)
+    peerRegistryTransaction.put(str(peerIP).encode('utf-8'),
+                                "".encode('utf-8'),
+                                overwrite=False)
     peerRegistryTransaction.commit()
 
-    return jsonify(
-        result={
-            "listOfPeers": listOfPeers
-        })
+    return jsonify(result={"listOfPeers": listOfPeers})
 
 
 @app.route('/sw.js', methods=['GET'])
@@ -433,7 +495,8 @@ def _answerPeer():
     queryLanguage = request.args.get("queryLanguage", 0, type=str)
     numberOfURLs = request.args.get("numberOfURLs", 0, type=int)
     numberOfPage = request.args.get("numberOfPage", 1, type=int)
-    return jsonify(result=answerPeer(query, q_vec, queryLanguage, numberOfURLs, numberOfPage))
+    return jsonify(result=answerPeer(query, q_vec, queryLanguage, numberOfURLs,
+                                     numberOfPage))
 
 
 @app.route("/_updateAnswer", methods=["GET", "POST"])
@@ -446,26 +509,35 @@ def _updateAnswer():
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, page)
     images = loadMoreImages(q_vec, 50, page)
 
-    listOfDataFromPeers = asyncio.run(getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, page))
+    listOfDataFromPeers = asyncio.run(
+        getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, page))
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
         listOfImagesFromHost = list(zip(images["images"], images["scores"]))
         listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers][0]
-        listOfImagesFromPeers = [pack["images"] for pack in listOfDataFromPeers][0]
+        listOfImagesFromPeers = [
+            pack["images"] for pack in listOfDataFromPeers
+        ][0]
         bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
-        bigListOfImages = list(set(listOfImagesFromHost + listOfImagesFromPeers))
-        bigListOfUrls.sort(key = lambda x: x[1])
-        bigListOfImages.sort(key = lambda x: x[1])
+        bigListOfImages = list(
+            set(listOfImagesFromHost + listOfImagesFromPeers))
+        bigListOfUrls.sort(key=lambda x: x[1])
+        bigListOfImages.sort(key=lambda x: x[1])
         bigListOfUrls = [url[0] for url in bigListOfUrls]
-        bigListOfImages = [image[0] for image in bigListOfImages if image[0] != '']
+        bigListOfImages = [
+            image[0] for image in bigListOfImages if image[0] != ''
+        ]
     else:
         bigListOfUrls = urls["urls"]
         bigListOfImages = images["images"]
 
     return jsonify(
         result={
-            "urls": list({frozenset(item.items()) : item for item in bigListOfUrls}.values()),
-            "images": bigListOfImages
+            "urls":
+            list({frozenset(item.items()): item
+                  for item in bigListOfUrls}.values()),
+            "images":
+            bigListOfImages
         })
 
 
