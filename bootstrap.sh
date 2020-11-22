@@ -48,6 +48,7 @@ pip3 install -U scikit-learn
 pip3 install -U pandas
 # pip3 install -U torchvision
 pip3 install -U h5py
+pip3 install -U uWSGI
 
 python3 -m spacy download en_core_web_sm
 python3 -c "import nltk; nltk.download('punkt')"
@@ -57,7 +58,7 @@ unzip -d "glove.6B" glove.6B.zip
 rm -rf glove.6B/glove.6B.100d.txt glove.6B/glove.6B.200d.txt glove.6B/glove.6B.300d.txt
 GLOVE_SIZE=$(du glove.6B/glove.6B.50d.txt | cut -f1)
 
-if [ "$GLOVE_SIZE" -gt "167336" ]
+if [ "$GLOVE_SIZE" -lt "167336" ]
 then
 	sed -i '1i 400000 50' glove.6B/glove.6B.50d.txt
 fi

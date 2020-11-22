@@ -54,7 +54,7 @@ from pymongo import MongoClient
 from symspellpy.symspellpy import SymSpell, Verbosity
 from bs4 import BeautifulSoup
 from naive_bayes_chatbot_classifier import *
-from config import PEER_PORT
+from config import HOST_NAME PEER_PORT
 
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
@@ -62,7 +62,7 @@ bson.dumps = bson.BSON.encode
 global port, hostIP, hostname, listOfPeers, app, mail, accounts, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, queryClassifier, numberOfURLs
 port = int(PEER_PORT)
 hostIP = requests.get("https://api.ipify.org?format=json").json()["ip"] + ":" + str(port)
-hostname = socket.getfqdn()
+hostname = HOST_NAME
 listOfPeers = []
 numberOfURLs = 5  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
 dirname = os.path.dirname(__file__)
