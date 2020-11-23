@@ -20,4 +20,4 @@
 #########################################################################
 
 cd $(dirname $0)
-nohup python3 linkreaper.py &
+nohup python3 linkreaper.py > /dev/null 2>&1 &
