@@ -27,7 +27,7 @@ from urllib.parse import urljoin, urlparse
 from scrapy.crawler import CrawlerProcess
 from nltk.tokenize import word_tokenize
 from gensim.models import KeyedVectors
-from config import SEED_URLS
+from config import SEED_URLS, CONCURRENT_REQUESTS, CONCURRENT_REQUESTS_PER_DOMAIN, CONCURRENT_ITEMS, REACTOR_THREADPOOL_MAXSIZE, DOWNLOAD_MAXSIZE
 from Monad import *
 import numpy as np
 
@@ -129,17 +129,17 @@ class Indexer(scrapy.Spider):
     name = "indexer"
     allowed_urls = ["*"]
     custom_settings = {
-        "CONCURRENT_REQUESTS": 200,
-        "CONCURRENT_REQUESTS_PER_DOMAIN": 25,
+        "CONCURRENT_REQUESTS": CONCURRENT_REQUESTS,
+        "CONCURRENT_REQUESTS_PER_DOMAIN": CONCURRENT_REQUESTS_PER_DOMAIN,
         "ROBOTSTXT_OBEY": True,
-        "CONCURRENT_ITEMS": 100,
-        "REACTOR_THREADPOOL_MAXSIZE": 20,
+        "CONCURRENT_ITEMS": CONCURRENT_ITEMS,
+        "REACTOR_THREADPOOL_MAXSIZE": REACTOR_THREADPOOL_MAXSIZE,
         # Hides printing item dicts
         "LOG_LEVEL": "INFO",
         "RETRY_ENABLED": False,
         "REDIRECT_MAX_TIMES": 1,
         # Stops loading page after 5mb
-        "DOWNLOAD_MAXSIZE": 100000000,
+        "DOWNLOAD_MAXSIZE": DOWNLOAD_MAXSIZE,
         # Grabs xpath before site finish loading
         "DOWNLOAD_FAIL_ON_DATALOSS": False,
         # "DOWNLOAD_DELAY": 2.0,
