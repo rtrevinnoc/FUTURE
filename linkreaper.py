@@ -27,7 +27,7 @@ from urllib.parse import urljoin, urlparse
 from scrapy.crawler import CrawlerProcess
 from nltk.tokenize import word_tokenize
 from gensim.models import KeyedVectors
-from config import SEED_URLS, CONCURRENT_REQUESTS, CONCURRENT_REQUESTS_PER_DOMAIN, CONCURRENT_ITEMS, REACTOR_THREADPOOL_MAXSIZE, DOWNLOAD_MAXSIZE, LOG_LEVEL, AUTOTHROTTLE, DEPTH_PRIORITY
+from config import SEED_URLS, CONCURRENT_REQUESTS, CONCURRENT_REQUESTS_PER_DOMAIN, CONCURRENT_ITEMS, REACTOR_THREADPOOL_MAXSIZE, DOWNLOAD_MAXSIZE, LOG_LEVEL, AUTOTHROTTLE, DEPTH_PRIORITY, TARGET_CONCURRENCY, MAX_DELAY, START_DELAY
 from Monad import *
 import numpy as np
 
@@ -144,6 +144,9 @@ class Indexer(scrapy.Spider):
         "DOWNLOAD_FAIL_ON_DATALOSS": False,
         # "DOWNLOAD_DELAY": 2.0,
         "AUTOTHROTTLE_ENABLED": AUTOTHROTTLE,
+        "AUTOTHROTTLE_TARGET_CONCURRENCY": TARGET_CONCURRENCY,
+        "AUTOTHROTTLE_MAX_DELAY": MAX_DELAY,
+        "AUTOTHROTTLE_START_DELAY": START_DELAY,
         # "JOBDIR": "./indexer_state",
         "SCHEDULER_PRIORITY_QUEUE":
         "scrapy.pqueues.DownloaderAwarePriorityQueue",
