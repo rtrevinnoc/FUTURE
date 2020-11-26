@@ -27,7 +27,7 @@ from urllib.parse import urljoin, urlparse
 from scrapy.crawler import CrawlerProcess
 from nltk.tokenize import word_tokenize
 from gensim.models import KeyedVectors
-from config import SEED_URLS, CONCURRENT_REQUESTS, CONCURRENT_REQUESTS_PER_DOMAIN, CONCURRENT_ITEMS, REACTOR_THREADPOOL_MAXSIZE, DOWNLOAD_MAXSIZE, LOG_LEVEL
+from config import SEED_URLS, CONCURRENT_REQUESTS, CONCURRENT_REQUESTS_PER_DOMAIN, CONCURRENT_ITEMS, REACTOR_THREADPOOL_MAXSIZE, DOWNLOAD_MAXSIZE, LOG_LEVEL, AUTOTHROTTLE, DEPTH_PRIORITY
 from Monad import *
 import numpy as np
 
@@ -143,12 +143,13 @@ class Indexer(scrapy.Spider):
         # Grabs xpath before site finish loading
         "DOWNLOAD_FAIL_ON_DATALOSS": False,
         # "DOWNLOAD_DELAY": 2.0,
-        "AUTOTHROTTLE_ENABLED": False,
+        "AUTOTHROTTLE_ENABLED": AUTOTHROTTLE,
         # "JOBDIR": "./indexer_state",
         "SCHEDULER_PRIORITY_QUEUE":
         "scrapy.pqueues.DownloaderAwarePriorityQueue",
         "COOKIES_ENABLED": False,
         "DOWNLOAD_TIMEOUT": 60,
+        "DEPTH_PRIORITY": DEPTH_PRIORITY,
         "SCHEDULER_DISK_QUEUE": 'scrapy.squeues.PickleFifoDiskQueue',
         "SCHEDULER_MEMORY_QUEUE": 'scrapy.squeues.FifoMemoryQueue',
         "AJAXCRAWL_ENABLED": True
