@@ -45,14 +45,11 @@ with imageDBIndex.begin() as imageDBTransaction:
         except:
             pass
 
-search = futureURLs.searchIndex(getSentenceMeanVector("web hosting"), 5, 1)
-print(search["results"])
-print(search["vectorIds"])
-print(search["vectorScores"])
+#search = futureURLs.searchIndex(getSentenceMeanVector("web hosting"), 5, 1)
 futureURLs.saveIndex()
 
-labels, distances = hnswImagesLookup.knn_query(
-    getSentenceMeanVector("web hosting"), k=5)
-print(labels)
-print(distances)
+#labels, distances = hnswImagesLookup.knn_query(
+#    getSentenceMeanVector("web hosting"), k=5)
+#print(labels)
+#print(distances)
 hnswImagesLookup.save_index("FUTURE_images_vecs.bin")
