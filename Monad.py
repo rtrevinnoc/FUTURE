@@ -475,10 +475,8 @@ class Monad():
 
     def compileIndex(self):
         with self.database.begin() as databaseTransaction:
-            print(databaseTransaction.stat()["entries"])
             databaseSelector = databaseTransaction.cursor()
             for key, value in databaseSelector:
-                print(key.decode("utf-8"))
                 self.index.add_items(
                     np.array([
                         np.frombuffer(bson.loads(value)["vec"],
@@ -500,7 +498,6 @@ class Monad():
             if totalItems <= databaseLimit:
                 vectorIds, vectorScores = self.index.knn_query(term,
                                                                k=totalItems)
-                print(vectorIds)
             else:
                 raise ValueError(
                     "Number of items to fetch higher than items in database.")
