@@ -116,11 +116,7 @@ def returnDataFromImageTags(url: str, someIterable: list) -> list:
         if src == None:
             continue
         alt = imageTag.xpath("@alt").get()
-        if src.startswith("/"):
-            anotherIterable.append(
-                (str(urljoin(url,
-                             urlparse(url).path) + src), alt))
-        else:
+        if src.startswith("http"):
             anotherIterable.append((src, alt))
     return anotherIterable
 
