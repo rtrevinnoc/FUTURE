@@ -267,7 +267,6 @@ def answer(query: str) -> jsonify:
             "images": [],
             "n_res": 0,
             "map": "",
-            "chatbot": 0,
         }
 
     if len(query) <= 160:

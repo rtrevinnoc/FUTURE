@@ -33,7 +33,7 @@ from nltk.corpus import wordnet
 from SPARQLWrapper import SPARQLWrapper, JSON
 from polyglot.detect import Detector
 
-import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, pyqrcode, lmdb, hnswlib, time, bson, requests
+import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
 
@@ -132,7 +132,7 @@ def returnUnpackedListOfTrigrams(someIterable: list) -> list:
 def tokenizeSentence(text: str) -> List[str]:
     try:
         doc = spacyModel(text)
-
+        
         words = []
         for ent in doc.ents:
             words.append(ent.text)
@@ -151,84 +151,6 @@ def tokenizeSentence(text: str) -> List[str]:
         ]
     except:
         return []
-
-
-def getWordChunkVector(sentence: str) -> np.array:
-    words: List[str] = tokenizeSentence(sentence)
-    wordVectors = []
-    for word in words:
-        try:
-            wordVectors.append(gloveVectors[word])
-        except:
-            pass
-    try:
-        if len(wordVectors) > 0:
-            return np.array(wordVectors).mean(axis=0).astype(np.float32)
-        else:
-            return np.array([])
-    except:
-        return np.array([])
-
-
-def getSentenceMeanVector(sentence: str) -> np.array:
-    words = tokenizeSentence(sentence)
-    wordVectors = []
-    for word in words:
-        word = re.sub(r"\W", "", word)
-        try:
-            wordVectors.append(gloveVectors[word])
-        except:
-            try:
-                wordVectors.append(
-                    getWordChunkVector(wordnet.synsets(word)[0].definition()))
-            except:
-                try:
-                    wordVectors.append(
-                        getWordChunkVector(getDefinitionFromDBPedia(word)))
-                except:
-                    pass
-    try:
-        if len(wordVectors) > 0:
-            return np.array(wordVectors).mean(axis=0).astype(np.float32)
-        else:
-            return np.array([])
-    except:
-        return np.array([])
-
-
-locationVector: np.array = getSentenceMeanVector(
-    "location country city place landmark land monument sculpture building structure"
-)
-
-
-def encodeURLAsNumber(url: str, id: Any) -> bytes:
-    """
-      Parameters:
-      1. url - a string
-      2. id - a string or a number-like object
-
-      What the function does?
-      -----------------------
-      Converts an url into a unique float number encoded as a bytestring
-
-      Returns:
-      ---------
-      Returns a bytestring
-   """
-
-    text = str(id) + ":" + url
-    text = [code for code in text.encode("ascii")]
-    return str(
-        sum([y * (128**x) for x, y in enumerate(text, start=-len(text))
-             ])).replace("0.", "8").encode("utf-8")
-
-
-def isLocation(vec: np.array) -> bool:
-    dist: float = distance.cosine(vec, locationVector)
-    if dist >= 0.3:
-        return True
-    else:
-        return False
 
 
 def preprocessSentece(sentence: str) -> str:
@@ -391,6 +313,88 @@ def getDefinitionFromDBPedia(word: str, noUrl: bool = True) -> Any:
     except:
         return None
 
+
+def appendIfNotEmpty(list1, element):
+    if len(element > 0):
+        list1.append(element)
+
+
+def getWordChunkVector(sentence: str) -> np.array:
+    words: List[str] = tokenizeSentence(sentence)
+    wordVectors = []
+    for word in words:
+        try:
+            appendIfNotEmpty(wordVectors, gloveVectors[word])
+        except:
+            pass
+    try:
+        if len(wordVectors) > 0:
+            return np.array(wordVectors).mean(axis=0).astype(np.float32)
+        else:
+            return np.array([])
+    except:
+        return np.array([])
+
+
+def getSentenceMeanVector(sentence: str) -> np.array:
+    words = tokenizeSentence(sentence)
+    wordVectors = []
+    for word in words:
+        word = word.strip()
+        try:
+            appendIfNotEmpty(wordVectors, gloveVectors[word])
+        except:
+            try:
+                appendIfNotEmpty(wordVectors,
+                    getWordChunkVector(wordnet.synsets(word)[0].definition()))
+            except:
+                try:
+                    appendIfNotEmpty(wordVectors,
+                        getWordChunkVector(getDefinitionFromDBPedia(word)))
+                except:
+                    pass
+    try:
+        if len(wordVectors) > 0:
+            return np.array(wordVectors).mean(axis=0).astype(np.float32)
+        else:
+            return np.array([])
+    except:
+        return np.array([])
+
+
+locationVector: np.array = getSentenceMeanVector(
+    "location country city place landmark land monument sculpture building structure"
+)
+
+
+def encodeURLAsNumber(url: str, id: Any) -> bytes:
+    """
+      Parameters:
+      1. url - a string
+      2. id - a string or a number-like object
+
+      What the function does?
+      -----------------------
+      Converts an url into a unique float number encoded as a bytestring
+
+      Returns:
+      ---------
+      Returns a bytestring
+   """
+
+    text = str(id) + ":" + url
+    text = [code for code in text.encode("ascii")]
+    return str(
+        sum([y * (128**x) for x, y in enumerate(text, start=-len(text))
+             ])).replace("0.", "8").encode("utf-8")
+
+
+def isLocation(vec: np.array) -> bool:
+    dist: float = distance.cosine(vec, locationVector)
+    if dist >= 0.3:
+        return True
+    else:
+        return False
 
 def isPlace(query: str) -> bool:
     sparql.setQuery("""

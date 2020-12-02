@@ -51,14 +51,8 @@ For further modifications, feel free to fork the project, but bear in mind the t
 Below are listed all the projects upon which __FUTURE__ rests.
 Name | License
 ---|---
-[Tensorflow](https://github.com/tensorflow/tensorflow)|Apache 2.0
 [Flask](https://github.com/pallets/flask)|BSD 3-Clause
-[Flask_login](https://github.com/maxcountryman/flask-login)|MIT                          
 [Werkzeug](https://github.com/pallets/werkzeug)|BSD 3-Clause                
-[Flask_scrypt](https://github.com/cryptojuice/flask-scrypt)|MIT                       
-[Flask_Mail](https://github.com/mattupstate/flask-mail)|BSD License               
-[MongoDB](https://github.com/mongodb/mongo)|Server Side Public License   
-[MongoDB Python bindings](https://github.com/mongodb/mongo-python-driver)|Apache 2.0                   
 [SymSpell](https://github.com/wolfgarbe/SymSpell/)|MIT
 [Polyglot](https://github.com/aboSamoor/polyglot/)|GPL v3                   
 [Beautifulsoup ](https://code.launchpad.net/beautifulsoup)|BSD 2-Clause              
@@ -67,7 +61,6 @@ Name | License
 [GeoPy](https://github.com/geopy/geopy)|MIT                   
 [SciKit Learn](https://github.com/scikit-learn/scikit-learn)|BSD 3-Clause                 
 [Pandas](https://github.com/pandas-dev/pandas)|BSD 3-Clause     
-[PyTorch](https://github.com/pytorch/pytorch)|BSD 3-Clause                  
 [Gensim](https://github.com/RaRe-Technologies/gensim)|LGPL 2.1                      
 [NLTK](https://github.com/nltk/nltk)|Apache 2.0      
 [Scrapy](https://github.com/scrapy/scrapy)|BSD License                   
@@ -75,23 +68,17 @@ Name | License
 [LMBD](https://github.com/LMDB/lmdb)|OpenLDAP
 [LMBD Python bindings](https://github.com/jnwatson/py-lmdb)|OpenLDAP                    
 [tldextract](https://github.com/john-kurkowski/tldextract)|BSD 3-Clause       
-[Python Imaging Library (PIL)](http://www.pythonware.com/products/pil/)|PIL License             
-[COCO API (Python bindings)](https://github.com/cocodataset/cocoapi)|BSD 2-Clause             
 [WTForms](https://github.com/wtforms/wtforms)|BSD 3-Clause               
 [Flask_wtf](https://github.com/lepture/flask-wtf)|BSD 3-Clause
 [HNSWLib](https://github.com/nmslib/hnswlib)|Apache 2.0
 [JQuery](https://github.com/jquery/jquery)|MIT                      
 [JQuery UI](https://github.com/jquery/jquery-ui)|MIT             
 [Particles JS](https://github.com/VincentGarreau/particles.js/)|MIT             
-[Simplebar](https://github.com/Grsmto/simplebar)|MIT  
 [Ionicons](https://github.com/ionic-team/ionicons)|MIT         
 [Source Sans Pro](https://github.com/adobe-fonts/source-sans-pro)|OFL 1.1                   
 [GloVe](https://github.com/stanfordnlp/GloVe)|Apache 2.0
 [SPARQLWrapper](https://github.com/RDFLib/sparqlwrapper)|W3C License      
 [TextScrambler](https://codepen.io/soulwire/pen/mErPAK)|BSD-like   
-[NMT with Attention](https://github.com/tensorflow/docs/blob/master/site/en/tutorials/text/nmt_with_attention.ipynb)|Apache 2.0
-[Transformer Chatbot](https://github.com/tensorflow/examples/blob/master/community/en/transformer_chatbot.ipynb)|Apache 2.0
-[Image Captioning](https://github.com/yunjey/pytorch-tutorial/tree/master/tutorials/03-advanced/)|MIT
 
 ### FUTURE on w3m
 [![asciicast](https://asciinema.org/a/331246.svg)](https://asciinema.org/a/331246?autoplay=1)
