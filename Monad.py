@@ -419,8 +419,8 @@ def createMap(query: str) -> str:
         folium.Marker([location.latitude, location.longitude],
                       popup=location.address))
     return mapObject._repr_html_().replace(
-        '<div style="position:relative;width:100%;height:0;padding-bottom:60%;">',
-        '').replace("</iframe></div>", "</iframe>")
+        '<div style="width:100%;"><div style="position:relative;width:100%;height:0;padding-bottom:60%;"><span style="color:#565656">Make this Notebook Trusted to load map: File -> Trust Notebook</span>',
+        '').replace("</iframe></div></div>", "</iframe>")
 
 
 def getMap(alternateQuery: str, query: str) -> str:
