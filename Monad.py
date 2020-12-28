@@ -412,7 +412,7 @@ def isPlace(query: str) -> bool:
 
 def createMap(query: str) -> str:
     processed: str = preprocessSentece(query)
-    geolocator = Nominatim()
+    geolocator = Nominatim(user_agent="FUTURE")
     location = geolocator.geocode(processed)
     mapObject = folium.Map(location=[location.latitude, location.longitude])
     mapObject.add_child(

@@ -273,9 +273,9 @@ $(function() {
 		links.fadeOut("fast");
 		images.fadeOut("fast");
 		maps.fadeIn("fast");
-		if (images.html().length == 0) {
-			maps.append(response["map"])
-		}
+		//if (images.html().length == 0) {
+		maps.append(response["map"])
+		//}
 	})
 
 	$('#sidebar_show').click(function(e) {
