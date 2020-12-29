@@ -29,6 +29,20 @@ $(function() {
 	var links_button = $('#links')
 	var images_button = $('#images')
 	var maps_button = $('#maps')
+	var urlParams = new URLSearchParams(window.location.search);
+	const initial_query = urlParams.get('q');
+	if (!!initial_query) {
+		searchbar.val(initial_query)
+		submit_form(initial_query)
+	}
+	$(window).bind("popstate", function(e) {
+		urlParams = new URLSearchParams(window.location.search);
+		var new_query = urlParams.get('q');
+		if (!!new_query) {
+			searchbar.val(new_query)
+			submit_form(new_query)
+		}
+	});
 
 	// LOAD PARTICLES ANIMATION
 	particlesJS.load('particles-js', 'particles_white.json');
@@ -54,7 +68,7 @@ $(function() {
 		var commands = {
 			'search for *query': function(query) {
 				searchbar.val(query);
-				submit_form();
+				submit_form(query);
 			}
 		};
 		annyang.addCommands(commands);
@@ -68,13 +82,16 @@ $(function() {
 
 	$('#sidebar_content').hide();
 	//scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
-	var submit_form = function(e) {
+	function submit_form(input) {
 		$("#welcome").fadeOut("fast");
 		$(".hex").addClass("rotate");
 		//scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
 		$.getJSON($SCRIPT_ROOT + '/_answer', {
-			query: searchbar.val()
+			query: input
 		}, function(data) {
+			const url = new URL(window.location)
+			url.searchParams.set('q', input)
+			window.history.pushState({}, '', url)
 			response = data.result
 			var current_page = 1
 			summary_button.show();
@@ -363,10 +380,14 @@ $(function() {
 		}
 	}
 
-	$('#sendbutton').bind('click', submit_form);
+	$('#sendbutton').bind('click', function(e) {
+		e.preventDefault()
+		submit_form(searchbar.val());
+	});
 	searchbar.bind('keydown', function(e) {
 		if (e.keyCode == 13) {
-			submit_form();
+			e.preventDefault()
+			submit_form(searchbar.val());
 		}
 	});
 
