@@ -181,6 +181,7 @@ class Indexer(scrapy.Spider):
                         bson.dumps({
                             "vec": imageDescriptionVector.tostring(),
                             "url": imageLink,
+                            "parentUrl": url
                         }))
                 except Exception as e:
                     print(e)
