@@ -31,7 +31,7 @@ from scipy.spatial import distance
 from itertools import tee, islice, chain
 from nltk.corpus import wordnet
 from SPARQLWrapper import SPARQLWrapper, JSON
-from polyglot.detect import Detector
+# from polyglot.detect import Detector
 
 import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests
 bson.loads = bson.BSON.decode
@@ -291,38 +291,35 @@ def getAbstractFromDBPedia(query: str) -> str:
 
 
 def getDefinitionFromDBPedia(word: str, noUrl: bool = True) -> Any:
-    try:
-        if noUrl:
-            sparql.setQuery("""
-             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    if noUrl:
+        sparql.setQuery("""
+            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-             select str(?desc)
-                where {
-                    <%s> rdfs:comment ?desc
-                    FILTER (langMatches(lang(?desc),"en"))
-                }
-             """ % getResourceFromDBPedia(preprocessSentece(word))["resource"])
-            return sparql.query().convert(
-            )[u"results"][u"bindings"][0][u"callret-0"][u"value"]
-        else:
-            sparql.setQuery("""
-             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+            select str(?desc)
+               where {
+                   <%s> rdfs:comment ?desc
+                   FILTER (langMatches(lang(?desc),"en"))
+               }
+            """ % getResourceFromDBPedia(preprocessSentece(word))["resource"])
+        return sparql.query().convert(
+        )[u"results"][u"bindings"][0][u"callret-0"][u"value"]
+    else:
+        sparql.setQuery("""
+            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-             select str(?desc) str(?url)
-                where {
-                    <%s> rdfs:comment ?desc;
-                    foaf:isPrimaryTopicOf ?url.
-                    FILTER (langMatches(lang(?desc),"en")).
-                }
-             """ % getResourceFromDBPedia(
-                preprocessSentece("Statue of Liberty"))["resource"])
-            response = sparql.query().convert()[u"results"][u"bindings"][0]
-            return {
-                "definition": response[u"callret-0"][u"value"],
-                "url": response["callret-1"][u"value"]
-            }
-    except:
-        return None
+            select str(?desc) str(?url)
+               where {
+                   <%s> rdfs:comment ?desc;
+                   foaf:isPrimaryTopicOf ?url.
+                   FILTER (langMatches(lang(?desc),"en")).
+               }
+            """ % getResourceFromDBPedia(
+            preprocessSentece("Statue of Liberty"))["resource"])
+        response = sparql.query().convert()[u"results"][u"bindings"][0]
+        return {
+            "definition": response[u"callret-0"][u"value"],
+            "url": response["callret-1"][u"value"]
+        }
 
 
 def appendIfNotEmpty(list1, element):
@@ -365,7 +362,26 @@ def getSentenceMeanVector(sentence: str) -> np.array:
                         wordVectors,
                         getWordChunkVector(getDefinitionFromDBPedia(word)))
                 except:
-                    pass
+                    for subword in word.split(" "):
+                        subword = subword.strip()
+                        try:
+                            appendIfNotEmpty(wordVectors,
+                                             gloveVectors[subword])
+                        except:
+                            try:
+                                appendIfNotEmpty(
+                                    wordVectors,
+                                    getWordChunkVector(
+                                        wordnet.synsets(subword)
+                                        [0].definition()))
+                            except:
+                                try:
+                                    appendIfNotEmpty(
+                                        wordVectors,
+                                        getWordChunkVector(
+                                            getDefinitionFromDBPedia(subword)))
+                                except:
+                                    pass
     try:
         if len(wordVectors) > 0:
             return np.array(wordVectors).mean(axis=0).astype(np.float32)

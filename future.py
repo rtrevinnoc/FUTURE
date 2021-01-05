@@ -313,11 +313,16 @@ def answer(query: str) -> jsonify:
         bigListOfUrls = urls["urls"]
         bigListOfImages = images["images"]
 
+    try:
+        DBPediaDef = getDefinitionFromDBPedia(query)
+    except:
+        DBPediaDef = "Brief description not found."
+
     return {
         "answer":
         escapeHTMLString(getAbstractFromDBPedia(query)),
         "small_summary":
-        escapeHTMLString(getDefinitionFromDBPedia(query)),
+        escapeHTMLString(DBPediaDef),
         "time":
         time.time() - start,
         "corrected":

@@ -25,9 +25,11 @@ pip3 install -U scikit-learn
 pip3 install -U pandas
 pip3 install -U h5py
 pip3 install -U uWSGI
+pip3 install -U wordnet
 
 python3 -m spacy download en_core_web_sm
 python3 -c "import nltk; nltk.download('punkt')"
+python -c "import nltk; nltk.download('wordnet')"
 
 wget http://nlp.stanford.edu/data/glove.6B.zip
 unzip -d "glove.6B" glove.6B.zip
