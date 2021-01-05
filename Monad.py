@@ -132,7 +132,7 @@ def returnUnpackedListOfTrigrams(someIterable: list) -> list:
 def tokenizeSentence(text: str) -> List[str]:
     try:
         doc = spacyModel(text)
-        
+
         words = []
         for ent in doc.ents:
             words.append(ent.text)
@@ -236,8 +236,8 @@ def getResourceFromDBPedia(query: str) -> dict:
             }""" % locals())
             return {
                 "resource":
-                sparql.query().convert()["results"]["bindings"][0]["s"]
-                ["value"],
+                cleanDBPediaResourceName(sparql.query().convert()["results"]
+                                         ["bindings"][0]["s"])["value"],
                 "verification":
                 True
             }
@@ -356,11 +356,13 @@ def getSentenceMeanVector(sentence: str) -> np.array:
             appendIfNotEmpty(wordVectors, gloveVectors[word])
         except:
             try:
-                appendIfNotEmpty(wordVectors,
+                appendIfNotEmpty(
+                    wordVectors,
                     getWordChunkVector(wordnet.synsets(word)[0].definition()))
             except:
                 try:
-                    appendIfNotEmpty(wordVectors,
+                    appendIfNotEmpty(
+                        wordVectors,
                         getWordChunkVector(getDefinitionFromDBPedia(word)))
                 except:
                     pass
@@ -406,6 +408,7 @@ def isLocation(vec: np.array) -> bool:
         return True
     else:
         return False
+
 
 def isPlace(query: str) -> bool:
     sparql.setQuery("""
