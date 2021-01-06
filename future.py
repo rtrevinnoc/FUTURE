@@ -39,7 +39,7 @@ from config import HOST_NAME, PEER_PORT
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
 
-global port, hostIP, hostname, listOfPeers, app, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, numberOfURLs
+global port, hostIP, hostname, listOfPeers, app, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, numberOfURLs, goodSearxInstances, headersForSearx
 port = int(PEER_PORT)
 hostIP = requests.get(
     "https://api.ipify.org?format=json").json()["ip"] + ":" + str(port)
@@ -174,6 +174,21 @@ with peerRegistry.begin() as peerRegistryDBTransaction:
         sendRegisterRequestToPeer(key)
 
 
+searxInstances = requests.get("https://searx.space/data/instances.json").json()["instances"]
+goodSearxInstances = filter(lambda x: x[1].get("timing").get("search").get("error") == None, filter(lambda x: x[1].get("timing").get("search")["success_percentage"] >= 90, filter(lambda x: x[1].get("timing").get("search") != None, filter(lambda x: type(x[1].get("timing")) == dict, searxInstances.items()))))
+goodSearxInstances = filter(lambda x: x[1].get("tls")["grade"] == "A+", filter(lambda x: x[1].get("tls") != None, filter(lambda x: x[1]["network_type"] == "normal", goodSearxInstances)))
+goodSearxInstances = sorted(goodSearxInstances, key=lambda x: x[1]["timing"]["search"]["all"]["mean"])
+
+
+headersForSearx = {
+    "Accept-Encoding": "gzip, deflate, br", 
+    "Accept-Language": "en-US,en;q=0.5", 
+    "Upgrade-Insecure-Requests": "1", 
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0", 
+    "X-Amzn-Trace-Id": "Root=1-5ff4f39d-43753d3a161269974fdca42e"
+}
+
+
 async def getDataFromPeers(query, queryVector, queryLanguage, numberOfURLs,
                            numberOfPage):
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
@@ -229,12 +244,13 @@ def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
         elif page == 1:
             lowerLimit = 0
 
+        resultImages = []
+        for image in vectorIds[0][lowerLimit:totalItems]:
+            image = bson.loads(imageDBTransaction.get(str(image).encode("utf-8")))
+            resultImages.append({"url": image["url"], "parentUrl": image["parentUrl"]})
+
         return {
-            "images": [
-                bson.loads(imageDBTransaction.get(
-                    str(image).encode("utf-8")))["url"]
-                for image in vectorIds[0][lowerLimit:totalItems]
-            ],
+            "images": resultImages,
             "vectorIds":
             vectorIds[0][lowerLimit:totalItems],
             "scores":
@@ -301,8 +317,9 @@ def answer(query: str) -> jsonify:
         listOfImagesFromPeers = list(
             itertools.chain(*[pack["images"] for pack in listOfDataFromPeers]))
         bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
-        bigListOfImages = list(
-            set(listOfImagesFromHost + listOfImagesFromPeers))
+        # bigListOfImages = list(
+            # set(listOfImagesFromHost + listOfImagesFromPeers))
+        bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
         bigListOfUrls.sort(key=lambda x: x[1])
         bigListOfImages.sort(key=lambda x: x[1])
         bigListOfUrls = [url[0] for url in bigListOfUrls]
@@ -312,6 +329,22 @@ def answer(query: str) -> jsonify:
     else:
         bigListOfUrls = urls["urls"]
         bigListOfImages = images["images"]
+
+    while True:
+        try:
+            resultURLsFromSearx = requests.get(goodSearxInstances[int(random.random() * len(goodSearxInstances))][0] + "search", headers=headersForSearx, params={'q': query, 'format': 'json'}, timeout=5).json()['results']
+            resultURLsFromSearx = [{'url': result.get('url', "No URL available."), 'header': result.get('title', "No header available."), 'body': result.get('content', "No description available.")} for result in resultURLsFromSearx]
+            bigListOfUrls = resultURLsFromSearx + bigListOfUrls
+        except:
+            pass
+
+    while True:
+        try:
+            resultImagesFromSearx = requests.get(goodSearxInstances[int(random.random() * len(goodSearxInstances))][0] + "search", headers=headersForSearx, params={'q': query, 'format': 'json', 'categories': 'images'}, timeout=5).json()['results']
+            resultImagesFromSearx = [{'url': result.get('img_src', "Resource not available."), 'parentUrl': result.get('url', "Resource not available.")} for result in resultImagesFromSearx]
+            bigListOfImages = resultImagesFromSearx + bigListOfImages
+        except:
+            pass
 
     try:
         DBPediaDef = getDefinitionFromDBPedia(query)
@@ -331,7 +364,8 @@ def answer(query: str) -> jsonify:
         list({frozenset(item.items()): item
               for item in bigListOfUrls}.values()),
         "images":
-        bigListOfImages,
+        list({frozenset(item.items()): item
+              for item in bigListOfImages}.values()),
         "n_res":
         len(bigListOfUrls),
         "map":

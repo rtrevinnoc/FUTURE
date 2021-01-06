@@ -131,8 +131,8 @@ $(function() {
 			maps.empty()
 			summary.empty()
 
-			response["images"].forEach(function(url) {
-				images.append('<div class="grid-item"><img class="image-item" src="' + url + '" alt="Not available"></div>')
+			response["images"].forEach(function(image) {
+				images.append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
 			});
 
 			section = "links"
@@ -164,8 +164,8 @@ $(function() {
 					response["urls"].forEach(function(url) {
 						$('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>').insertBefore("#load_more_items");
 					});
-					response["images"].forEach(function(url) {
-						images.append('<div class="grid-item"><img class="image-item" src="' + url + '" alt="Not available"></div>')
+					response["images"].forEach(function(image) {
+						images.append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
 					});
 					current_page = current_page + 1;
 				});
