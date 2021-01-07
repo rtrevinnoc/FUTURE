@@ -527,6 +527,7 @@ def index():
 @app.route("/_autocomplete", methods=["GET", "POST"])
 def _autocomplete():
     term = request.args.get("term", 0, type=str)
+    type_arg = request.args.get("type", "list", type=str)
     with analyticsDBIndex.begin() as analyticsDBTransaction:
         analyticsDBSelector = analyticsDBTransaction.cursor()
         decodedPreviousQueries = [(str(key.decode("utf-8")), int(value))
@@ -538,9 +539,13 @@ def _autocomplete():
             ][:5],
                                                  key=lambda x: x[1],
                                                  reverse=True)
-        ]
-        return Response(json.dumps(similarPreviousQueries),
-                        mimetype='application/json')
+        ] 
+        if type_arg == "list":
+            return Response(json.dumps([term, similarPreviousQueries]),
+                    mimetype='application/json')
+        else:
+            return Response(json.dumps(similarPreviousQueries),
+                    mimetype='application/json')
 
 
 @app.route("/_answer")
