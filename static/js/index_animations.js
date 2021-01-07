@@ -80,7 +80,7 @@ $(function() {
 		minLength: 1
 	});
 
-	var changeSection = function() {
+	function changeSection() {
 		if (section == "summary") {
 			$("body").animate({
 				backgroundColor: "#505050"
@@ -130,8 +130,6 @@ $(function() {
 
 		$('#particles-js').fadeOut("slow");
 
-		section = "links"
-		changeSection();
 		links_button.animate({
 			color: "#9e3434"
 		}, "fast");
@@ -223,6 +221,8 @@ $(function() {
 		const url = new URL(window.location)
 		url.searchParams.set('q', input)
 		window.history.pushState({}, '', url)
+		section = "links"
+		changeSection();
 
 		return false;
 	};
