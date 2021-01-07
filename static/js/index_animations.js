@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Roberto Treviño Cervantes
+-/ Copyright (c) 2020 Roberto Treviño Cervantes
 
 // This file is part of FUTURE (Powered by Monad).
 
@@ -197,7 +197,6 @@ $(function() {
 					backgroundColor: "#2b2b2b"
 				}, "fast");
 			}
-			$(".hex").removeClass("rotate")
 			//$('#chat .simplebar-content').append('<div class="blockline"><div class="container2"><span class="you">' + response["corrected"] + '</span></div></div>');
 
 			response["images"].forEach(function(image) {
@@ -223,6 +222,7 @@ $(function() {
 		window.history.pushState({}, '', url)
 		section = "links"
 		changeSection();
+		$(".hex").removeClass("rotate")
 
 		return false;
 	};
