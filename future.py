@@ -330,22 +330,6 @@ def answer(query: str) -> jsonify:
         bigListOfUrls = urls["urls"]
         bigListOfImages = images["images"]
 
-    while True:
-        try:
-            resultURLsFromSearx = requests.get(goodSearxInstances[int(random.random() * len(goodSearxInstances))][0] + "search", headers=headersForSearx, params={'q': query, 'format': 'json'}, timeout=5).json()['results']
-            resultURLsFromSearx = [{'url': result.get('url', "No URL available."), 'header': result.get('title', "No header available."), 'body': result.get('content', "No description available.")} for result in resultURLsFromSearx]
-            bigListOfUrls = resultURLsFromSearx + bigListOfUrls
-        except:
-            pass
-
-    while True:
-        try:
-            resultImagesFromSearx = requests.get(goodSearxInstances[int(random.random() * len(goodSearxInstances))][0] + "search", headers=headersForSearx, params={'q': query, 'format': 'json', 'categories': 'images'}, timeout=5).json()['results']
-            resultImagesFromSearx = [{'url': result.get('img_src', "Resource not available."), 'parentUrl': result.get('url', "Resource not available.")} for result in resultImagesFromSearx]
-            bigListOfImages = resultImagesFromSearx + bigListOfImages
-        except:
-            pass
-
     try:
         DBPediaDef = getDefinitionFromDBPedia(query)
     except:
@@ -421,6 +405,47 @@ def _registerPeer():
     peerRegistryTransaction.commit()
 
     return jsonify(result={"listOfPeers": listOfPeers})
+
+
+@app.route('/_fetchSearxResults', methods=['GET'])
+def fetchSearxResults():
+    query = request.args.get("query", 0, type=str)
+
+    queryBeforePreprocessing = query
+    if getResourceFromDBPedia(
+            queryBeforePreprocessing)["verification"] == False:
+        spellCheckerSuggestions = spellChecker.lookup_compound(
+            query, 2)  # LAST PARAMETER INDICATES MAX EDIT DISTANCE LOOKUP
+        query = " ".join(
+            [suggestion.term for suggestion in spellCheckerSuggestions])
+    else:
+        query = queryBeforePreprocessing
+
+    while True:
+        try:
+            resultURLsFromSearx = requests.get(goodSearxInstances[int(random.random() * len(goodSearxInstances))][0] + "search", headers=headersForSearx, params={'q': query, 'format': 'json'}, timeout=5).json()['results']
+            resultURLsFromSearx = [{'url': result.get('url', "No URL available."), 'header': result.get('title', "No header available."), 'body': result.get('content', "No description available.")} for result in resultURLsFromSearx]
+            break
+        except:
+            pass
+
+    while True:
+        try:
+            resultImagesFromSearx = requests.get(goodSearxInstances[int(random.random() * len(goodSearxInstances))][0] + "search", headers=headersForSearx, params={'q': query, 'format': 'json', 'categories': 'images'}, timeout=5).json()['results']
+            resultImagesFromSearx = [{'url': result.get('img_src', ""), 'parentUrl': result.get('url', "")} for result in resultImagesFromSearx]
+            break
+        except:
+            pass
+
+    return jsonify(
+        result={
+            "urls":
+            list({frozenset(item.items()): item
+                  for item in resultURLsFromSearx}.values()),
+            "images":
+            list({frozenset(item.items()): item
+                  for item in resultImagesFromSearx}.values())
+        })
 
 
 @app.route('/sw.js', methods=['GET'])
