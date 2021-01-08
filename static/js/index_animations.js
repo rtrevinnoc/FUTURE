@@ -1,4 +1,4 @@
--/ Copyright (c) 2020 Roberto Treviño Cervantes
+// Copyright (c) 2020 Roberto Treviño Cervantes
 
 // This file is part of FUTURE (Powered by Monad).
 
@@ -159,12 +159,12 @@ $(function() {
 			maps.fadeOut("fast");
 			links.fadeIn("fast");
 
-			searx_response["images"].forEach(function(image) {
-				images.append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
+			searx_response["images"].reverse().forEach(function(image) {
+				images.prepend('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
 			});
 
-			searx_response["urls"].forEach(function(url) {
-				$("#links_list").append('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>')
+			searx_response["urls"].reverse().forEach(function(url) {
+				$("#links_list").prepend('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>')
 			});
 		})
 
