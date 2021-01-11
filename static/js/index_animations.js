@@ -122,6 +122,7 @@ $(function() {
 		$("#welcome").fadeOut("fast");
 		$(".hex").addClass("rotate");
 		$("#links_list").empty()
+		$("#links_description").empty()
 		images.empty()
 		maps.empty()
 		summary.empty()
@@ -203,8 +204,8 @@ $(function() {
 				images.append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
 			});
 
-			links.prepend('<div id="small_summary">' + response["small_summary"] + '</div>')
-			links.prepend('<p id="gathered">Gathered ' + response["n_res"] + ' resources in ' + response["time"] + 's</p>')
+			$("#links_description").prepend('<div id="small_summary">' + response["small_summary"] + '</div>')
+			$("#links_description").prepend('<p id="gathered">Gathered ' + response["n_res"] + ' resources in ' + response["time"] + 's</p>')
 			response["urls"].forEach(function(url) {
 				$("#links_list").append('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>')
 			});
