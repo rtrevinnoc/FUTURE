@@ -24,10 +24,12 @@ $(function() {
 	var summary = $("#summary_content")
 	var links = $("#links_content")
 	var images = $("#images_content")
+	var videos = $("#videos_content")
 	var maps = $("#maps_content")
 	var summary_button = $('#summary')
 	var links_button = $('#links')
 	var images_button = $('#images')
+	var videos_button = $('#videos')
 	var maps_button = $('#maps')
 	var urlParams = new URLSearchParams(window.location.search);
 	const initial_query = urlParams.get('q');
@@ -56,12 +58,14 @@ $(function() {
 	summary.hide();
 	links.hide();
 	images.hide();
+	videos.hide();
 	maps.hide();
 
 	// REMOVE ACCESS TO HIDDEN SECTIONS
 	summary_button.hide();
 	links_button.hide();
 	images_button.hide();
+	videos_button.hide();
 	maps_button.hide();
 
 	if (annyang) {
@@ -88,6 +92,21 @@ $(function() {
 			summary.animate({
 				color: "#BABABA"
 			}, "slow");
+			summary_button.animate({
+				color: "#9e3434"
+			}, "fast");
+			links_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			maps_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			images_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			videos_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
 		} else if (section == "links") {
 			$("body").animate({
 				backgroundColor: "#EEEEEE"
@@ -95,6 +114,21 @@ $(function() {
 			links.animate({
 				color: "#1C1C1C"
 			}, "slow");
+			links_button.animate({
+				color: "#9e3434"
+			}, "fast");
+			summary_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			maps_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			images_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			videos_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
 		} else if (section == "maps") {
 			$("body").animate({
 				backgroundColor: "#EEEEEE"
@@ -102,6 +136,21 @@ $(function() {
 			maps.animate({
 				color: "#1C1C1C"
 			}, "slow");
+			maps_button.animate({
+				color: "#9e3434"
+			}, "fast");
+			links_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			summary_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			videos_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			images_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
 		} else if (section == "images") {
 			$("body").animate({
 				backgroundColor: "#EEEEEE"
@@ -109,6 +158,43 @@ $(function() {
 			images.animate({
 				color: "#1C1C1C"
 			}, "slow");
+			images_button.animate({
+				color: "#9e3434"
+			}, "fast");
+			links_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			summary_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			maps_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			videos_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+		} else if (section == "videos") {
+			$("body").animate({
+				backgroundColor: "#EEEEEE"
+			}, "slow");
+			videos.animate({
+				color: "#1C1C1C"
+			}, "slow");
+			videos_button.animate({
+				color: "#9e3434"
+			}, "fast");
+			links_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			summary_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			maps_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
+			images_button.animate({
+				color: "#1b1a1a"
+			}, "fast");
 		} else {
 			$("body").animate({
 				backgroundColor: "#EEEEEE"
@@ -119,13 +205,17 @@ $(function() {
 	$('#sidebar_content').hide();
 	//scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
 	function submit_form(input) {
+		var date = new Date();
+		var start_time = date.getTime();
 		$("#welcome").fadeOut("fast");
 		$(".hex").addClass("rotate");
 		$("#links_list").empty()
 		$("#links_description").empty()
 		images.empty()
+		videos.empty()
 		maps.empty()
 		summary.empty()
+		counter = 0
 
 		//$('#sidebar_show').addClass("blink_sidebar");
 
@@ -138,6 +228,9 @@ $(function() {
 			color: "#1b1a1a"
 		}, "fast");
 		maps_button.animate({
+			color: "#1b1a1a"
+		}, "fast");
+		videos_button.animate({
 			color: "#1b1a1a"
 		}, "fast");
 		images_button.animate({
@@ -154,19 +247,33 @@ $(function() {
 			summary_button.show();
 			links_button.show();
 			images_button.show();
+			videos_button.show();
 			maps_button.show();
 			summary.fadeOut("fast");
 			images.fadeOut("fast");
+			videos.fadeOut("fast");
 			maps.fadeOut("fast");
 			links.fadeIn("fast");
+			section = "links"
+			changeSection();
+
+			searx_response["urls"].reverse().forEach(function(url) {
+				$("#links_list").prepend('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>')
+			});
 
 			searx_response["images"].reverse().forEach(function(image) {
 				images.prepend('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
 			});
 
-			searx_response["urls"].reverse().forEach(function(url) {
-				$("#links_list").prepend('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>')
+			searx_response["videos"].forEach(function(video) {
+				videos.append('<div class="video_item"><div class="video_thumbnail"><a href="' + video["url"] + '"><img src="' + video["thumbnail"] + '" alt=""></a></div><div class="video_description"><p class="link_paragraph"><span class="domain"><a href="' + video["url"] + '">' + video["title"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + video["url"] + '">' + video["url"] + '</a></span></p><p class="body searchable">' + video['length'] + ' | Uploaded by ' + video["author"] + ' on ' + video['date'] + '.<p></div></div>')
 			});
+
+			counter += 1
+			if (counter == 2) {
+				$(".hex").removeClass("rotate")
+				$("#links_description").prepend('<p id="gathered">Gathered ' + $("#links_list .url_item").length + ' resources in ' + (date.getTime() - start_time) + 's</p>')
+			}
 		})
 
 		$.getJSON($SCRIPT_ROOT + '/_answer', {
@@ -178,11 +285,15 @@ $(function() {
 			summary_button.show();
 			links_button.show();
 			images_button.show();
+			videos_button.show();
 			maps_button.show();
 			summary.fadeOut("fast");
 			images.fadeOut("fast");
+			videos.fadeOut("fast");
 			maps.fadeOut("fast");
 			links.fadeIn("fast");
+			section = "links"
+			changeSection();
 			if (response["map"] === "") {
 				maps_button.hide();
 			} else {
@@ -205,7 +316,6 @@ $(function() {
 			});
 
 			$("#links_description").prepend('<div id="small_summary">' + response["small_summary"] + '</div>')
-			$("#links_description").prepend('<p id="gathered">Gathered ' + response["n_res"] + ' resources in ' + response["time"] + 's</p>')
 			response["urls"].forEach(function(url) {
 				$("#links_list").append('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>')
 			});
@@ -216,14 +326,17 @@ $(function() {
 			//if (response["n_res"] === 0 || response["chatbot"] === 0) {
 			//	chat.slideDown("slow")
 			//}
+			
+			counter += 1
+			if (counter == 2) {
+				$(".hex").removeClass("rotate")
+				$("#links_description").prepend('<p id="gathered">Gathered ' + $("#links_list .url_item").length + ' resources in ' + (date.getTime() - start_time) + 's</p>')
+			}
 		});
 
 		const url = new URL(window.location)
 		url.searchParams.set('q', input)
 		window.history.pushState({}, '', url)
-		section = "links"
-		changeSection();
-		$(".hex").removeClass("rotate")
 
 		return false;
 	};
@@ -247,44 +360,22 @@ $(function() {
 	//})
 
 	links_button.click(function(e) {
-		links_button.animate({
-			color: "#9e3434"
-		}, "fast");
-		summary_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
-		maps_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
-		images_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
 		section = "links"
 		changeSection()
 		summary.fadeOut("fast");
 		images.fadeOut("fast");
 		maps.fadeOut("fast");
+		videos.fadeOut("fast");
 		links.fadeIn("fast");
 	})
 
 	summary_button.click(function(e) {
-		summary_button.animate({
-			color: "#9e3434"
-		}, "fast");
-		links_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
-		maps_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
-		images_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
 		section = "summary"
 		changeSection()
 		links.fadeOut("fast");
 		images.fadeOut("fast");
 		maps.fadeOut("fast");
+		videos.fadeOut("fast");
 		summary.fadeIn("fast");
 		if (summary.text().length == 0) {
 			summary.text(response["answer"]);
@@ -292,23 +383,12 @@ $(function() {
 	})
 
 	images_button.click(function(e) {
-		images_button.animate({
-			color: "#9e3434"
-		}, "fast");
-		links_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
-		summary_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
-		maps_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
 		section = "images"
 		changeSection()
 		summary.fadeOut("fast");
 		links.fadeOut("fast");
 		maps.fadeOut("fast");
+		videos.fadeOut("fast");
 		images.fadeIn("fast");
 		//if (images.html().length == 0) {
 			//response["images"].forEach(function(url) {
@@ -317,24 +397,23 @@ $(function() {
 		//}
 	})
 
+	videos_button.click(function(e) {
+		section = "videos"
+		changeSection()
+		summary.fadeOut("fast");
+		images.fadeOut("fast");
+		maps.fadeOut("fast");
+		links.fadeOut("fast");
+		videos.fadeIn("fast");
+	})
+
 	maps_button.click(function(e) {
-		maps_button.animate({
-			color: "#9e3434"
-		}, "fast");
-		links_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
-		summary_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
-		images_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
 		section = "maps"
 		changeSection()
 		summary.fadeOut("fast");
 		links.fadeOut("fast");
 		images.fadeOut("fast");
+		videos.fadeOut("fast");
 		maps.show();
 		maps.append(response["map"])
 	})

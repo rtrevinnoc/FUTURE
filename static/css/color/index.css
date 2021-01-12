@@ -193,21 +193,21 @@ p#gathered {
   background-color: #111111;
 }
 
-.url_item .link_paragraph .domain a {
+.url_item .link_paragraph .domain a, .video_item .link_paragraph .domain a {
   color: #DAA520;
   text-decoration: none;
 }
 
-.url_item .link_paragraph .header a {
+.url_item .link_paragraph .header a, .video_item .link_paragraph .header a {
   color: #959595;
   text-decoration: none;
 }
 
-.url_item .body {
+.url_item .body, .video_item .body {
   color: #111111;
 }
 
-.url_item .link_paragraph2 .link a {
+.url_item .link_paragraph2 .link a, .video_item .link_paragraph2 .link a {
   color: #b82f2f;
   text-decoration: underline;
 }

@@ -173,18 +173,31 @@ with peerRegistry.begin() as peerRegistryDBTransaction:
         listOfPeers.append(key.decode("utf-8"))
         sendRegisterRequestToPeer(key)
 
-
-searxInstances = requests.get("https://searx.space/data/instances.json").json()["instances"]
-goodSearxInstances = filter(lambda x: x[1].get("timing").get("search").get("error") == None, filter(lambda x: x[1].get("timing").get("search")["success_percentage"] >= 90, filter(lambda x: x[1].get("timing").get("search") != None, filter(lambda x: type(x[1].get("timing")) == dict, searxInstances.items()))))
-goodSearxInstances = filter(lambda x: x[1].get("tls")["grade"] == "A+", filter(lambda x: x[1].get("tls") != None, filter(lambda x: x[1]["network_type"] == "normal", goodSearxInstances)))
-goodSearxInstances = sorted(goodSearxInstances, key=lambda x: x[1]["timing"]["search"]["all"]["mean"])
-
+searxInstances = requests.get(
+    "https://searx.space/data/instances.json").json()["instances"]
+goodSearxInstances = filter(
+    lambda x: x[1].get("timing").get("search").get("error") == None,
+    filter(
+        lambda x: x[1].get("timing").get("search")["success_percentage"] >= 90,
+        filter(
+            lambda x: x[1].get("timing").get("search") != None,
+            filter(lambda x: type(x[1].get("timing")) == dict,
+                   searxInstances.items()))))
+goodSearxInstances = filter(
+    lambda x: x[1].get("tls")["grade"] == "A+",
+    filter(
+        lambda x: x[1].get("tls") != None,
+        filter(lambda x: x[1]["network_type"] == "normal",
+               goodSearxInstances)))
+goodSearxInstances = sorted(
+    goodSearxInstances, key=lambda x: x[1]["timing"]["search"]["all"]["mean"])
 
 headersForSearx = {
-    "Accept-Encoding": "gzip, deflate, br", 
-    "Accept-Language": "en-US,en;q=0.5", 
-    "Upgrade-Insecure-Requests": "1", 
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0", 
+    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Language": "en-US,en;q=0.5",
+    "Upgrade-Insecure-Requests": "1",
+    "User-Agent":
+    "Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0",
     "X-Amzn-Trace-Id": "Root=1-5ff4f39d-43753d3a161269974fdca42e"
 }
 
@@ -246,20 +259,21 @@ def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
 
         resultImages = []
         for image in vectorIds[0][lowerLimit:totalItems]:
-            image = bson.loads(imageDBTransaction.get(str(image).encode("utf-8")))
-            resultImages.append({"url": image["url"], "parentUrl": image["parentUrl"]})
+            image = bson.loads(
+                imageDBTransaction.get(str(image).encode("utf-8")))
+            resultImages.append({
+                "url": image["url"],
+                "parentUrl": image["parentUrl"]
+            })
 
         return {
             "images": resultImages,
-            "vectorIds":
-            vectorIds[0][lowerLimit:totalItems],
-            "scores":
-            vectorScores[0][lowerLimit:totalItems]
+            "vectorIds": vectorIds[0][lowerLimit:totalItems],
+            "scores": vectorScores[0][lowerLimit:totalItems]
         }
 
 
 def answer(query: str) -> jsonify:
-    start = time.time()
     queryBeforePreprocessing = query
     queryLanguage = inferLanguage(query)
     if getResourceFromDBPedia(
@@ -277,11 +291,11 @@ def answer(query: str) -> jsonify:
         return {
             "answer": "No relevant information available.",
             "small_summary": "No relevant information available.",
-            "time": time.time() - start,
+            # "time": time.time() - start,
             "corrected": query,
             "urls": [],
             "images": [],
-            "n_res": 0,
+            # "n_res": 0,
             "map": "",
         }
 
@@ -318,7 +332,7 @@ def answer(query: str) -> jsonify:
             itertools.chain(*[pack["images"] for pack in listOfDataFromPeers]))
         bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
         # bigListOfImages = list(
-            # set(listOfImagesFromHost + listOfImagesFromPeers))
+        # set(listOfImagesFromHost + listOfImagesFromPeers))
         bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
         bigListOfUrls.sort(key=lambda x: x[1])
         bigListOfImages.sort(key=lambda x: x[1])
@@ -340,8 +354,8 @@ def answer(query: str) -> jsonify:
         escapeHTMLString(getAbstractFromDBPedia(query)),
         "small_summary":
         escapeHTMLString(DBPediaDef),
-        "time":
-        time.time() - start,
+        # "time":
+        # time.time() - start,
         "corrected":
         escapeHTMLString(query),
         "urls":
@@ -350,8 +364,8 @@ def answer(query: str) -> jsonify:
         "images":
         list({frozenset(item.items()): item
               for item in bigListOfImages}.values()),
-        "n_res":
-        len(bigListOfUrls),
+        # "n_res":
+        # len(bigListOfUrls),
         "map":
         getMap(queryBeforePreprocessing, query),
     }
@@ -423,28 +437,83 @@ def fetchSearxResults():
 
     while True:
         try:
-            resultURLsFromSearx = requests.get(goodSearxInstances[int(random.random() * len(goodSearxInstances))][0] + "search", headers=headersForSearx, params={'q': query, 'format': 'json'}, timeout=5).json()['results']
-            resultURLsFromSearx = [{'url': result.get('url', "No URL available."), 'header': result.get('title', "No header available."), 'body': result.get('content', "No description available.")} for result in resultURLsFromSearx]
+            resultURLsFromSearx = requests.get(goodSearxInstances[int(
+                random.random() * len(goodSearxInstances))][0] + "search",
+                                               headers=headersForSearx,
+                                               params={
+                                                   'q': query,
+                                                   'format': 'json'
+                                               },
+                                               timeout=5).json()['results']
+            resultURLsFromSearx = [{
+                'url':
+                result.get('url', "No URL available."),
+                'header':
+                result.get('title', "No header available."),
+                'body':
+                result.get('content', "No description available.")
+            } for result in resultURLsFromSearx]
             break
         except:
             pass
 
     while True:
         try:
-            resultImagesFromSearx = requests.get(goodSearxInstances[int(random.random() * len(goodSearxInstances))][0] + "search", headers=headersForSearx, params={'q': query, 'format': 'json', 'categories': 'images'}, timeout=5).json()['results']
-            resultImagesFromSearx = [{'url': result.get('img_src', ""), 'parentUrl': result.get('url', "")} for result in resultImagesFromSearx]
+            resultImagesFromSearx = requests.get(goodSearxInstances[int(
+                random.random() * len(goodSearxInstances))][0] + "search",
+                                                 headers=headersForSearx,
+                                                 params={
+                                                     'q': query,
+                                                     'format': 'json',
+                                                     'categories': 'images'
+                                                 },
+                                                 timeout=5).json()['results']
+            resultImagesFromSearx = [{
+                'url': result.get('img_src', ""),
+                'parentUrl': result.get('url', "")
+            } for result in resultImagesFromSearx]
+            break
+        except:
+            pass
+
+    while True:
+        try:
+            resultVideosFromSearx = requests.get(goodSearxInstances[int(
+                random.random() * len(goodSearxInstances))][0] + "search",
+                                                 headers=headersForSearx,
+                                                 params={
+                                                     'q': query,
+                                                     'format': 'json',
+                                                     'categories': 'videos'
+                                                 },
+                                                 timeout=5).json()['results']
+            resultVideosFromSearx = sorted(
+                resultVideosFromSearx,
+                key=lambda x: "youtube" in x.get("url"),
+                reverse=True)
+            resultVideosFromSearx = [{
+                'title':
+                result.get("title", "Untitled"),
+                'author':
+                result.get("author", "unknown"),
+                'length':
+                result.get("length", "Length not available."),
+                'date':
+                result.get("publishedDate", "unknown date"),
+                'url':
+                result.get('url', "Resource not available."),
+                'thumbnail':
+                result.get('thumbnail', "")
+            } for result in resultVideosFromSearx]
             break
         except:
             pass
 
     return jsonify(
         result={
-            "urls":
-            list({frozenset(item.items()): item
-                  for item in resultURLsFromSearx}.values()),
-            "images":
-            list({frozenset(item.items()): item
-                  for item in resultImagesFromSearx}.values())
+            "urls": resultURLsFromSearx,
+            "images": resultImagesFromSearx,
+            "videos": resultVideosFromSearx
         })
 
 
@@ -539,13 +608,13 @@ def _autocomplete():
             ][:5],
                                                  key=lambda x: x[1],
                                                  reverse=True)
-        ] 
+        ]
         if type_arg == "list":
             return Response(json.dumps([term, similarPreviousQueries]),
-                    mimetype='application/json')
+                            mimetype='application/json')
         else:
             return Response(json.dumps(similarPreviousQueries),
-                    mimetype='application/json')
+                            mimetype='application/json')
 
 
 @app.route("/_answer")
