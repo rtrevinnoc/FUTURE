@@ -285,7 +285,7 @@ def answer(query: str) -> jsonify:
             [suggestion.term for suggestion in spellCheckerSuggestions])
     else:
         query = queryBeforePreprocessing
-    query = query.lower()
+    query = query.lower().strip()
     try:
         q_vec = getSentenceMeanVector(query)
     except:
@@ -349,7 +349,7 @@ def answer(query: str) -> jsonify:
         DBPediaDef = getDefinitionFromDBPedia(query)
     except:
         try:
-            DBPediaDef = str(ne.evaluate(query)[()])
+            DBPediaDef = query + " = " str(ne.evaluate(query)[()])
         except:
             DBPediaDef = "Brief description not found."
 
