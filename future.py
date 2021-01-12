@@ -349,7 +349,7 @@ def answer(query: str) -> jsonify:
         DBPediaDef = getDefinitionFromDBPedia(query)
     except:
         try:
-            DBPediaDef = ne.evaluate(query)[()]
+            DBPediaDef = str(ne.evaluate(query)[()])
         except:
             DBPediaDef = "Brief description not found."
 
