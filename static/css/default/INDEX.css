@@ -166,12 +166,12 @@ p#gathered {
 }
 
 .url_item {
-	margin-top: 45px;
-	margin-bottom: 45px;
+	margin-top: 2vh;
+	margin-bottom: 2vh;
 }
 
 .video_item {
-	margin-bottom: 20px;
+	margin-bottom: 2vh;
 }
 
 .url_item .link_paragraph, .video_item .link_paragraph {
@@ -184,12 +184,17 @@ p#gathered {
 .url_item .link_paragraph .domain, .video_item .link_paragraph .domain {
 	font-family: 'Source Sans Pro Light';
 	font-weight: 700;
-	font-size: 2vh;
+	font-size: 3vh;
 }
 
 .url_item .link_paragraph2 .link, .video_item .link_paragraph2 .link {
 	font-family: monospace;
-	font-size: 1.2vh;
+	font-size: 1.3vh;
+}
+
+.url_item .link_paragraph2 .body, .video_item .link_paragraph2 .body {
+	font-family: monospace;
+	font-size: 1.7vh;
 }
 
 .video_item .video_thumbnail {
