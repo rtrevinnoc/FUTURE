@@ -24,6 +24,7 @@
 from Monad import *
 import os.path, os, shutil, json, random, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools
 import numpy as np
+import numexpr as ne
 from flask import (Flask, render_template, request, redirect,
                    send_from_directory, flash, abort, jsonify, escape,
                    Response)
@@ -347,7 +348,10 @@ def answer(query: str) -> jsonify:
     try:
         DBPediaDef = getDefinitionFromDBPedia(query)
     except:
-        DBPediaDef = "Brief description not found."
+        try:
+            DBPediaDef = ne.evaluate(query)[()]
+        except:
+            DBPediaDef = "Brief description not found."
 
     return {
         "answer":
