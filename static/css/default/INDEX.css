@@ -184,12 +184,12 @@ p#gathered {
 .url_item .link_paragraph .domain, .video_item .link_paragraph .domain {
 	font-family: 'Source Sans Pro Light';
 	font-weight: 700;
-	font-size: 25px;
+	font-size: 2vh;
 }
 
 .url_item .link_paragraph2 .link, .video_item .link_paragraph2 .link {
 	font-family: monospace;
-	font-size: 12px;
+	font-size: 1.2vh;
 }
 
 .video_item .video_thumbnail {
