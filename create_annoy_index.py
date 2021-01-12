@@ -30,7 +30,7 @@ futureURLs.createIndex("FUTURE_url_vecs")
 futureURLs.compileIndex()
 
 hnswImagesLookup = hnswlib.Index(space="cosine", dim=50)
-hnswImagesLookup.init_index(max_elements=100000, ef_construction=200, M=16)
+hnswImagesLookup.init_index(max_elements=1000000, ef_construction=200, M=16)
 hnswImagesLookup.set_ef(100)
 imageDBIndex = lmdb.open("./future_images", readonly=True)
 with imageDBIndex.begin() as imageDBTransaction:

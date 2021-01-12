@@ -485,7 +485,7 @@ class Monad():
 
     def loadIndex(self,
                   indexName: str,
-                  maxElements=100000,
+                  maxElements=1000000,
                   dimensions=50,
                   efConstruction=100):
         self.indexName = indexName
@@ -498,7 +498,7 @@ class Monad():
 
     def createIndex(self,
                     indexName: str,
-                    maxElements=100000,
+                    maxElements=1000000,
                     dimensions=50,
                     efConstruction=200):
         self.indexName = indexName
