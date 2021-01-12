@@ -197,12 +197,12 @@ p#gathered {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	min-width: calc(24.1vh + 3.3vw);
+	min-width: 25vw;
 }
 
 .video_item .video_thumbnail img {
-	max-width: calc(24.1vh + 3.3vw);
-	max-height: calc(20vh + 5vw);
+	max-width: 25vw;
+	max-height: 12vh;
 }
 
 #sidebar_bottom {
@@ -549,7 +549,7 @@ p.body, p.link_paragraph, p.link_paragraph2 {
 		padding-left: 0px;
 		padding-right: 0px;
 		font-size: calc(1.5vh + 1.5vw);
-		word-spacing: calc(7vw - 2vh);
+		word-spacing: calc(7vw - 1.7vh);
 	}
 
 	#subheader_sections {
