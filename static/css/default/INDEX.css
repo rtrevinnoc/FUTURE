@@ -549,7 +549,7 @@ p.body, p.link_paragraph, p.link_paragraph2 {
 		padding-left: 0px;
 		padding-right: 0px;
 		font-size: calc(1.5vh + 1.5vw);
-		word-spacing: calc(7vw - 3.5vh);
+		word-spacing: calc(7vw - 2.5vh);
 	}
 
 	#subheader_sections {
