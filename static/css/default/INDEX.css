@@ -166,8 +166,8 @@ p#gathered {
 }
 
 .url_item {
-	margin-top: 4vh;
-	margin-bottom: 4vh;
+	margin-top: 6vh;
+	margin-bottom: 6vh;
 }
 
 .video_item {
@@ -184,7 +184,7 @@ p#gathered {
 .url_item .link_paragraph .domain, .video_item .link_paragraph .domain {
 	font-family: 'Source Sans Pro Light';
 	font-weight: 700;
-	font-size: 2.5vh;
+	font-size: 2.7vh;
 }
 
 .url_item .link_paragraph2 .link, .video_item .link_paragraph2 .link {
@@ -440,7 +440,7 @@ p#gathered {
 	font-weight: 400;
 	font-style: normal;
 
-	font-size: 20px;
+	font-size: 2vh;
 	word-break: break-word !important;
 }
 
@@ -536,8 +536,8 @@ p.body, p.link_paragraph, p.link_paragraph2 {
 	}
 
 	.url_item {
-		margin-top: 4vh;
-		margin-bottom: 4vh;
+		margin-top: 6vh;
+		margin-bottom: 6vh;
 	}
 
 	.video_item {
