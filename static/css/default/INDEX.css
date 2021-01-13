@@ -166,8 +166,8 @@ p#gathered {
 }
 
 .url_item {
-	margin-top: 6vh;
-	margin-bottom: 6vh;
+	margin-top: 4vh;
+	margin-bottom: 4vh;
 }
 
 .video_item {
@@ -536,8 +536,8 @@ p.body, p.link_paragraph, p.link_paragraph2 {
 	}
 
 	.url_item {
-		margin-top: 6vh;
-		margin-bottom: 6vh;
+		margin-top: 4vh;
+		margin-bottom: 4vh;
 	}
 
 	.video_item {
