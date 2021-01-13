@@ -43,7 +43,7 @@ label {
 
 #small_summary, #load_more_items {
 	border-radius: 8px;
-	font-size: 18px;
+	font-size: 2vh;
 	padding: 12px;
 }
 
@@ -82,6 +82,7 @@ p#gathered {
 	font-family: 'Source Sans Pro';
 	font-weight: 400;
 	font-style: italic;
+	font-size: 3vh;
 }
 
 #images_content {
@@ -165,6 +166,24 @@ p#gathered {
 	cursor: pointer;
 }
 
+#whole_answer {
+	margin: auto;
+	position: absolute;
+	top: 110px;
+	right: 25px;
+	left: 25px;
+	text-align: justify;
+	height: calc(100% - 110px);
+	z-index: -999;
+
+	font-family: 'Source Sans Pro';
+	font-weight: 400;
+	font-style: normal;
+
+	font-size: 2vh;
+	word-break: break-word !important;
+}
+
 .url_item {
 	margin-top: 4vh;
 	margin-bottom: 4vh;
@@ -192,7 +211,7 @@ p#gathered {
 	font-size: 1.3vh;
 }
 
-.url_item .link_paragraph2 .body, .video_item .link_paragraph2 .body {
+.url_item .link_paragraph2, .video_item .link_paragraph2 {
 	font-family: monospace;
 	font-size: 1.7vh;
 }
@@ -422,26 +441,6 @@ p#gathered {
 	animation-duration: 0.6s;
 	animation-iteration-count:2;
 	animation-timing-function:ease-in-out;
-}
-
-#whole_answer {
-	margin: auto;
-	position: absolute;
-	top: 110px;
-	right: 25px;
-	left: 25px;
-	text-align: justify;
-	height: calc(100% - 110px);
-	z-index: -999;
-
-
-	/* font-family: 'Source Sans Pro'; */
-	font-family: 'Source Sans Pro';
-	font-weight: 400;
-	font-style: normal;
-
-	font-size: 2vh;
-	word-break: break-word !important;
 }
 
 #particles-js {
