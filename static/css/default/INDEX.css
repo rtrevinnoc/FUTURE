@@ -83,6 +83,8 @@ p#gathered {
 	font-weight: 400;
 	font-style: italic;
 	font-size: 3vh;
+	margin-top: 1vh;
+	margin-bottom: 1vh;
 }
 
 #images_content {
