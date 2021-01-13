@@ -184,7 +184,7 @@ p#gathered {
 .url_item .link_paragraph .domain, .video_item .link_paragraph .domain {
 	font-family: 'Source Sans Pro Light';
 	font-weight: 700;
-	font-size: 3vh;
+	font-size: 2.5vh;
 }
 
 .url_item .link_paragraph2 .link, .video_item .link_paragraph2 .link {
@@ -536,8 +536,8 @@ p.body, p.link_paragraph, p.link_paragraph2 {
 	}
 
 	.url_item, .video_item {
-		margin-top: 45px;
-		margin-bottom: 55px;
+		margin-top: 2vh;
+		margin-bottom: 2.3vh;
 	}
 
 	#images_content {
