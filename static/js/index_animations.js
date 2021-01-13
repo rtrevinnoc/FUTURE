@@ -46,6 +46,39 @@ $(function() {
 		}
 	});
 
+	const adCode = '<iframe data-aa="1549965" src="//ad.a-ads.com/1549965?size=320x50&background_color=eeeeee&text_color=111111&title_color=daa520&title_hover_color=daa520&link_color=b82f2f&link_hover_color=b82f2f" scrolling="no" style="width:320px; height:50px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>'
+	function showAds () {
+		var cusid_ele = document.getElementsByClassName('ad')
+		for (var i = 0; i < cusid_ele.length; ++i) {
+			cusid_ele[i].innerHTML = adCode;
+		}
+	}
+
+	function removeAds () {
+		var cusid_ele = document.getElementsByClassName('ad')
+		for (var i = 0; i < cusid_ele.length; ++i) {
+			cusid_ele[i].remove()
+		}
+	}
+
+	let hasPaid = false
+	if (document.monetization) {
+		document.monetization.addEventListener('monetizationstart', () => {
+			hasPaid = true
+			removeAds()
+		})
+	}
+
+	if (!document.monetization) {
+		showAds()
+	} else {
+		//setTimeout(() => {
+		if (!hasPaid) {
+			showAds()
+		}
+		//}, 3000)
+	}
+
 	// LOAD PARTICLES ANIMATION
 	particlesJS.load('particles-js', 'particles_white.json');
 
@@ -274,7 +307,7 @@ $(function() {
 				$(".hex").removeClass("rotate")
 				var new_date = new Date();
 				var end_time = new_date.getTime();
-				$("#links_description").prepend('<p id="gathered">Gathered ' + $("#links_list .url_item").length + ' resources in ' + (end_time - start_time) + 's</p>')
+				$("#links_description").prepend('<p id="gathered">Gathered ' + $("#links_list .url_item").length + ' resources in ' + ((end_time - start_time)/1000) + 's</p>')
 			}
 		})
 
@@ -334,7 +367,7 @@ $(function() {
 				$(".hex").removeClass("rotate")
 				var new_date = new Date();
 				var end_time = new_date.getTime();
-				$("#links_description").prepend('<p id="gathered">Gathered ' + $("#links_list .url_item").length + ' resources in ' + (end_time - start_time) + 's</p>')
+				$("#links_description").prepend('<p id="gathered">Gathered ' + $("#links_list .url_item").length + ' resources in ' + ((end_time - start_time)/1000) + 's</p>')
 			}
 		});
 

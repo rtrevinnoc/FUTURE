@@ -87,6 +87,17 @@ p#gathered {
 	margin-bottom: 1vh;
 }
 
+#welcome_ad {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+}
+
+#links_ad {
+	margin-top: 2vh;
+	margin-bottom: -2vh;
+}
+
 #images_content {
 	display: grid;
 	grid-gap: 10px;
