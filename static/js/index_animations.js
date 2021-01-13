@@ -272,7 +272,9 @@ $(function() {
 			counter += 1
 			if (counter == 2) {
 				$(".hex").removeClass("rotate")
-				$("#links_description").prepend('<p id="gathered">Gathered ' + $("#links_list .url_item").length + ' resources in ' + (date.getTime() - start_time) + 's</p>')
+				var new_date = new Date();
+				var end_time = new_date.getTime();
+				$("#links_description").prepend('<p id="gathered">Gathered ' + $("#links_list .url_item").length + ' resources in ' + (end_time - start_time) + 's</p>')
 			}
 		})
 
@@ -330,7 +332,9 @@ $(function() {
 			counter += 1
 			if (counter == 2) {
 				$(".hex").removeClass("rotate")
-				$("#links_description").prepend('<p id="gathered">Gathered ' + $("#links_list .url_item").length + ' resources in ' + (date.getTime() - start_time) + 's</p>')
+				var new_date = new Date();
+				var end_time = new_date.getTime();
+				$("#links_description").prepend('<p id="gathered">Gathered ' + $("#links_list .url_item").length + ' resources in ' + (end_time - start_time) + 's</p>')
 			}
 		});
 
