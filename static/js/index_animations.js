@@ -46,7 +46,7 @@ $(function() {
 		}
 	});
 
-	const adCode = '<iframe data-aa="1549965" src="//ad.a-ads.com/1549965?size=320x50&background_color=eeeeee&text_color=111111&title_color=daa520&title_hover_color=daa520&link_color=b82f2f&link_hover_color=b82f2f" scrolling="no" style="width:320px; height:50px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>'
+	const adCode = '<iframe data-aa="1549965" src="//acceptable.a-ads.com/1549965?size=Adaptive&background_color=eeeeee&text_color=111111&title_color=daa520&title_hover_color=daa520&link_color=b82f2f&link_hover_color=b82f2f" scrolling="no" style="border:0px; padding:0; width:100%; height:100%; overflow:hidden" allowtransparency="true"></iframe>'
 	function showAds () {
 		var cusid_ele = document.getElementsByClassName('ad')
 		for (var i = 0; i < cusid_ele.length; ++i) {
