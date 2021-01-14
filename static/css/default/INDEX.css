@@ -89,8 +89,8 @@ p#gathered {
 
 #welcome_ad {
 	position: fixed;
-	bottom: 3vh;
-	right: 3vw;
+	bottom: 0;
+	right: 0;
 }
 
 #links_ad {
