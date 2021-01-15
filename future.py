@@ -222,56 +222,62 @@ async def getDataFromPeers(query, queryVector, queryLanguage, numberOfURLs,
 
 def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
                  page: int):
-    search = FUTURE.searchIndex(q_vec, numberOfURLs, page)
+    try:
+        search = FUTURE.searchIndex(q_vec, numberOfURLs, page)
 
-    urls = [{
-        "url": escapeHTMLString(url["url"]),
-        "header": escapeHTMLString(url["header"]),
-        "body": escapeHTMLString(url["body"]),
-        "language": url["language"],
-    } for url in search["results"]]
+        urls = [{
+            "url": escapeHTMLString(url["url"]),
+            "header": escapeHTMLString(url["header"]),
+            "body": escapeHTMLString(url["body"]),
+            "language": url["language"],
+        } for url in search["results"]]
 
-    urlsInPreferedLanguage, urlsInOtherLanguages = [], []
-    for url in urls:
-        if url["language"] == queryLanguage:
-            urlsInPreferedLanguage.append(url)
-        else:
-            urlsInOtherLanguages.append(url)
-    urls = urlsInPreferedLanguage + urlsInOtherLanguages
+        urlsInPreferedLanguage, urlsInOtherLanguages = [], []
+        for url in urls:
+            if url["language"] == queryLanguage:
+                urlsInPreferedLanguage.append(url)
+            else:
+                urlsInOtherLanguages.append(url)
+        urls = urlsInPreferedLanguage + urlsInOtherLanguages
 
-    return {"urls": urls, "scores": search["vectorScores"]}
+        return {"urls": urls, "scores": search["vectorScores"]}
+    except:
+        return {"urls": [], "scores": []}
 
 
 def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
-    with imageDBIndex.begin() as imageDBTransaction:
-        databaseLimit = imageDBTransaction.stat()["entries"]
-        totalItems = number * page
-        if totalItems <= databaseLimit:
-            vectorIds, vectorScores = hnswImagesLookup.knn_query(term,
-                                                                 k=totalItems)
-        else:
-            raise ValueError(
-                "Number of items to fetch higher than items in database.")
+    try:
+        with imageDBIndex.begin() as imageDBTransaction:
+            databaseLimit = imageDBTransaction.stat()["entries"]
+            totalItems = number * page
+            if totalItems <= databaseLimit:
+                vectorIds, vectorScores = hnswImagesLookup.knn_query(
+                    term, k=totalItems)
+            else:
+                raise ValueError(
+                    "Number of items to fetch higher than items in database.")
 
-        if page > 1:
-            lowerLimit = number * (page - 1)
-        elif page == 1:
-            lowerLimit = 0
+            if page > 1:
+                lowerLimit = number * (page - 1)
+            elif page == 1:
+                lowerLimit = 0
 
-        resultImages = []
-        for image in vectorIds[0][lowerLimit:totalItems]:
-            image = bson.loads(
-                imageDBTransaction.get(str(image).encode("utf-8")))
-            resultImages.append({
-                "url": image["url"],
-                "parentUrl": image["parentUrl"]
-            })
+            resultImages = []
+            for image in vectorIds[0][lowerLimit:totalItems]:
+                image = bson.loads(
+                    imageDBTransaction.get(str(image).encode("utf-8")))
+                resultImages.append({
+                    "url": image["url"],
+                    "parentUrl": image["parentUrl"]
+                })
 
-        return {
-            "images": resultImages,
-            "vectorIds": vectorIds[0][lowerLimit:totalItems],
-            "scores": vectorScores[0][lowerLimit:totalItems]
-        }
+            return {
+                "images": resultImages,
+                "vectorIds": vectorIds[0][lowerLimit:totalItems],
+                "scores": vectorScores[0][lowerLimit:totalItems]
+            }
+    except:
+        return {"images": [], "vectorIds": [], "scores": []}
 
 
 def answer(query: str) -> jsonify:
