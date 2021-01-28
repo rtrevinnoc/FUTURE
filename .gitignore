@@ -25,3 +25,4 @@ indexer
 nohup.out
 peer_registry/
 ex.py
+docs/build/
