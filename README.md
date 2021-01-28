@@ -6,44 +6,13 @@
 ![Screenshot_20200517_192300](https://user-images.githubusercontent.com/7103315/82164538-bea0e600-9876-11ea-8d42-c8a1b126d8fb.png)
 
 __FUTURE__ is a search engine that improves on traditional methods of search by keyword by instead relying on machine learning techniques to encode words as vectors, and capture their meaning and be able to return more precise matches, all while dropping user tracking as only the query is sufficient to retrieve meaningful data.
-It was written with Python for backend, using Tensorflow and PyTorch and web technologies for the frontend.
 
 *__FUTURE__ IS DISTRIBUTED UNDER THE __GNU GPL v3__*
 
 
+## DOCUMENTATION
 
-## INSTRUCTIONS
-
-In order to get FUTURE working, first you will need to install the appropiate tensorflow and pytorch packages for your system. After that, it is only necessary that you run the following commands, which have been tested on Arch Linux, Open SuSe and Ubuntu:
-
-```bash
-./bootstrap.sh
-```
-
-The last command will never finish in a feasible amount of time, as it is building the index. However it can always be paused with CTRL+C and resumed later. Shell scripts to automate tasks are provided and are aptly named.
-
-Pause the crawler with CTRL+C, and execute:
-
-```bash
-./save_index.sh
-```
-
-
-Finally, start the server, and point your browser to 0.0.0.0:3000 with the command below:
-
-```bash
-./future.py
-```
-
-
-
-## HACKING
-
-Out of the box, **FUTURE** is designed as a web search engine, which means that running the `./bootstrap.sh` script provided will only prepare it to search web pages. However, it is hackable down to the core, therefore, you can open `indexer.py` and tinker with it to save other types of data into the *LMDB* database, or perhaps refer to the `Monad` class on the `Monad.py` and write the files to handle the creation of the database and the index yourself.
-
-If you were to modify the data that is saved into the database, you may also need to change how it is served in an HTML template, and for that refer to the lines **240-327** of `future.py`, where you can adapt the code that manages the database to whatever suits your needs.
-
-For further modifications, feel free to fork the project, but bear in mind the terms of the GPL v3 license.
+Documentation is available online at [Documentation](https://wearebuildingthefuture.readthedocs.io/en/latest/) and in the `docs` directory.
 
 
 ## DEPENDENCIES
