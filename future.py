@@ -35,7 +35,7 @@ from werkzeug.utils import secure_filename
 from base64 import b64decode
 from symspellpy.symspellpy import SymSpell, Verbosity
 from bs4 import BeautifulSoup
-from config import HOST_NAME, PEER_PORT
+from config import HOST_NAME, PEER_PORT, CONTACT, MAINTAINER
 
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
@@ -542,6 +542,28 @@ def particlesBlack():
     return send_from_directory("static/js/", "particles_black.json")
 
 
+@app.route("/future_search.xml")
+def openSearchSpec():
+    return Response("""<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+                       xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <!-- Created on Wed, 13 Jan 2021 20:19:19 GMT -->
+  <ShortName>future_search</ShortName>
+  <Description>Adds wearebuildingthefuture.com as a search engine.</Description>
+  <Url type="text/html" method="get" template="http://""" + hostname +
+                    """/?q={searchTerms}"/>
+  <Url type="application/x-suggestions+json" template="http://""" + hostname +
+                    """/_autocomplete/?term={searchTerms}&amp;type=list"/>
+  <Contact>""" + CONTACT + """</Contact>
+  <Image width="16" height="16">https://mycroftproject.com/updateos.php/id0/future_search.ico</Image>
+  <Developer>""" + MAINTAINER + """</Developer>
+  <InputEncoding>UTF-8</InputEncoding>
+  <moz:SearchForm>http://""" + hostname + """/</moz:SearchForm>
+  <Url type="application/opensearchdescription+xml" rel="self" template="https://mycroftproject.com/updateos.php/id0/future_search.xml"/>
+</OpenSearchDescription>""",
+                    mimetype='text/xml')
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -600,7 +622,7 @@ def index():
                                    section="summary",
                                    answer=response["answer"],
                                    currentPage=1)
-    return render_template("index.html", name=None)
+    return render_template("index.html", name=None, contact=CONTACT)
 
 
 @app.route("/_autocomplete", methods=["GET", "POST"])
