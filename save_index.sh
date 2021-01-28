@@ -21,4 +21,4 @@
 
 cd $(dirname $0)
 ps axf | grep linkreaper.py | grep -v grep | awk '{print "kill -9 " $1}' | sh
-python3 create_annoy_index.py
+python3 create_index.py

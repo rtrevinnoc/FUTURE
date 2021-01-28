@@ -29,6 +29,6 @@ imageDBIndex = lmdb.open("./future_images", readonly=True)
 
 with URLDBIndex.begin() as urlDBTransaction, imageDBIndex.begin(
 ) as imageDBTransaction:  #, analyticsDBIndex.begin() as analyticsDBTransaction:
-    print(urlDBTransaction.stat()["entries"])
-    print(imageDBTransaction.stat()["entries"])
+    print("Number of URL's: ", urlDBTransaction.stat()["entries"])
+    print("Number of images: ", imageDBTransaction.stat()["entries"])
     # print(analyticsDBTransaction.stat()["entries"])
