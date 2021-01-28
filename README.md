@@ -12,7 +12,7 @@ __FUTURE__ is a search engine that improves on traditional methods of search by 
 
 ## DOCUMENTATION
 
-Documentation is available online at [Documentation](https://wearebuildingthefuture.readthedocs.io/en/latest/) and in the `docs` directory.
+Documentation is available online at https://wearebuildingthefuture.readthedocs.io/en/latest/ and in the `docs` directory.
 
 
 ## DEPENDENCIES
