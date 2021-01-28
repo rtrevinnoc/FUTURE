@@ -35,7 +35,7 @@ from werkzeug.utils import secure_filename
 from base64 import b64decode
 from symspellpy.symspellpy import SymSpell, Verbosity
 from bs4 import BeautifulSoup
-from config import HOST_NAME, PEER_PORT, CONTACT, MAINTAINER
+from config import HOST_NAME, PEER_PORT, CONTACT, MAINTAINER, FIRST_NOTICE, SECOND_NOTICE, DONATE, COLABORATE
 
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
@@ -622,7 +622,12 @@ def index():
                                    section="summary",
                                    answer=response["answer"],
                                    currentPage=1)
-    return render_template("index.html", name=None, contact=CONTACT)
+    return render_template("index.html",
+                           contact=CONTACT,
+                           first_notice=FIRST_NOTICE,
+                           second_notice=SECOND_NOTICE,
+                           donate=DONATE,
+                           colaborate=COLABORATE)
 
 
 @app.route("/_autocomplete", methods=["GET", "POST"])

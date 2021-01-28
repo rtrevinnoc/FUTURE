@@ -99,12 +99,12 @@
 
 		<div id="sidebar_menu">
 			<div id="sidebar_content">
-				<p id="maintainer">Written and Mantained By <a href="https://keybase.io/rtrevinnoc">Roberto Treviño</a></p>
+				<p id="maintainer">{{ first_notice | safe }}</p>
 				<p id="contact">Contact at <a href="mailto:{{ contact }}">{{ contact }}</a></p>
 				<div id="sidebar_sections">
-					<div id="donate"><p><a href="https://www.buymeacoffee.com/searchatfuture">DONATE</a></p></div>
-					<div id="colaborate"><p><a href="https://github.com/rtrevinnoc/FUTURE">COLABORATE</a></p></div>
-					<div id="hosting"><p>Proudly Hosted on <a href="https://uberspace.de/en/">Uberspace</a></p></div> 
+					<div id="donate"><p>{{ donate | safe }}</p></div>
+					<div id="colaborate"><p>{{ colaborate | safe }}</p></div>
+					<div id="hosting"><p>{{ second_notice | safe }}</p></div> 
 				</div>
 			</div>
 		</div>
