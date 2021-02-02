@@ -1,5 +1,4 @@
-![Website](https://img.shields.io/website?down_color=red&down_message=offline&up_color=green&up_message=online&url=https%3A%2F%2Fwearebuildingthefuture.com) [![Documentation Status](https://readthedocs.org/projects/wearebuildingthefuture/badge/?version=latest)](https://wearebuildingthefuture.readthedocs.io/en/latest/?badge=latest) ![GitHub](https://img.shields.io/github/license/rtrevinnoc/FUTURE) ![Keybase BTC](https://img.shields.io/keybase/btc/rtrevinnoc) \
-
+![Website](https://img.shields.io/website?down_color=red&down_message=offline&up_color=green&up_message=online&url=https%3A%2F%2Fwearebuildingthefuture.com) [![Documentation Status](https://readthedocs.org/projects/wearebuildingthefuture/badge/?version=latest)](https://wearebuildingthefuture.readthedocs.io/en/latest/?badge=latest) ![GitHub](https://img.shields.io/github/license/rtrevinnoc/FUTURE) ![Keybase BTC](https://img.shields.io/keybase/btc/rtrevinnoc)\
 [![Buy Me A Coffee](https://camo.githubusercontent.com/031fc5a134cdca5ae3460822aba371e63f794233/68747470733a2f2f7777772e6275796d6561636f666665652e636f6d2f6173736574732f696d672f637573746f6d5f696d616765732f6f72616e67655f696d672e706e67)](https://www.buymeacoffee.com/searchatfuture)
 
 # FUTURE
