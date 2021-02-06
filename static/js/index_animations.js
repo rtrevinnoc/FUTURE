@@ -31,18 +31,74 @@ $(function() {
 	var images_button = $('#images')
 	var videos_button = $('#videos')
 	var maps_button = $('#maps')
+	
+	// LOAD PARTICLES ANIMATION
+	particlesJS.load('particles-js', 'particles_white.json');
+
+	// DEFINE WHICH SECTION TO SHOW FIRST
+
+	// HIDE ALL SECTIONS WITH NO INFORMATION
+	//chat.hide();
+	sidebar_menu.hide();
+	summary.hide();
+	links.hide();
+	images.hide();
+	videos.hide();
+	maps.hide();
+
+	// REMOVE ACCESS TO HIDDEN SECTIONS
+	summary_button.hide();
+	links_button.hide();
+	images_button.hide();
+	videos_button.hide();
+	maps_button.hide();
+
 	var urlParams = new URLSearchParams(window.location.search);
 	const initial_query = urlParams.get('q');
+	const initial_section = urlParams.get('section');
 	if (!!initial_query) {
 		searchbar.val(initial_query)
-		submit_form(initial_query)
+
+		$("#links_list").empty()
+		$("#links_description").empty()
+		$("#welcome").fadeOut("fast");
+		images.empty()
+		videos.empty()
+		maps.empty()
+		summary.empty()
+
+		if (initial_section == 'links' || initial_section == '') {
+			get_urls(initial_query)
+		} else if (initial_section == "summary") {
+			get_urls(initial_query)
+		} else if (initial_section == "images") {
+			get_images(initial_query)
+		} else if (initial_section == "videos") {
+			get_videos(initial_query)
+		} else if (initial_section == "maps") {
+			get_map(initial_query)
+		}
 	}
 	$(window).bind("popstate", function(e) {
 		urlParams = new URLSearchParams(window.location.search);
 		var new_query = urlParams.get('q');
 		if (!!new_query) {
+
+			const url = new URL(window.location)
+			url.searchParams.set('q', input)
+			url.searchParams.set('section', 'links')
+			window.history.pushState({}, '', url)
+
+			$("#links_list").empty()
+			$("#links_description").empty()
+			$("#welcome").fadeOut("fast");
+			images.empty()
+			videos.empty()
+			maps.empty()
+			summary.empty()
+
 			searchbar.val(new_query)
-			submit_form(new_query)
+			get_urls(new_query)
 		}
 	});
 
@@ -79,33 +135,26 @@ $(function() {
 		////}, 3000)
 	//}
 
-	// LOAD PARTICLES ANIMATION
-	particlesJS.load('particles-js', 'particles_white.json');
-
-	// DEFINE WHICH SECTION TO SHOW FIRST
-	var section = "initial"
-
-	// HIDE ALL SECTIONS WITH NO INFORMATION
-	//chat.hide();
-	sidebar_menu.hide();
-	summary.hide();
-	links.hide();
-	images.hide();
-	videos.hide();
-	maps.hide();
-
-	// REMOVE ACCESS TO HIDDEN SECTIONS
-	summary_button.hide();
-	links_button.hide();
-	images_button.hide();
-	videos_button.hide();
-	maps_button.hide();
 
 	if (annyang) {
 		var commands = {
 			'search for *query': function(query) {
+
+				const url = new URL(window.location)
+				url.searchParams.set('q', input)
+				url.searchParams.set('section', 'links')
+				window.history.pushState({}, '', url)
+				
+				$("#links_list").empty()
+				$("#links_description").empty()
+				$("#welcome").fadeOut("fast");
+				images.empty()
+				videos.empty()
+				maps.empty()
+				summary.empty()
+
 				searchbar.val(query);
-				submit_form(query);
+				get_urls(query);
 			}
 		};
 		annyang.addCommands(commands);
@@ -118,7 +167,20 @@ $(function() {
 	});
 
 	function changeSection() {
+		$('#particles-js').fadeOut("slow");
+		urlParams = new URLSearchParams(window.location.search);
+		section = urlParams.get('section');
+		summary_button.show();
+		links_button.show();
+		images_button.show();
+		videos_button.show();
+		maps_button.show();
 		if (section == "summary") {
+			links.fadeOut("fast");
+			images.fadeOut("fast");
+			maps.fadeOut("fast");
+			videos.fadeOut("fast");
+			summary.fadeIn("fast");
 			$("body").animate({
 				backgroundColor: "#505050"
 			}, "slow");
@@ -140,7 +202,12 @@ $(function() {
 			videos_button.animate({
 				color: "#1b1a1a"
 			}, "fast");
-		} else if (section == "links") {
+		} else if (section == "links" || section == "") {
+			summary.fadeOut("fast");
+			images.fadeOut("fast");
+			maps.fadeOut("fast");
+			videos.fadeOut("fast");
+			links.fadeIn("fast");
 			$("body").animate({
 				backgroundColor: "#EEEEEE"
 			}, "slow");
@@ -163,6 +230,11 @@ $(function() {
 				color: "#1b1a1a"
 			}, "fast");
 		} else if (section == "maps") {
+			summary.fadeOut("fast");
+			links.fadeOut("fast");
+			images.fadeOut("fast");
+			videos.fadeOut("fast");
+			maps.show();
 			$("body").animate({
 				backgroundColor: "#EEEEEE"
 			}, "slow");
@@ -185,6 +257,11 @@ $(function() {
 				color: "#1b1a1a"
 			}, "fast");
 		} else if (section == "images") {
+			summary.fadeOut("fast");
+			links.fadeOut("fast");
+			maps.fadeOut("fast");
+			videos.fadeOut("fast");
+			images.fadeIn("fast");
 			$("body").animate({
 				backgroundColor: "#EEEEEE"
 			}, "slow");
@@ -207,6 +284,11 @@ $(function() {
 				color: "#1b1a1a"
 			}, "fast");
 		} else if (section == "videos") {
+			summary.fadeOut("fast");
+			images.fadeOut("fast");
+			maps.fadeOut("fast");
+			links.fadeOut("fast");
+			videos.fadeIn("fast");
 			$("body").animate({
 				backgroundColor: "#EEEEEE"
 			}, "slow");
@@ -237,69 +319,19 @@ $(function() {
 
 	$('#sidebar_content').hide();
 	//scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
-	function submit_form(input) {
+	function get_urls(input) {
 		var date = new Date();
 		var start_time = date.getTime();
-		$("#welcome").fadeOut("fast");
 		$(".hex").addClass("rotate");
-		$("#links_list").empty()
-		$("#links_description").empty()
-		images.empty()
-		videos.empty()
-		maps.empty()
-		summary.empty()
 		counter = 0
 
-		//$('#sidebar_show').addClass("blink_sidebar");
-
-		$('#particles-js').fadeOut("slow");
-
-		links_button.animate({
-			color: "#9e3434"
-		}, "fast");
-		summary_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
-		maps_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
-		videos_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
-		images_button.animate({
-			color: "#1b1a1a"
-		}, "fast");
-
-		//scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
 		$.getJSON($SCRIPT_ROOT + '/_fetchSearxResults', {
 			query: input
 		}, function(data) {
 			searx_response = data.result
 
-			var current_page = 1
-			summary_button.show();
-			links_button.show();
-			images_button.show();
-			videos_button.show();
-			maps_button.show();
-			summary.fadeOut("fast");
-			images.fadeOut("fast");
-			videos.fadeOut("fast");
-			maps.fadeOut("fast");
-			links.fadeIn("fast");
-			section = "links"
-			changeSection();
-
 			searx_response["urls"].reverse().forEach(function(url) {
 				$("#links_list").prepend('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>')
-			});
-
-			searx_response["images"].reverse().forEach(function(image) {
-				images.prepend('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
-			});
-
-			searx_response["videos"].forEach(function(video) {
-				videos.append('<div class="video_item"><div class="video_thumbnail"><a href="' + video["url"] + '"><img src="' + video["thumbnail"] + '" alt=""></a></div><div class="video_description"><p class="link_paragraph"><span class="domain"><a href="' + video["url"] + '">' + video["title"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + video["url"] + '">' + video["url"] + '</a></span></p><p class="body searchable">' + video['length'] + ' | Uploaded by ' + video["author"] + ' on ' + video['date'] + '.<p></div></div>')
 			});
 
 			counter += 1
@@ -317,23 +349,6 @@ $(function() {
 			response = data.result
 
 			var current_page = 1
-			summary_button.show();
-			links_button.show();
-			images_button.show();
-			videos_button.show();
-			maps_button.show();
-			summary.fadeOut("fast");
-			images.fadeOut("fast");
-			videos.fadeOut("fast");
-			maps.fadeOut("fast");
-			links.fadeIn("fast");
-			section = "links"
-			changeSection();
-			if (response["map"] === "") {
-				maps_button.hide();
-			} else {
-				maps_button.show();
-			}
 			
 			if (searchbar.val() != response["corrected"]) {
 				searchbar.val(response["corrected"])
@@ -344,11 +359,6 @@ $(function() {
 					backgroundColor: "#2b2b2b"
 				}, "fast");
 			}
-			//$('#chat .simplebar-content').append('<div class="blockline"><div class="container2"><span class="you">' + response["corrected"] + '</span></div></div>');
-
-			response["images"].forEach(function(image) {
-				images.append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
-			});
 
 			$("#links_description").prepend('<div id="small_summary">' + response["small_summary"] + '</div>')
 			response["urls"].forEach(function(url) {
@@ -356,11 +366,6 @@ $(function() {
 			});
 
 			summary.text(response["answer"]);
-			//$('#chat .simplebar-content').append('<div class="blockline"><div class="container"><span class="machine">' + response["reply"] + '</span></div></div>');
-
-			//if (response["n_res"] === 0 || response["chatbot"] === 0) {
-			//	chat.slideDown("slow")
-			//}
 			
 			counter += 1
 			if (counter == 2) {
@@ -371,10 +376,85 @@ $(function() {
 			}
 		});
 
-		const url = new URL(window.location)
-		url.searchParams.set('q', input)
-		window.history.pushState({}, '', url)
+		current_query = input;
+		changeSection();
 
+		return false;
+	};
+
+	function get_images(input) {
+		$(".hex").addClass("rotate");
+		counter = 0
+
+		$.getJSON($SCRIPT_ROOT + '/_fetchSearxImages', {
+			query: input
+		}, function(data) {
+			searx_response = data.result
+
+			searx_response["images"].reverse().forEach(function(image) {
+				images.prepend('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
+			});
+
+			counter += 1
+			if (counter == 2) {
+				$(".hex").removeClass("rotate")
+			}
+		})
+
+		$.getJSON($SCRIPT_ROOT + '/_answerImages', {
+			query: input
+		}, function(data) {
+			response = data.result
+
+			response["images"].forEach(function(image) {
+				images.append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
+			});
+
+			counter += 1
+			if (counter == 2) {
+				$(".hex").removeClass("rotate")
+			}
+		});
+
+		current_query = input;
+		changeSection();
+		return false;
+	};
+
+	function get_videos(input) {
+		$(".hex").addClass("rotate");
+
+		$.getJSON($SCRIPT_ROOT + '/_fetchSearxVideos', {
+			query: input
+		}, function(data) {
+			searx_response = data.result
+
+			searx_response["videos"].forEach(function(video) {
+				videos.append('<div class="video_item"><div class="video_thumbnail"><a href="' + video["url"] + '"><img src="' + video["thumbnail"] + '" alt=""></a></div><div class="video_description"><p class="link_paragraph"><span class="domain"><a href="' + video["url"] + '">' + video["title"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + video["url"] + '">' + video["url"] + '</a></span></p><p class="body searchable">' + video['length'] + ' | Uploaded by ' + video["author"] + ' on ' + video['date'] + '.<p></div></div>')
+			});
+
+			$(".hex").removeClass("rotate")
+		})
+
+		current_query = input;
+		changeSection();
+		return false;
+	};
+
+	function get_map(input) {
+		$(".hex").addClass("rotate");
+
+		$.getJSON($SCRIPT_ROOT + '/_answerMap', {
+			query: input
+		}, function(data) {
+			response = data.result
+			maps.append(response["map"])
+
+			$(".hex").removeClass("rotate")
+		})
+
+		current_query = input;
+		changeSection();
 		return false;
 	};
 
@@ -397,62 +477,58 @@ $(function() {
 	//})
 
 	links_button.click(function(e) {
-		section = "links"
-		changeSection()
-		summary.fadeOut("fast");
-		images.fadeOut("fast");
-		maps.fadeOut("fast");
-		videos.fadeOut("fast");
-		links.fadeIn("fast");
+		const url = new URL(window.location)
+		url.searchParams.set('section', 'links')
+		window.history.pushState({}, '', url)
+		changeSection();
+
+		if ($("#links_list").html() == '') {
+			get_urls(current_query)
+		}
 	})
 
 	summary_button.click(function(e) {
-		section = "summary"
-		changeSection()
-		links.fadeOut("fast");
-		images.fadeOut("fast");
-		maps.fadeOut("fast");
-		videos.fadeOut("fast");
-		summary.fadeIn("fast");
+		const url = new URL(window.location)
+		url.searchParams.set('section', 'summary')
+		window.history.pushState({}, '', url)
+		changeSection();
+		
 		if (summary.text().length == 0) {
-			summary.text(response["answer"]);
+			get_urls(current_query)
 		}
 	})
 
 	images_button.click(function(e) {
-		section = "images"
-		changeSection()
-		summary.fadeOut("fast");
-		links.fadeOut("fast");
-		maps.fadeOut("fast");
-		videos.fadeOut("fast");
-		images.fadeIn("fast");
-		//if (images.html().length == 0) {
-			//response["images"].forEach(function(url) {
-				//images.append('<div class="grid-item"><img class="image-item" src="' + url + '" alt="Not available"></div>')
-			//});
-		//}
+		const url = new URL(window.location)
+		url.searchParams.set('section', 'images')
+		window.history.pushState({}, '', url)
+		changeSection();
+		
+		if (images.html() == '') {
+			get_images(current_query)
+		}
 	})
 
 	videos_button.click(function(e) {
-		section = "videos"
-		changeSection()
-		summary.fadeOut("fast");
-		images.fadeOut("fast");
-		maps.fadeOut("fast");
-		links.fadeOut("fast");
-		videos.fadeIn("fast");
+		const url = new URL(window.location)
+		url.searchParams.set('section', 'videos')
+		window.history.pushState({}, '', url)
+		changeSection();
+		
+		if (videos.html() == '') {
+			get_videos(current_query)
+		}
 	})
 
 	maps_button.click(function(e) {
-		section = "maps"
-		changeSection()
-		summary.fadeOut("fast");
-		links.fadeOut("fast");
-		images.fadeOut("fast");
-		videos.fadeOut("fast");
-		maps.show();
-		maps.append(response["map"])
+		const url = new URL(window.location)
+		url.searchParams.set('section', 'maps')
+		window.history.pushState({}, '', url)
+		changeSection();
+		
+		if (maps.html() == '') {
+			get_map(current_query)
+		}
 	})
 
 	$('#load_more_items').click(function(e) {
@@ -463,14 +539,12 @@ $(function() {
 		}, function(data) {
 			$(".hex").removeClass("rotate")
 			response = data.result
-			console.log(searchbar.val(), (current_page + 1))
-			console.log(response)
 			response["urls"].forEach(function(url) {
 				$('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>').insertBefore("#load_more_items");
 			});
-			response["images"].forEach(function(image) {
-				images.append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
-			});
+			//response["images"].forEach(function(image) {
+				//images.append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
+			//});
 			current_page = current_page + 1;
 		});
 	});
@@ -513,7 +587,6 @@ $(function() {
 				$('#particles-js').animate({
 					width: $(window).width()
 				}, function() {
-					changeSection();
 					$("#particles-js").animate({
 						opacity: 1
 					});
@@ -528,12 +601,40 @@ $(function() {
 
 	$('#sendbutton').bind('click', function(e) {
 		e.preventDefault()
-		submit_form(searchbar.val());
+
+		const url = new URL(window.location)
+		url.searchParams.set('q', searchbar.val())
+		url.searchParams.set('section', 'links')
+		window.history.pushState({}, '', url)
+
+		$("#links_list").empty()
+		$("#links_description").empty()
+		$("#welcome").fadeOut("fast");
+		images.empty()
+		videos.empty()
+		maps.empty()
+		summary.empty()
+
+		get_urls(searchbar.val());
 	});
 	searchbar.bind('keydown', function(e) {
 		if (e.keyCode == 13) {
 			e.preventDefault()
-			submit_form(searchbar.val());
+
+			const url = new URL(window.location)
+			url.searchParams.set('q', searchbar.val())
+			url.searchParams.set('section', 'links')
+			window.history.pushState({}, '', url)
+
+			$("#links_list").empty()
+			$("#links_description").empty()
+			$("#welcome").fadeOut("fast");
+			images.empty()
+			videos.empty()
+			maps.empty()
+			summary.empty()
+
+			get_urls(searchbar.val());
 		}
 	});
 

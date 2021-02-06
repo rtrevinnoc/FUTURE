@@ -127,7 +127,7 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
     print("#######################")
     if peer == hostIP or peer == hostname:
         print("Same as origin")
-        return {"urls": [], "images": []}
+        return {"urls": []}  #, "images": []}
     else:
         try:
             r = requests.get("http://" + peer + "/_answerPeer",
@@ -142,8 +142,8 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
             result = r.json()["result"]
             print("Obtained with http")
             return {
-                "urls": list(zip(result["urls"], result["url_scores"])),
-                "images": list(zip(result["images"], result["images_scores"]))
+                "urls": list(zip(result["urls"], result["url_scores"]))
+                # "images": list(zip(result["images"], result["images_scores"]))
             }
         except:
             try:
@@ -159,13 +159,63 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                 result = r.json()["result"]
                 print("Obtained with https")
                 return {
-                    "urls": list(zip(result["urls"], result["url_scores"])),
+                    "urls": list(zip(result["urls"], result["url_scores"]))
+                    # "images":
+                    # list(zip(result["images"], result["images_scores"]))
+                }
+            except:
+                print("Could not connect with peer")
+                return {"urls": []}  #, "images": []}
+
+
+def sendImagesAnswerRequestToPeer(url, query, queryVector, queryLanguage,
+                                  numberOfURLs, numberOfPage):
+    peer = url
+    queryVector = json.dumps(queryVector.tolist())
+    print("#######################")
+    print("host:, ", hostIP)
+    print("peer:, ", peer)
+    print("#######################")
+    if peer == hostIP or peer == hostname:
+        print("Same as origin")
+        return {"images": []}
+    else:
+        try:
+            r = requests.get("http://" + peer + "/_answerPeerImages",
+                             params={
+                                 'query': query,
+                                 'q_vec': queryVector,
+                                 'queryLanguage': queryLanguage,
+                                 'numberOfURLs': numberOfURLs,
+                                 'numberOfPage': numberOfPage
+                             },
+                             timeout=10)
+            result = r.json()["result"]
+            print("Obtained with http")
+            return {
+                "images": list(zip(result["images"], result["images_scores"]))
+            }
+        except:
+            try:
+                r = requests.get("https://" + peer + "/_answerPeerImages",
+                                 params={
+                                     'query': query,
+                                     'q_vec': queryVector,
+                                     'queryLanguage': queryLanguage,
+                                     'numberOfURLs': numberOfURLs,
+                                     'numberOfPage': numberOfPage
+                                 },
+                                 timeout=10)
+                result = r.json()["result"]
+                print("Obtained with https")
+                return {
                     "images":
                     list(zip(result["images"], result["images_scores"]))
                 }
             except:
                 print("Could not connect with peer")
-                return {"urls": [], "images": []}
+                return {"images": []}
+
 
 if hostname != "private":
     with peerRegistry.begin() as peerRegistryDBTransaction:
@@ -211,6 +261,23 @@ async def getDataFromPeers(query, queryVector, queryLanguage, numberOfURLs,
             loop.run_in_executor(
                 executor,
                 functools.partial(sendAnswerRequestToPeer, peer, query,
+                                  queryVector, queryLanguage, numberOfURLs,
+                                  numberOfPage)) for peer in listOfPeers
+        ]
+        listOfResponses = []
+        for response in await asyncio.gather(*futures):
+            listOfResponses.append(response)
+        return listOfResponses
+
+
+async def getImagesFromPeers(query, queryVector, queryLanguage, numberOfURLs,
+                             numberOfPage):
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        loop = asyncio.get_event_loop()
+        futures = [
+            loop.run_in_executor(
+                executor,
+                functools.partial(sendImagesAnswerRequestToPeer, peer, query,
                                   queryVector, queryLanguage, numberOfURLs,
                                   numberOfPage)) for peer in listOfPeers
         ]
@@ -298,12 +365,8 @@ def answer(query: str) -> jsonify:
         return {
             "answer": "No relevant information available.",
             "small_summary": "No relevant information available.",
-            # "time": time.time() - start,
             "corrected": query,
-            "urls": [],
-            "images": [],
-            # "n_res": 0,
-            "map": "",
+            "urls": []
         }
 
     if len(query) <= 160:
@@ -317,39 +380,20 @@ def answer(query: str) -> jsonify:
                     queryBytes,
                     str(int(analyticsPreviousValue.decode("utf-8")) +
                         1).encode("utf-8"))
-    # imageVectorIds, imageVectorScores = hnswImagesLookup.knn_query(q_vec, k=50)
-    images = loadMoreImages(q_vec, 50, 1)
-    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
 
-    # with imageDBIndex.begin() as imageDBTransaction:
-    # imagesBinaryDictionary = [
-    # bson.loads(imageDBTransaction.get(
-    # str(image).encode("utf-8")))["url"]
-    # for image in imageVectorIds[0]
-    # ]  # [:n_imgs]]
+    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
 
     listOfDataFromPeers = asyncio.run(
         getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, 1))
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
-        listOfImagesFromHost = list(zip(images["images"], images["scores"]))
         listOfUrlsFromPeers = list(
             itertools.chain(*[pack["urls"] for pack in listOfDataFromPeers]))
-        listOfImagesFromPeers = list(
-            itertools.chain(*[pack["images"] for pack in listOfDataFromPeers]))
         bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
-        # bigListOfImages = list(
-        # set(listOfImagesFromHost + listOfImagesFromPeers))
-        bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
         bigListOfUrls.sort(key=lambda x: x[1])
-        bigListOfImages.sort(key=lambda x: x[1])
         bigListOfUrls = [url[0] for url in bigListOfUrls]
-        bigListOfImages = [
-            image[0] for image in bigListOfImages if image[0] != ''
-        ]
     else:
         bigListOfUrls = urls["urls"]
-        bigListOfImages = images["images"]
 
     try:
         DBPediaDef = getDefinitionFromDBPedia(query)
@@ -364,29 +408,31 @@ def answer(query: str) -> jsonify:
         escapeHTMLString(getAbstractFromDBPedia(query)),
         "small_summary":
         escapeHTMLString(DBPediaDef),
-        # "time":
-        # time.time() - start,
         "corrected":
         escapeHTMLString(query),
         "urls":
         list({frozenset(item.items()): item
-              for item in bigListOfUrls}.values()),
-        "images":
-        list({frozenset(item.items()): item
-              for item in bigListOfImages}.values()),
-        # "n_res":
-        # len(bigListOfUrls),
-        "map":
-        getMap(queryBeforePreprocessing, query),
+              for item in bigListOfUrls}.values())
     }
 
 
-def answerPeer(query: str, q_vec: list, queryLanguage: str, numberOfURLs: int,
-               numberOfPage: int) -> jsonify:
-    q_vec = np.array(ast.literal_eval("".join(q_vec)))
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-    print(q_vec)
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+def answerImages(query: str) -> jsonify:
+    queryBeforePreprocessing = query
+    queryLanguage = inferLanguage(query)
+    if getResourceFromDBPedia(
+            queryBeforePreprocessing)["verification"] == False:
+        spellCheckerSuggestions = spellChecker.lookup_compound(
+            query, 2)  # LAST PARAMETER INDICATES MAX EDIT DISTANCE LOOKUP
+        query = " ".join(
+            [suggestion.term for suggestion in spellCheckerSuggestions])
+    else:
+        query = queryBeforePreprocessing
+    query = query.lower().strip()
+    try:
+        q_vec = getSentenceMeanVector(query)
+    except:
+        return {"images": []}
+
     if len(query) <= 160:
         with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
             queryBytes = query.encode("utf-8")
@@ -399,20 +445,106 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str, numberOfURLs: int,
                     str(int(analyticsPreviousValue.decode("utf-8")) +
                         1).encode("utf-8"))
 
-    # imageVectorIds, imageVectorScores = hnswImagesLookup.knn_query(q_vec, k=50)
-    images = loadMoreImages(q_vec, 50, numberOfPage)
-    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, numberOfPage)
+    images = loadMoreImages(q_vec, 50, 1)
 
-    # with imageDBIndex.begin() as imageDBTransaction:
-    # imagesBinaryDictionary = [
-    # bson.loads(imageDBTransaction.get(
-    # str(image).encode("utf-8")))["url"]
-    # for image in imageVectorIds[0]
-    # ]  # [:n_imgs]]
+    listOfDataFromPeers = asyncio.run(
+        getImagesFromPeers(query, q_vec, queryLanguage, numberOfURLs, 1))
+    if len(listOfDataFromPeers) > 0:
+        listOfImagesFromHost = list(zip(images["images"], images["scores"]))
+        listOfImagesFromPeers = list(
+            itertools.chain(*[pack["images"] for pack in listOfDataFromPeers]))
+        bigListOfImages = listOfImagesFromHost + listOfImagesFromPeers
+        bigListOfImages.sort(key=lambda x: x[1])
+        bigListOfImages = [
+            image[0] for image in bigListOfImages if image[0] != ''
+        ]
+    else:
+        bigListOfImages = images["images"]
 
     return {
-        "urls": urls["urls"],
-        "url_scores": urls["scores"].tolist(),
+        "corrected":
+        escapeHTMLString(query),
+        "images":
+        list({frozenset(item.items()): item
+              for item in bigListOfImages}.values())
+    }
+
+
+def answerMap(query: str) -> jsonify:
+    queryBeforePreprocessing = query
+    queryLanguage = inferLanguage(query)
+    if getResourceFromDBPedia(
+            queryBeforePreprocessing)["verification"] == False:
+        spellCheckerSuggestions = spellChecker.lookup_compound(
+            query, 2)  # LAST PARAMETER INDICATES MAX EDIT DISTANCE LOOKUP
+        query = " ".join(
+            [suggestion.term for suggestion in spellCheckerSuggestions])
+    else:
+        query = queryBeforePreprocessing
+    query = query.lower().strip()
+    try:
+        q_vec = getSentenceMeanVector(query)
+    except:
+        return {
+            "map": "",
+        }
+
+    if len(query) <= 160:
+        with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
+            queryBytes = query.encode("utf-8")
+            analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
+            if analyticsPreviousValue == None:
+                analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
+            else:
+                analyticsDBTransaction.put(
+                    queryBytes,
+                    str(int(analyticsPreviousValue.decode("utf-8")) +
+                        1).encode("utf-8"))
+
+    return {
+        "corrected": escapeHTMLString(query),
+        "map": getMap(queryBeforePreprocessing, query)
+    }
+
+
+def answerPeer(query: str, q_vec: list, queryLanguage: str, numberOfURLs: int,
+               numberOfPage: int) -> jsonify:
+    q_vec = np.array(ast.literal_eval("".join(q_vec)))
+    if len(query) <= 160:
+        with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
+            queryBytes = query.encode("utf-8")
+            analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
+            if analyticsPreviousValue == None:
+                analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
+            else:
+                analyticsDBTransaction.put(
+                    queryBytes,
+                    str(int(analyticsPreviousValue.decode("utf-8")) +
+                        1).encode("utf-8"))
+
+    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, numberOfPage)
+
+    return {"urls": urls["urls"], "url_scores": urls["scores"].tolist()}
+
+
+def answerPeerImages(query: str, q_vec: list, queryLanguage: str,
+                     numberOfURLs: int, numberOfPage: int) -> jsonify:
+    q_vec = np.array(ast.literal_eval("".join(q_vec)))
+    if len(query) <= 160:
+        with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
+            queryBytes = query.encode("utf-8")
+            analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
+            if analyticsPreviousValue == None:
+                analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
+            else:
+                analyticsDBTransaction.put(
+                    queryBytes,
+                    str(int(analyticsPreviousValue.decode("utf-8")) +
+                        1).encode("utf-8"))
+
+    images = loadMoreImages(q_vec, 50, numberOfPage)
+
+    return {
         "images": images["images"],
         "images_scores": images["scores"].tolist()
     }
@@ -421,7 +553,6 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str, numberOfURLs: int,
 @app.route('/_registerPeer')
 def _registerPeer():
     peerIP = request.args.get("ip", 0, type=str)
-    print("gotten")
     peerRegistryTransaction = peerRegistry.begin(write=True)
     peerRegistryTransaction.put(str(peerIP).encode('utf-8'),
                                 "".encode('utf-8'),
@@ -467,6 +598,23 @@ def fetchSearxResults():
         except:
             pass
 
+    return jsonify(result={"urls": resultURLsFromSearx})
+
+
+@app.route('/_fetchSearxImages', methods=['GET'])
+def fetchSearxImages():
+    query = request.args.get("query", 0, type=str)
+
+    queryBeforePreprocessing = query
+    if getResourceFromDBPedia(
+            queryBeforePreprocessing)["verification"] == False:
+        spellCheckerSuggestions = spellChecker.lookup_compound(
+            query, 2)  # LAST PARAMETER INDICATES MAX EDIT DISTANCE LOOKUP
+        query = " ".join(
+            [suggestion.term for suggestion in spellCheckerSuggestions])
+    else:
+        query = queryBeforePreprocessing
+
     while True:
         try:
             resultImagesFromSearx = requests.get(goodSearxInstances[int(
@@ -485,6 +633,23 @@ def fetchSearxResults():
             break
         except:
             pass
+
+    return jsonify(result={"images": resultImagesFromSearx})
+
+
+@app.route('/_fetchSearxVideos', methods=['GET'])
+def fetchSearxVideos():
+    query = request.args.get("query", 0, type=str)
+
+    queryBeforePreprocessing = query
+    if getResourceFromDBPedia(
+            queryBeforePreprocessing)["verification"] == False:
+        spellCheckerSuggestions = spellChecker.lookup_compound(
+            query, 2)  # LAST PARAMETER INDICATES MAX EDIT DISTANCE LOOKUP
+        query = " ".join(
+            [suggestion.term for suggestion in spellCheckerSuggestions])
+    else:
+        query = queryBeforePreprocessing
 
     while True:
         try:
@@ -519,12 +684,7 @@ def fetchSearxResults():
         except:
             pass
 
-    return jsonify(
-        result={
-            "urls": resultURLsFromSearx,
-            "images": resultImagesFromSearx,
-            "videos": resultVideosFromSearx
-        })
+    return jsonify(result={"videos": resultVideosFromSearx})
 
 
 @app.route('/sw.js', methods=['GET'])
@@ -661,6 +821,20 @@ def _answer():
     return jsonify(result=answer(query))
 
 
+@app.route("/_answerImages")
+def _answerImages():
+    """The method for processing form data and answering."""
+    query = request.args.get("query", 0, type=str)
+    return jsonify(result=answerImages(query))
+
+
+@app.route("/_answerMap")
+def _answerMap():
+    """The method for processing form data and answering."""
+    query = request.args.get("query", 0, type=str)
+    return jsonify(result=answerMap(query))
+
+
 @app.route("/_answerPeer")
 def _answerPeer():
     """The method for processing form data and answering."""
@@ -671,6 +845,18 @@ def _answerPeer():
     numberOfPage = request.args.get("numberOfPage", 1, type=int)
     return jsonify(result=answerPeer(query, q_vec, queryLanguage, numberOfURLs,
                                      numberOfPage))
+
+
+@app.route("/_answerPeerImages")
+def _answerPeerImages():
+    """The method for processing form data and answering."""
+    query = request.args.get("query", 0, type=str)
+    q_vec = request.args.get("q_vec", 0, type=str)
+    queryLanguage = request.args.get("queryLanguage", 0, type=str)
+    numberOfURLs = request.args.get("numberOfURLs", 0, type=int)
+    numberOfPage = request.args.get("numberOfPage", 1, type=int)
+    return jsonify(result=answerPeerImages(query, q_vec, queryLanguage,
+                                           numberOfURLs, numberOfPage))
 
 
 @app.route("/_updateAnswer", methods=["GET", "POST"])
