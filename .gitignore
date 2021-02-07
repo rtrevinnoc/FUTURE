@@ -26,3 +26,4 @@ nohup.out
 peer_registry/
 ex.py
 docs/build/
+external_image_cache/

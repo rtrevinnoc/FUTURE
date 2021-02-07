@@ -31,16 +31,17 @@ from flask import (Flask, render_template, request, redirect,
 from forms import *
 # from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.contrib.fixers import ProxyFix
+from flask_caching import Cache
 from werkzeug.utils import secure_filename
 from base64 import b64decode
 from symspellpy.symspellpy import SymSpell, Verbosity
 from bs4 import BeautifulSoup
-from config import HOST_NAME, PEER_PORT, CONTACT, MAINTAINER, FIRST_NOTICE, SECOND_NOTICE, DONATE, COLABORATE
+from config import HOST_NAME, PEER_PORT, CONTACT, MAINTAINER, FIRST_NOTICE, SECOND_NOTICE, DONATE, COLABORATE, CACHE_TIMEOUT, CACHE_THRESHOLD
 
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
 
-global port, hostIP, hostname, listOfPeers, app, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, numberOfURLs, goodSearxInstances, headersForSearx
+global port, hostIP, hostname, listOfPeers, app, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, numberOfURLs, goodSearxInstances, headersForSearx, cache
 port = int(PEER_PORT)
 hostIP = requests.get(
     "https://api.ipify.org?format=json").json()["ip"] + ":" + str(port)
@@ -75,6 +76,7 @@ spellChecker = SymSpell(
 spellChecker.load_dictionary(
     "./frequency_dictionary_en_82_765.txt", 0, 1
 )  # LAST TWO PARAMETERS ARE (COLUMN TERM, FREQUENCY TERM) LOCATIONS IN DICTIONARY FILE
+cache = Cache(app, config={'CACHE_TYPE': 'filesystem','CACHE_DEFAULT_TIMEOUT': CACHE_TIMEOUT, 'CACHE_THRESHOLD': CACHE_THRESHOLD, 'CACHE_DIR': './external_image_cache'})
 
 
 def sendRegisterRequestToPeer(url):
@@ -127,7 +129,7 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
     print("#######################")
     if peer == hostIP or peer == hostname:
         print("Same as origin")
-        return {"urls": []}  #, "images": []}
+        return {"urls": []}
     else:
         try:
             r = requests.get("http://" + peer + "/_answerPeer",
@@ -143,7 +145,6 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
             print("Obtained with http")
             return {
                 "urls": list(zip(result["urls"], result["url_scores"]))
-                # "images": list(zip(result["images"], result["images_scores"]))
             }
         except:
             try:
@@ -160,12 +161,10 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                 print("Obtained with https")
                 return {
                     "urls": list(zip(result["urls"], result["url_scores"]))
-                    # "images":
-                    # list(zip(result["images"], result["images_scores"]))
                 }
             except:
                 print("Could not connect with peer")
-                return {"urls": []}  #, "images": []}
+                return {"urls": []}
 
 
 def sendImagesAnswerRequestToPeer(url, query, queryVector, queryLanguage,
@@ -688,6 +687,7 @@ def fetchSearxVideos():
 
 
 @app.route('/_retrieveImage')
+@cache.cached(timeout=15, query_string=True)
 def _retrieveImage():
     url = request.args.get("url", "", type=str)
     if url.startswith("//"):
@@ -880,39 +880,55 @@ def _updateAnswer():
     queryLanguage = inferLanguage(query)
 
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, page)
-    images = loadMoreImages(q_vec, 50, page)
 
     listOfDataFromPeers = asyncio.run(
         getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, page))
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
-        listOfImagesFromHost = list(zip(images["images"], images["scores"]))
         listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers][0]
-        listOfImagesFromPeers = [
-            pack["images"] for pack in listOfDataFromPeers
-        ][0]
         bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
-        bigListOfImages = list(
-            set(listOfImagesFromHost + listOfImagesFromPeers))
         bigListOfUrls.sort(key=lambda x: x[1])
-        bigListOfImages.sort(key=lambda x: x[1])
         bigListOfUrls = [url[0] for url in bigListOfUrls]
-        bigListOfImages = [
-            image[0] for image in bigListOfImages if image[0] != ''
-        ]
     else:
         bigListOfUrls = urls["urls"]
-        bigListOfImages = images["images"]
 
     return jsonify(
         result={
             "urls":
             list({frozenset(item.items()): item
-                  for item in bigListOfUrls}.values()),
+                  for item in bigListOfUrls}.values())
+        })
+
+@app.route("/_updateImages", methods=["GET", "POST"])
+def _updateImages():
+    query = request.args.get("query", 0, type=str)
+    page = request.args.get("page", 0, type=int)
+    q_vec = getSentenceMeanVector(query)
+    queryLanguage = inferLanguage(query)
+
+    images = loadMoreImages(q_vec, 15, page)
+
+    listOfDataFromPeers = asyncio.run(
+        getImagesFromPeers(query, q_vec, queryLanguage, numberOfURLs, page))
+    if len(listOfDataFromPeers) > 0:
+        listOfImagesFromHost = list(zip(images["images"], images["scores"]))
+        listOfImagesFromPeers = [
+            pack["images"] for pack in listOfDataFromPeers
+        ][0]
+        bigListOfImages = list(
+            set(listOfImagesFromHost + listOfImagesFromPeers))
+        bigListOfImages.sort(key=lambda x: x[1])
+        bigListOfImages = [
+            image[0] for image in bigListOfImages if image[0] != ''
+        ]
+    else:
+        bigListOfImages = images["images"]
+
+    return jsonify(
+        result={
             "images":
             bigListOfImages
         })
-
 
 @app.route("/_midnightcypher")
 def _midnightcypher():

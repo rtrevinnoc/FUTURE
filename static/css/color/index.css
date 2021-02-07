@@ -47,12 +47,12 @@ body {
   background-color: #aaaaaa;
 }
 
-#small_summary, #load_more_items {
+#small_summary, .load_more_items {
   background-color: #1C1C1C;
   color: #bfbfbf;
 }
 
-#load_more_items {
+.load_more_items {
   text-align: center;
 }
 

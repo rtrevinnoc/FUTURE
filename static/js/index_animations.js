@@ -62,7 +62,7 @@ $(function() {
 		$("#links_list").empty()
 		$("#links_description").empty()
 		$("#welcome").fadeOut("fast");
-		images.empty()
+		$("images_list").empty()
 		videos.empty()
 		maps.empty()
 		summary.empty()
@@ -92,7 +92,7 @@ $(function() {
 			$("#links_list").empty()
 			$("#links_description").empty()
 			$("#welcome").fadeOut("fast");
-			images.empty()
+			$("images_list").empty()
 			videos.empty()
 			maps.empty()
 			summary.empty()
@@ -148,7 +148,7 @@ $(function() {
 				$("#links_list").empty()
 				$("#links_description").empty()
 				$("#welcome").fadeOut("fast");
-				images.empty()
+				$("images_list").empty()
 				videos.empty()
 				maps.empty()
 				summary.empty()
@@ -324,6 +324,7 @@ $(function() {
 		var start_time = date.getTime();
 		$(".hex").addClass("rotate");
 		counter = 0
+		current_links_page = 1
 
 		$.getJSON($SCRIPT_ROOT + '/_fetchSearxResults', {
 			query: input
@@ -348,8 +349,6 @@ $(function() {
 		}, function(data) {
 			response = data.result
 
-			var current_page = 1
-			
 			if (searchbar.val() != response["corrected"]) {
 				searchbar.val(response["corrected"])
 				searchbar.animate({
@@ -385,6 +384,7 @@ $(function() {
 	function get_images(input) {
 		$(".hex").addClass("rotate");
 		counter = 0
+		current_images_page = 1
 
 		$.getJSON($SCRIPT_ROOT + '/_fetchSearxImages', {
 			query: input
@@ -392,7 +392,7 @@ $(function() {
 			searx_response = data.result
 
 			searx_response["images"].reverse().forEach(function(image) {
-				images.prepend('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="/_retrieveImage?url=' + image["url"] + '" alt="Not available"></a></div>')
+				$("#images_list").prepend('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="/_retrieveImage?url=' + image["url"] + '" alt="Not available"></a></div>')
 			});
 
 			counter += 1
@@ -407,7 +407,7 @@ $(function() {
 			response = data.result
 
 			response["images"].forEach(function(image) {
-				images.append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="/_retrieveImage?url=' + image["url"] + '" alt="Not available"></a></div>')
+				$("#images_list").append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="/_retrieveImage?url=' + image["url"] + '" alt="Not available"></a></div>')
 			});
 
 			counter += 1
@@ -531,21 +531,33 @@ $(function() {
 		}
 	})
 
-	$('#load_more_items').click(function(e) {
+	$('#load_more_links').click(function(e) {
 		$(".hex").addClass("rotate");
 		$.getJSON($SCRIPT_ROOT + '/_updateAnswer', {
-			query: searchbar.val(),
-			page: (current_page + 1)
+			query: current_query,
+			page: (current_links_page + 1)
 		}, function(data) {
 			$(".hex").removeClass("rotate")
 			response = data.result
 			response["urls"].forEach(function(url) {
-				$('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>').insertBefore("#load_more_items");
+				$("#links_list").append('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>');
 			});
-			//response["images"].forEach(function(image) {
-				//images.append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="/_retrieveImage?url=' + image["url"] + '" alt="Not available"></a></div>')
-			//});
-			current_page = current_page + 1;
+			current_links_page += 1;
+		});
+	});
+
+	$('#load_more_images').click(function(e) {
+		$(".hex").addClass("rotate");
+		$.getJSON($SCRIPT_ROOT + '/_updateImages', {
+			query: current_query,
+			page: (current_images_page + 1)
+		}, function(data) {
+			$(".hex").removeClass("rotate")
+			response = data.result
+			response["images"].forEach(function(image) {
+				$("#images_list").append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="/_retrieveImage?url=' + image["url"] + '" alt="Not available"></a></div>')
+			});
+			current_images_page += 1;
 		});
 	});
 
@@ -610,7 +622,7 @@ $(function() {
 		$("#links_list").empty()
 		$("#links_description").empty()
 		$("#welcome").fadeOut("fast");
-		images.empty()
+		$("images_list").empty()
 		videos.empty()
 		maps.empty()
 		summary.empty()
@@ -629,7 +641,7 @@ $(function() {
 			$("#links_list").empty()
 			$("#links_description").empty()
 			$("#welcome").fadeOut("fast");
-			images.empty()
+			$("images_list").empty()
 			videos.empty()
 			maps.empty()
 			summary.empty()

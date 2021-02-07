@@ -41,13 +41,13 @@ label {
 	white-space: nowrap;
 }
 
-#small_summary, #load_more_items {
+#small_summary, .load_more_items {
 	border-radius: 8px;
 	font-size: 2vh;
 	padding: 12px;
 }
 
-#load_more_items {
+.load_more_items {
 	margin-bottom: 10px;
 	max-width: 200px;
 	margin: 0 auto;
@@ -98,7 +98,7 @@ p#gathered {
 	margin-bottom: -2vh;
 }
 
-#images_content {
+#images_list {
 	display: grid;
 	grid-gap: 10px;
 	grid-template-columns: repeat(auto-fill, minmax(calc(24.1vh + 3.3vw),1fr));
@@ -556,7 +556,7 @@ p.body, p.link_paragraph, p.link_paragraph2 {
 		margin-bottom: 2vh;
 	}
 
-	#images_content {
+	#images_list {
 		grid-template-columns: repeat(3, 1fr);
 	}
 

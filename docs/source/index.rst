@@ -58,6 +58,8 @@ It is suggested to start with this configuration template, which is essentially 
         SECOND_NOTICE = "Proudly Hosted on <a href='https://uberspace.de/en/'>Uberspace</a>"
         DONATE = "<a href='https://www.buymeacoffee.com/searchatfuture'>DONATE</a>"
         COLABORATE = "<a href='https://github.com/rtrevinnoc/FUTURE'>COLABORATE</a>"
+        CACHE_TIMEOUT = 15
+        CACHE_THRESHOLD = 100
 
 After you have configurated your FUTURE instance, but before you can start the server, you will be required to add a minimum of ~25 urls to your local index, by executing:
 
