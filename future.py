@@ -598,7 +598,7 @@ def fetchSearxResults():
         except:
             pass
 
-    return jsonify(result={"urls": resultURLsFromSearx})
+    return jsonify(result={"urls": resultURLsFromSearx[:15]})
 
 
 @app.route('/_fetchSearxImages', methods=['GET'])
@@ -684,7 +684,7 @@ def fetchSearxVideos():
         except:
             pass
 
-    return jsonify(result={"videos": resultVideosFromSearx})
+    return jsonify(result={"videos": resultVideosFromSearx[:30]})
 
 
 @app.route('/_retrieveImage')
