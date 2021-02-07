@@ -920,8 +920,7 @@ def _updateImages():
         listOfImagesFromPeers = [
             pack["images"] for pack in listOfDataFromPeers
         ][0]
-        # bigListOfImages = list(
-            # set(listOfImagesFromHost + listOfImagesFromPeers))
+        bigListOfImages = list(listOfImagesFromHost + listOfImagesFromPeers)
         bigListOfImages.sort(key=lambda x: x[1])
         bigListOfImages = [
             image[0] for image in bigListOfImages if image[0] != ''
