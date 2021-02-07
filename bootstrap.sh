@@ -28,6 +28,7 @@ pip3 install -U uWSGI
 pip3 install -U wordnet
 pip3 install -U numexpr
 pip3 install -U flask-caching
+pip3 install -U pillow
 
 python3 -m spacy download en_core_web_sm
 python3 -c "import nltk; nltk.download('punkt')"
