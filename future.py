@@ -76,7 +76,13 @@ spellChecker = SymSpell(
 spellChecker.load_dictionary(
     "./frequency_dictionary_en_82_765.txt", 0, 1
 )  # LAST TWO PARAMETERS ARE (COLUMN TERM, FREQUENCY TERM) LOCATIONS IN DICTIONARY FILE
-cache = Cache(app, config={'CACHE_TYPE': 'filesystem','CACHE_DEFAULT_TIMEOUT': CACHE_TIMEOUT, 'CACHE_THRESHOLD': CACHE_THRESHOLD, 'CACHE_DIR': './external_image_cache'})
+cache = Cache(app,
+              config={
+                  'CACHE_TYPE': 'filesystem',
+                  'CACHE_DEFAULT_TIMEOUT': CACHE_TIMEOUT,
+                  'CACHE_THRESHOLD': CACHE_THRESHOLD,
+                  'CACHE_DIR': './external_image_cache'
+              })
 
 
 def sendRegisterRequestToPeer(url):
@@ -143,9 +149,7 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                              timeout=10)
             result = r.json()["result"]
             print("Obtained with http")
-            return {
-                "urls": list(zip(result["urls"], result["url_scores"]))
-            }
+            return {"urls": list(zip(result["urls"], result["url_scores"]))}
         except:
             try:
                 r = requests.get("https://" + peer + "/_answerPeer",
@@ -899,6 +903,7 @@ def _updateAnswer():
                   for item in bigListOfUrls}.values())
         })
 
+
 @app.route("/_updateImages", methods=["GET", "POST"])
 def _updateImages():
     query = request.args.get("query", 0, type=str)
@@ -924,11 +929,8 @@ def _updateImages():
     else:
         bigListOfImages = images["images"]
 
-    return jsonify(
-        result={
-            "images":
-            bigListOfImages
-        })
+    return jsonify(result={"images": bigListOfImages})
+
 
 @app.route("/_midnightcypher")
 def _midnightcypher():
