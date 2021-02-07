@@ -22,12 +22,12 @@
 #########################################################################
 
 from Monad import *
-import os.path, os, shutil, json, random, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools
+import os.path, os, shutil, json, random, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools, mimetypes
 import numpy as np
 import numexpr as ne
 from flask import (Flask, render_template, request, redirect,
                    send_from_directory, flash, abort, jsonify, escape,
-                   Response)
+                   Response, make_response)
 from forms import *
 # from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.contrib.fixers import ProxyFix
@@ -445,7 +445,7 @@ def answerImages(query: str) -> jsonify:
                     str(int(analyticsPreviousValue.decode("utf-8")) +
                         1).encode("utf-8"))
 
-    images = loadMoreImages(q_vec, 50, 1)
+    images = loadMoreImages(q_vec, 15, 1)
 
     listOfDataFromPeers = asyncio.run(
         getImagesFromPeers(query, q_vec, queryLanguage, numberOfURLs, 1))
@@ -542,7 +542,7 @@ def answerPeerImages(query: str, q_vec: list, queryLanguage: str,
                     str(int(analyticsPreviousValue.decode("utf-8")) +
                         1).encode("utf-8"))
 
-    images = loadMoreImages(q_vec, 50, numberOfPage)
+    images = loadMoreImages(q_vec, 15, numberOfPage)
 
     return {
         "images": images["images"],
@@ -634,7 +634,7 @@ def fetchSearxImages():
         except:
             pass
 
-    return jsonify(result={"images": resultImagesFromSearx})
+    return jsonify(result={"images": resultImagesFromSearx[:15]})
 
 
 @app.route('/_fetchSearxVideos', methods=['GET'])
@@ -685,6 +685,19 @@ def fetchSearxVideos():
             pass
 
     return jsonify(result={"videos": resultVideosFromSearx})
+
+
+@app.route('/_retrieveImage')
+def _retrieveImage():
+    url = request.args.get("url", "", type=str)
+    if url.startswith("//"):
+        url = "http:" + url
+    image = requests.get(url, allow_redirects=True)
+
+    response = make_response(image.content)
+    response.headers.set('Content-Type',
+                         mimetypes.MimeTypes().guess_type(url)[0])
+    return response
 
 
 @app.route('/sw.js', methods=['GET'])

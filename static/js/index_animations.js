@@ -392,7 +392,7 @@ $(function() {
 			searx_response = data.result
 
 			searx_response["images"].reverse().forEach(function(image) {
-				images.prepend('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
+				images.prepend('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="/_retrieveImage?url=' + image["url"] + '" alt="Not available"></a></div>')
 			});
 
 			counter += 1
@@ -407,7 +407,7 @@ $(function() {
 			response = data.result
 
 			response["images"].forEach(function(image) {
-				images.append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
+				images.append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="/_retrieveImage?url=' + image["url"] + '" alt="Not available"></a></div>')
 			});
 
 			counter += 1
@@ -430,7 +430,7 @@ $(function() {
 			searx_response = data.result
 
 			searx_response["videos"].forEach(function(video) {
-				videos.append('<div class="video_item"><div class="video_thumbnail"><a href="' + video["url"] + '"><img src="' + video["thumbnail"] + '" alt=""></a></div><div class="video_description"><p class="link_paragraph"><span class="domain"><a href="' + video["url"] + '">' + video["title"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + video["url"] + '">' + video["url"] + '</a></span></p><p class="body searchable">' + video['length'] + ' | Uploaded by ' + video["author"] + ' on ' + video['date'] + '.<p></div></div>')
+				videos.append('<div class="video_item"><div class="video_thumbnail"><a href="' + video["url"] + '"><img src="/_retrieveImage?url=' + video["thumbnail"] + '" alt=""></a></div><div class="video_description"><p class="link_paragraph"><span class="domain"><a href="' + video["url"] + '">' + video["title"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + video["url"] + '">' + video["url"] + '</a></span></p><p class="body searchable">' + video['length'] + ' | Uploaded by ' + video["author"] + ' on ' + video['date'] + '.<p></div></div>')
 			});
 
 			$(".hex").removeClass("rotate")
@@ -543,7 +543,7 @@ $(function() {
 				$('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>').insertBefore("#load_more_items");
 			});
 			//response["images"].forEach(function(image) {
-				//images.append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="' + image["url"] + '" alt="Not available"></a></div>')
+				//images.append('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="/_retrieveImage?url=' + image["url"] + '" alt="Not available"></a></div>')
 			//});
 			current_page = current_page + 1;
 		});
