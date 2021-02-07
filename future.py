@@ -920,8 +920,8 @@ def _updateImages():
         listOfImagesFromPeers = [
             pack["images"] for pack in listOfDataFromPeers
         ][0]
-        bigListOfImages = list(
-            set(listOfImagesFromHost + listOfImagesFromPeers))
+        # bigListOfImages = list(
+            # set(listOfImagesFromHost + listOfImagesFromPeers))
         bigListOfImages.sort(key=lambda x: x[1])
         bigListOfImages = [
             image[0] for image in bigListOfImages if image[0] != ''
@@ -929,7 +929,12 @@ def _updateImages():
     else:
         bigListOfImages = images["images"]
 
-    return jsonify(result={"images": bigListOfImages})
+    return jsonify(
+        result={
+            "images":
+            list({frozenset(item.items()): item
+                  for item in bigListOfImages}.values())
+        })
 
 
 @app.route("/_midnightcypher")
