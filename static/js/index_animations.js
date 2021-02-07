@@ -52,6 +52,8 @@ $(function() {
 	images_button.hide();
 	videos_button.hide();
 	maps_button.hide();
+	$("load_more_links").hide()
+	$("load_more_images").hide()
 
 	var urlParams = new URLSearchParams(window.location.search);
 	const initial_query = urlParams.get('q');
@@ -66,8 +68,10 @@ $(function() {
 		videos.empty()
 		maps.empty()
 		summary.empty()
+		const url = new URL(window.location)
 
-		if (initial_section == 'links' || initial_section == '') {
+		if (initial_section == 'links' || initial_section == null) {
+			url.searchParams.set('section', "links")
 			get_urls(initial_query)
 		} else if (initial_section == "summary") {
 			get_urls(initial_query)
@@ -78,16 +82,14 @@ $(function() {
 		} else if (initial_section == "maps") {
 			get_map(initial_query)
 		}
+		window.history.pushState({}, '', url)
+		changeSection()
 	}
 	$(window).bind("popstate", function(e) {
 		urlParams = new URLSearchParams(window.location.search);
-		var new_query = urlParams.get('q');
-		if (!!new_query) {
-
-			const url = new URL(window.location)
-			url.searchParams.set('q', input)
-			url.searchParams.set('section', 'links')
-			window.history.pushState({}, '', url)
+		var prev_query = urlParams.get('q');
+		var prev_section = urlParams.get('section');
+		if (!!prev_query) {
 
 			$("#links_list").empty()
 			$("#links_description").empty()
@@ -97,8 +99,22 @@ $(function() {
 			maps.empty()
 			summary.empty()
 
-			searchbar.val(new_query)
-			get_urls(new_query)
+			searchbar.val(prev_query)
+			const url = new URL(window.location)
+			if (prev_section == 'links' || prev_section == null) {
+				url.searchParams.set('section', "links")
+				get_urls(initial_query)
+			} else if (prev_section == "summary") {
+				get_urls(initial_query)
+			} else if (prev_section == "images") {
+				get_images(initial_query)
+			} else if (prev_section == "videos") {
+				get_videos(initial_query)
+			} else if (prev_section == "maps") {
+				get_map(initial_query)
+			}
+			window.history.pushState({}, '', url)
+			changeSection()
 		}
 	});
 
@@ -202,7 +218,7 @@ $(function() {
 			videos_button.animate({
 				color: "#1b1a1a"
 			}, "fast");
-		} else if (section == "links" || section == "") {
+		} else if (section == "links" || section == null) {
 			summary.fadeOut("fast");
 			images.fadeOut("fast");
 			maps.fadeOut("fast");
@@ -341,6 +357,7 @@ $(function() {
 				var new_date = new Date();
 				var end_time = new_date.getTime();
 				$("#links_description").prepend('<p id="gathered">Gathered ' + $("#links_list .url_item").length + ' resources in ' + ((end_time - start_time)/1000) + 's</p>')
+				$("load_more_links").hide()
 			}
 		})
 
@@ -372,6 +389,7 @@ $(function() {
 				var new_date = new Date();
 				var end_time = new_date.getTime();
 				$("#links_description").prepend('<p id="gathered">Gathered ' + $("#links_list .url_item").length + ' resources in ' + ((end_time - start_time)/1000) + 's</p>')
+				$("load_more_links").hide()
 			}
 		});
 
@@ -398,6 +416,7 @@ $(function() {
 			counter += 1
 			if (counter == 2) {
 				$(".hex").removeClass("rotate")
+				$("load_more_images").hide()
 			}
 		})
 
@@ -413,6 +432,7 @@ $(function() {
 			counter += 1
 			if (counter == 2) {
 				$(".hex").removeClass("rotate")
+				$("load_more_images").hide()
 			}
 		});
 
@@ -503,8 +523,7 @@ $(function() {
 		url.searchParams.set('section', 'images')
 		window.history.pushState({}, '', url)
 		changeSection();
-		
-		if (images.html() == '') {
+		if ($("#images_list").html() == '') {
 			get_images(current_query)
 		}
 	})
@@ -614,10 +633,10 @@ $(function() {
 	$('#sendbutton').bind('click', function(e) {
 		e.preventDefault()
 
+		var urlParams = new URLSearchParams(window.location.search);
+		current_section = urlParams.get('section');
 		const url = new URL(window.location)
 		url.searchParams.set('q', searchbar.val())
-		url.searchParams.set('section', 'links')
-		window.history.pushState({}, '', url)
 
 		$("#links_list").empty()
 		$("#links_description").empty()
@@ -627,16 +646,30 @@ $(function() {
 		maps.empty()
 		summary.empty()
 
-		get_urls(searchbar.val());
+		if (current_section == 'links' || current_section == null) {
+			url.searchParams.set('section', "links")
+			get_urls(searchbar.val())
+		} else if (current_section == "summary") {
+			get_urls(searchbar.val())
+		} else if (current_section == "images") {
+			get_images(searchbar.val())
+		} else if (current_section == "videos") {
+			get_videos(searchbar.val())
+		} else if (current_section == "maps") {
+			get_map(searchbar.val())
+		}
+		window.history.pushState({}, '', url)
+		changeSection()
 	});
+
 	searchbar.bind('keydown', function(e) {
 		if (e.keyCode == 13) {
 			e.preventDefault()
 
+			var urlParams = new URLSearchParams(window.location.search);
+			current_section = urlParams.get('section');
 			const url = new URL(window.location)
 			url.searchParams.set('q', searchbar.val())
-			url.searchParams.set('section', 'links')
-			window.history.pushState({}, '', url)
 
 			$("#links_list").empty()
 			$("#links_description").empty()
@@ -646,7 +679,20 @@ $(function() {
 			maps.empty()
 			summary.empty()
 
-			get_urls(searchbar.val());
+			if (current_section == 'links' || current_section == null) {
+				url.searchParams.set('section', "links")
+				get_urls(searchbar.val())
+			} else if (current_section == "summary") {
+				get_urls(searchbar.val())
+			} else if (current_section == "images") {
+				get_images(searchbar.val())
+			} else if (current_section == "videos") {
+				get_videos(searchbar.val())
+			} else if (current_section == "maps") {
+				get_map(searchbar.val())
+			}
+			window.history.pushState({}, '', url)
+			changeSection()
 		}
 	});
 
