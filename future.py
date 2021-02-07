@@ -22,12 +22,12 @@
 #########################################################################
 
 from Monad import *
-import os.path, os, shutil, json, random, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools, mimetypes
+import os.path, os, shutil, json, random, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools, mimetypes, io
 import numpy as np
 import numexpr as ne
 from flask import (Flask, render_template, request, redirect,
                    send_from_directory, flash, abort, jsonify, escape,
-                   Response, make_response)
+                   Response, send_file)
 from forms import *
 # from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.contrib.fixers import ProxyFix
@@ -37,6 +37,7 @@ from base64 import b64decode
 from symspellpy.symspellpy import SymSpell, Verbosity
 from bs4 import BeautifulSoup
 from config import HOST_NAME, PEER_PORT, CONTACT, MAINTAINER, FIRST_NOTICE, SECOND_NOTICE, DONATE, COLABORATE, CACHE_TIMEOUT, CACHE_THRESHOLD
+from PIL import Image
 
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
@@ -698,10 +699,13 @@ def _retrieveImage():
         url = "http:" + url
     image = requests.get(url, allow_redirects=True)
 
-    response = make_response(image.content)
-    response.headers.set('Content-Type',
-                         mimetypes.MimeTypes().guess_type(url)[0])
-    return response
+    pic = Image.open(io.BytesIO(image.content))
+    pic.thumbnail((480,480), Image.LANCZOS)
+
+    img_io = io.BytesIO()
+    pic.save(img_io, 'JPEG', quality=70)
+    img_io.seek(0)
+    return send_file(img_io, mimetype='image/jpeg')
 
 
 @app.route('/sw.js', methods=['GET'])
