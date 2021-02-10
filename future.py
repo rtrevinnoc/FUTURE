@@ -38,7 +38,6 @@ from symspellpy.symspellpy import SymSpell, Verbosity
 from bs4 import BeautifulSoup
 from config import HOST_NAME, PEER_PORT, CONTACT, MAINTAINER, FIRST_NOTICE, SECOND_NOTICE, DONATE, COLABORATE, CACHE_TIMEOUT, CACHE_THRESHOLD
 from PIL import Image
-from flask_minify import minify
 
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
@@ -85,7 +84,6 @@ cache = Cache(app,
                   'CACHE_THRESHOLD': CACHE_THRESHOLD,
                   'CACHE_DIR': './external_image_cache'
               })
-minify(app=app, html=True, js=True, cssless=True, static=False, fail_safe=False, caching_limit=0)
 
 
 def sendRegisterRequestToPeer(url):
