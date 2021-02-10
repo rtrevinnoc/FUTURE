@@ -85,7 +85,7 @@ cache = Cache(app,
                   'CACHE_THRESHOLD': CACHE_THRESHOLD,
                   'CACHE_DIR': './external_image_cache'
               })
-minify(app=app, html=True, js=True, cssless=True, passive=True, caching_limit=0)
+minify(app=app, html=True, js=True, cssless=True, static=False, fail_safe=False, caching_limit=0)
 
 
 def sendRegisterRequestToPeer(url):
