@@ -118,40 +118,6 @@ $(function() {
 		}
 	});
 
-	//const adCode = '<iframe data-aa="1549965" src="//ad.a-ads.com/1549965?size=320x50&background_color=eeeeee&text_color=111111&title_color=daa520&title_hover_color=daa520&link_color=b82f2f&link_hover_color=b82f2f" scrolling="no" style="width:320px; height:50px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>'
-	//function showAds () {
-		//var cusid_ele = document.getElementsByClassName('ad')
-		//for (var i = 0; i < cusid_ele.length; ++i) {
-			//cusid_ele[i].innerHTML = adCode;
-		//}
-	//}
-
-	//function removeAds () {
-		//var cusid_ele = document.getElementsByClassName('ad')
-		//for (var i = 0; i < cusid_ele.length; ++i) {
-			//cusid_ele[i].remove()
-		//}
-	//}
-
-	//let hasPaid = false
-	//if (document.monetization) {
-		//document.monetization.addEventListener('monetizationstart', () => {
-			//hasPaid = true
-			//removeAds()
-		//})
-	//}
-
-	//if (!document.monetization) {
-		//showAds()
-	//} else {
-		////setTimeout(() => {
-		//if (!hasPaid) {
-			//showAds()
-		//}
-		////}, 3000)
-	//}
-
-
 	if (annyang) {
 		var commands = {
 			'search for *query': function(query) {
@@ -326,15 +292,10 @@ $(function() {
 			images_button.animate({
 				color: "#1b1a1a"
 			}, "fast");
-		} else {
-			$("body").animate({
-				backgroundColor: "#EEEEEE"
-			}, "slow");
 		}
 	}
 
 	$('#sidebar_content').hide();
-	//scroll_element.getScrollElement().scrollTop = scroll_element.getScrollElement().scrollHeight;
 	function get_urls(input) {
 		var date = new Date();
 		var start_time = date.getTime();
@@ -480,22 +441,6 @@ $(function() {
 
 	searchbar.focus()
 
-	//$('#eye').click(function(e) {
-		//if (chat.is(':hidden')) {
-			//chat.slideDown("slow")
-			//if ($(window).height() <= 768 && $(window).width() <= 960) {
-				//sidebar_menu.hide()
-				//$('#sidebar_show_icon').attr("class", "ion-chevron-left")
-			//}
-		//} else {
-			//chat.slideUp("slow")
-		//}
-	//});
-
-	//$("#close_chat").click(function(e) {
-		//chat.slideUp("slow")
-	//})
-
 	links_button.click(function(e) {
 		const url = new URL(window.location)
 		url.searchParams.set('section', 'links')
@@ -590,23 +535,9 @@ $(function() {
 		});
 		switch ($('#sidebar_show_icon').attr("class")) {
 			case 'ion-chevron-left':
-				//if ($(window).height() <= 768 && $(window).width() <= 960) {
-					//chat.hide()
-				//}
 				$('#sidebar_show_icon').attr("class", "ion-chevron-right")
 				$('#particles-js').animate({
 					width: ($(window).width() - ($(window).width() / 4.1))
-				}, function() {
-					$("#particles-js").animate({
-						opacity: 0.5
-					});
-					$("body").animate({
-						backgroundColor: "#111111"
-					}, "slow");
-					pJSDom[0].pJS.particles.opacity.value = 0
-					pJSDom[0].pJS.particles.line_linked.color = "#FFFFFF"
-					pJSDom[0].pJS.particles.move.speed = 10
-					pJSDom[0].pJS.fn.particlesRefresh()
 				});
 				$('#sidebar_content').fadeIn("slow")
 				break;
@@ -617,14 +548,6 @@ $(function() {
 
 				$('#particles-js').animate({
 					width: $(window).width()
-				}, function() {
-					$("#particles-js").animate({
-						opacity: 1
-					});
-					pJSDom[0].pJS.particles.opacity.value = 0
-					pJSDom[0].pJS.particles.line_linked.color = "#000000"
-					pJSDom[0].pJS.particles.move.speed = 3
-					pJSDom[0].pJS.fn.particlesRefresh()
 				});
 				break;
 		}

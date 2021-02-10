@@ -29,6 +29,7 @@ pip3 install -U wordnet
 pip3 install -U numexpr
 pip3 install -U flask-caching
 pip3 install -U pillow
+pip3 install -U Flask-Minify
 
 python3 -m spacy download en_core_web_sm
 python3 -c "import nltk; nltk.download('punkt')"
