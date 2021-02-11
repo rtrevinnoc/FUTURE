@@ -350,8 +350,21 @@ def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
     except:
         return {"images": [], "vectorIds": [], "scores": []}
 
+def registerQueryInAnalytics(query: str):
+    if len(query) <= 160:
+        with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
+            queryBytes = query.encode("utf-8")
+            analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
+            if analyticsPreviousValue == None:
+                analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
+            else:
+                analyticsDBTransaction.put(
+                    queryBytes,
+                    str(int(analyticsPreviousValue.decode("utf-8")) +
+                        1).encode("utf-8"))
 
-def answer(query: str) -> jsonify:
+
+def answer(query: str, page: int) -> jsonify:
     queryBeforePreprocessing = query
     queryLanguage = inferLanguage(query)
     if getResourceFromDBPedia(
@@ -373,22 +386,10 @@ def answer(query: str) -> jsonify:
             "urls": []
         }
 
-    if len(query) <= 160:
-        with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
-            queryBytes = query.encode("utf-8")
-            analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
-            if analyticsPreviousValue == None:
-                analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
-            else:
-                analyticsDBTransaction.put(
-                    queryBytes,
-                    str(int(analyticsPreviousValue.decode("utf-8")) +
-                        1).encode("utf-8"))
-
-    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, 1)
+    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, page)
 
     listOfDataFromPeers = asyncio.run(
-        getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, 1))
+        getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, page))
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
         listOfUrlsFromPeers = list(
@@ -407,20 +408,26 @@ def answer(query: str) -> jsonify:
         except:
             DBPediaDef = "Brief description not found."
 
-    return {
-        "answer":
-        escapeHTMLString(getAbstractFromDBPedia(query)),
-        "small_summary":
-        escapeHTMLString(DBPediaDef),
-        "corrected":
-        escapeHTMLString(query),
-        "urls":
-        list({frozenset(item.items()): item
-              for item in bigListOfUrls}.values())
-    }
+    bigListOfUrls = list({frozenset(item.items()): item for item in bigListOfUrls}.values())
+
+    if page == 1:
+        registerQueryInAnalytics(query)
+        return {
+                "answer":
+                escapeHTMLString(getAbstractFromDBPedia(query)),
+                "small_summary":
+                escapeHTMLString(DBPediaDef),
+                "corrected":
+                escapeHTMLString(query),
+                "urls": bigListOfUrls
+        }
+    else:
+        return {
+                "urls": bigListOfUrls
+        }
 
 
-def answerImages(query: str) -> jsonify:
+def answerImages(query: str, page: int) -> jsonify:
     queryBeforePreprocessing = query
     queryLanguage = inferLanguage(query)
     if getResourceFromDBPedia(
@@ -437,22 +444,10 @@ def answerImages(query: str) -> jsonify:
     except:
         return {"images": []}
 
-    if len(query) <= 160:
-        with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
-            queryBytes = query.encode("utf-8")
-            analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
-            if analyticsPreviousValue == None:
-                analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
-            else:
-                analyticsDBTransaction.put(
-                    queryBytes,
-                    str(int(analyticsPreviousValue.decode("utf-8")) +
-                        1).encode("utf-8"))
-
-    images = loadMoreImages(q_vec, 15, 1)
+    images = loadMoreImages(q_vec, 10, page)
 
     listOfDataFromPeers = asyncio.run(
-        getImagesFromPeers(query, q_vec, queryLanguage, numberOfURLs, 1))
+        getImagesFromPeers(query, q_vec, queryLanguage, numberOfURLs, page))
     if len(listOfDataFromPeers) > 0:
         listOfImagesFromHost = list(zip(images["images"], images["scores"]))
         listOfImagesFromPeers = list(
@@ -465,13 +460,18 @@ def answerImages(query: str) -> jsonify:
     else:
         bigListOfImages = images["images"]
 
-    return {
-        "corrected":
-        escapeHTMLString(query),
-        "images":
-        list({frozenset(item.items()): item
-              for item in bigListOfImages}.values())
-    }
+    bigListOfImages = list({frozenset(item.items()): item for item in bigListOfImages}.values())
+
+    if page == 1:
+        registerQueryInAnalytics(query)
+        return {
+                "corrected": escapeHTMLString(query),
+                "images": bigListOfImages
+        }
+    else:
+        return {
+                "images": bigListOfImages
+        }
 
 
 def answerMap(query: str) -> jsonify:
@@ -493,17 +493,7 @@ def answerMap(query: str) -> jsonify:
             "map": "",
         }
 
-    if len(query) <= 160:
-        with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
-            queryBytes = query.encode("utf-8")
-            analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
-            if analyticsPreviousValue == None:
-                analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
-            else:
-                analyticsDBTransaction.put(
-                    queryBytes,
-                    str(int(analyticsPreviousValue.decode("utf-8")) +
-                        1).encode("utf-8"))
+    registerQueryInAnalytics(query)
 
     return {
         "corrected": escapeHTMLString(query),
@@ -514,17 +504,7 @@ def answerMap(query: str) -> jsonify:
 def answerPeer(query: str, q_vec: list, queryLanguage: str, numberOfURLs: int,
                numberOfPage: int) -> jsonify:
     q_vec = np.array(ast.literal_eval("".join(q_vec)))
-    if len(query) <= 160:
-        with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
-            queryBytes = query.encode("utf-8")
-            analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
-            if analyticsPreviousValue == None:
-                analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
-            else:
-                analyticsDBTransaction.put(
-                    queryBytes,
-                    str(int(analyticsPreviousValue.decode("utf-8")) +
-                        1).encode("utf-8"))
+    registerQueryInAnalytics(query)
 
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, numberOfPage)
 
@@ -534,17 +514,7 @@ def answerPeer(query: str, q_vec: list, queryLanguage: str, numberOfURLs: int,
 def answerPeerImages(query: str, q_vec: list, queryLanguage: str,
                      numberOfURLs: int, numberOfPage: int) -> jsonify:
     q_vec = np.array(ast.literal_eval("".join(q_vec)))
-    if len(query) <= 160:
-        with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
-            queryBytes = query.encode("utf-8")
-            analyticsPreviousValue = analyticsDBTransaction.get(queryBytes)
-            if analyticsPreviousValue == None:
-                analyticsDBTransaction.put(queryBytes, str(0).encode("utf-8"))
-            else:
-                analyticsDBTransaction.put(
-                    queryBytes,
-                    str(int(analyticsPreviousValue.decode("utf-8")) +
-                        1).encode("utf-8"))
+    registerQueryInAnalytics(query)
 
     images = loadMoreImages(q_vec, 15, numberOfPage)
 
@@ -688,7 +658,7 @@ def fetchSearxVideos():
         except:
             pass
 
-    return jsonify(result={"videos": resultVideosFromSearx[:30]})
+    return jsonify(result={"videos": resultVideosFromSearx[:15]})
 
 
 @app.route('/_retrieveImage')
@@ -703,7 +673,7 @@ def _retrieveImage():
     pic.thumbnail((480, 480), Image.LANCZOS)
 
     img_io = io.BytesIO()
-    pic.save(img_io, 'JPEG', quality=70)
+    pic.save(img_io, 'PNG', optimize=True)
     img_io.seek(0)
     return send_file(img_io, mimetype='image/jpeg')
 
@@ -839,14 +809,16 @@ def _autocomplete():
 def _answer():
     """The method for processing form data and answering."""
     query = request.args.get("query", 0, type=str)
-    return jsonify(result=answer(query))
+    page = request.args.get("page", 1, type=int)
+    return jsonify(result=answer(query, page))
 
 
 @app.route("/_answerImages")
 def _answerImages():
     """The method for processing form data and answering."""
     query = request.args.get("query", 0, type=str)
-    return jsonify(result=answerImages(query))
+    page = request.args.get("page", 1, type=int)
+    return jsonify(result=answerImages(query, page))
 
 
 @app.route("/_answerMap")
@@ -878,84 +850,6 @@ def _answerPeerImages():
     numberOfPage = request.args.get("numberOfPage", 1, type=int)
     return jsonify(result=answerPeerImages(query, q_vec, queryLanguage,
                                            numberOfURLs, numberOfPage))
-
-
-@app.route("/_updateAnswer", methods=["GET", "POST"])
-def _updateAnswer():
-    query = request.args.get("query", 0, type=str)
-    page = request.args.get("page", 0, type=int)
-    q_vec = getSentenceMeanVector(query)
-    queryLanguage = inferLanguage(query)
-
-    urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, page)
-
-    listOfDataFromPeers = asyncio.run(
-        getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, page))
-    if len(listOfDataFromPeers) > 0:
-        listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
-        listOfUrlsFromPeers = [pack["urls"] for pack in listOfDataFromPeers][0]
-        bigListOfUrls = listOfUrlsFromHost + listOfUrlsFromPeers
-        bigListOfUrls.sort(key=lambda x: x[1])
-        bigListOfUrls = [url[0] for url in bigListOfUrls]
-    else:
-        bigListOfUrls = urls["urls"]
-
-    return jsonify(
-        result={
-            "urls":
-            list({frozenset(item.items()): item
-                  for item in bigListOfUrls}.values())
-        })
-
-
-@app.route("/_updateImages", methods=["GET", "POST"])
-def _updateImages():
-    query = request.args.get("query", 0, type=str)
-    page = request.args.get("page", 0, type=int)
-    q_vec = getSentenceMeanVector(query)
-    queryLanguage = inferLanguage(query)
-
-    images = loadMoreImages(q_vec, 15, page)
-
-    listOfDataFromPeers = asyncio.run(
-        getImagesFromPeers(query, q_vec, queryLanguage, numberOfURLs, page))
-    if len(listOfDataFromPeers) > 0:
-        listOfImagesFromHost = list(zip(images["images"], images["scores"]))
-        listOfImagesFromPeers = [
-            pack["images"] for pack in listOfDataFromPeers
-        ][0]
-        bigListOfImages = list(listOfImagesFromHost + listOfImagesFromPeers)
-        bigListOfImages.sort(key=lambda x: x[1])
-        bigListOfImages = [
-            image[0] for image in bigListOfImages if image[0] != ''
-        ]
-    else:
-        bigListOfImages = images["images"]
-
-    return jsonify(
-        result={
-            "images":
-            list({frozenset(item.items()): item
-                  for item in bigListOfImages}.values())
-        })
-
-
-@app.route("/_midnightcypher")
-def _midnightcypher():
-    query = request.args.get("query", 0, type=str)
-    q_vec = getSentenceMeanVector(query)
-    imageVectorIds, _ = hnswImagesLookup.knn_query(q_vec, k=50)
-
-    with imageDBIndex.begin() as imageDBTransaction:
-        imagesBinaryDictionary = [
-            bson.loads(imageDBTransaction.get(
-                str(image).encode("utf-8")))["url"]
-            for image in imageVectorIds[0]
-        ]  # [:n_imgs]]
-
-    return jsonify(result={
-        "images": imagesBinaryDictionary,
-    })
 
 
 if __name__ == "__main__":

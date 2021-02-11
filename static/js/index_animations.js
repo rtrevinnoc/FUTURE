@@ -323,7 +323,8 @@ $(function() {
 		})
 
 		$.getJSON($SCRIPT_ROOT + '/_answer', {
-			query: input
+			query: input,
+			page: 1
 		}, function(data) {
 			response = data.result
 
@@ -382,7 +383,8 @@ $(function() {
 		})
 
 		$.getJSON($SCRIPT_ROOT + '/_answerImages', {
-			query: input
+			query: input,
+			page: 1
 		}, function(data) {
 			response = data.result
 
@@ -497,7 +499,7 @@ $(function() {
 
 	$('#load_more_links').click(function(e) {
 		$(".hex").addClass("rotate");
-		$.getJSON($SCRIPT_ROOT + '/_updateAnswer', {
+		$.getJSON($SCRIPT_ROOT + '/_answer', {
 			query: current_query,
 			page: (current_links_page + 1)
 		}, function(data) {
@@ -512,7 +514,7 @@ $(function() {
 
 	$('#load_more_images').click(function(e) {
 		$(".hex").addClass("rotate");
-		$.getJSON($SCRIPT_ROOT + '/_updateImages', {
+		$.getJSON($SCRIPT_ROOT + '/_answerImages', {
 			query: current_query,
 			page: (current_images_page + 1)
 		}, function(data) {
