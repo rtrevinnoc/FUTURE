@@ -564,7 +564,7 @@ $(function() {
 		$("#links_list").empty()
 		$("#links_description").empty()
 		$("#welcome").fadeOut("fast");
-		$("images_list").empty()
+		$("#images_list").empty()
 		videos.empty()
 		maps.empty()
 		summary.empty()
@@ -597,7 +597,7 @@ $(function() {
 			$("#links_list").empty()
 			$("#links_description").empty()
 			$("#welcome").fadeOut("fast");
-			$("images_list").empty()
+			$("#images_list").empty()
 			videos.empty()
 			maps.empty()
 			summary.empty()
