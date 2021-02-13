@@ -31,7 +31,7 @@ from scipy.spatial import distance
 from itertools import tee, islice, chain
 from nltk.corpus import wordnet
 from SPARQLWrapper import SPARQLWrapper, JSON
-# from polyglot.detect import Detector
+from polyglot.detect import Detector
 
 import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests
 bson.loads = bson.BSON.decode
