@@ -676,6 +676,8 @@ def _retrieveImage():
             image = requests.get("http:" + url, allow_redirects=True)
         except:
             image = requests.get("https:" + url, allow_redirects=True)
+    else:
+        image = requests.get(url, allow_redirects=True)
 
     pic = Image.open(io.BytesIO(image.content))
     pic.thumbnail((480, 480), Image.LANCZOS)
@@ -846,6 +848,8 @@ def _answerPeer():
     numberOfPage = request.args.get("numberOfPage", 1, type=int)
     minimumScore = request.args.get("minimumScore", 0, type=float)
     result = answerPeer(query, q_vec, queryLanguage, numberOfURLs, numberOfPage)
+    print("maxPeer: ", max(result["url_scores"]))
+    print("maxOriginator: ", minimumScore)
     if max(result["url_scores"]) >= minimumScore:
         return jsonify(result=result)
     else:
@@ -862,6 +866,8 @@ def _answerPeerImages():
     numberOfPage = request.args.get("numberOfPage", 1, type=int)
     minimumScore = request.args.get("minimumScore", 0, type=float)
     result = answerPeerImages(query, q_vec, queryLanguage, numberOfURLs, numberOfPage)
+    print("maxPeer: ", max(result["url_scores"]))
+    print("maxOriginator: ", minimumScore)
     if max(result["images_scores"]) >= minimumScore:
         return jsonify(result=result)
     else:
