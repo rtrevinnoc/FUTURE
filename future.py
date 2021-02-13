@@ -866,7 +866,7 @@ def _answerPeerImages():
     numberOfPage = request.args.get("numberOfPage", 1, type=int)
     minimumScore = request.args.get("minimumScore", 0, type=float)
     result = answerPeerImages(query, q_vec, queryLanguage, numberOfURLs, numberOfPage)
-    print("maxPeer: ", max(result["url_scores"]))
+    print("maxPeer: ", max(result["images_scores"]))
     print("maxOriginator: ", minimumScore)
     if max(result["images_scores"]) >= minimumScore:
         return jsonify(result=result)
