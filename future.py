@@ -127,7 +127,7 @@ def sendRegisterRequestToPeer(url):
 
 
 def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
-                            numberOfURLs, numberOfPage):
+                            numberOfURLs, numberOfPage, minimumScore):
     peer = url
     queryVector = json.dumps(queryVector.tolist())
     print("#######################")
@@ -145,7 +145,8 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                                  'q_vec': queryVector,
                                  'queryLanguage': queryLanguage,
                                  'numberOfURLs': numberOfURLs,
-                                 'numberOfPage': numberOfPage
+                                 'numberOfPage': numberOfPage,
+                                 'minimumScore': minimumScore
                              },
                              timeout=10)
             result = r.json()["result"]
@@ -159,7 +160,8 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                                      'q_vec': queryVector,
                                      'queryLanguage': queryLanguage,
                                      'numberOfURLs': numberOfURLs,
-                                     'numberOfPage': numberOfPage
+                                     'numberOfPage': numberOfPage,
+                                     'minimumScore': minimumScore
                                  },
                                  timeout=10)
                 result = r.json()["result"]
@@ -173,7 +175,7 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
 
 
 def sendImagesAnswerRequestToPeer(url, query, queryVector, queryLanguage,
-                                  numberOfURLs, numberOfPage):
+                                  numberOfURLs, numberOfPage, minimumScore):
     peer = url
     queryVector = json.dumps(queryVector.tolist())
     print("#######################")
@@ -191,7 +193,8 @@ def sendImagesAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                                  'q_vec': queryVector,
                                  'queryLanguage': queryLanguage,
                                  'numberOfURLs': numberOfURLs,
-                                 'numberOfPage': numberOfPage
+                                 'numberOfPage': numberOfPage,
+                                 'minimumScore': minimumScore
                              },
                              timeout=10)
             result = r.json()["result"]
@@ -207,7 +210,8 @@ def sendImagesAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                                      'q_vec': queryVector,
                                      'queryLanguage': queryLanguage,
                                      'numberOfURLs': numberOfURLs,
-                                     'numberOfPage': numberOfPage
+                                     'numberOfPage': numberOfPage,
+                                     'minimumScore': minimumScore
                                  },
                                  timeout=10)
                 result = r.json()["result"]
@@ -258,7 +262,7 @@ headersForSearx = {
 
 
 async def getDataFromPeers(query, queryVector, queryLanguage, numberOfURLs,
-                           numberOfPage):
+                           numberOfPage, minimumScore):
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         loop = asyncio.get_event_loop()
         futures = [
@@ -266,7 +270,7 @@ async def getDataFromPeers(query, queryVector, queryLanguage, numberOfURLs,
                 executor,
                 functools.partial(sendAnswerRequestToPeer, peer, query,
                                   queryVector, queryLanguage, numberOfURLs,
-                                  numberOfPage)) for peer in listOfPeers
+                                  numberOfPage, minimumScore)) for peer in listOfPeers
         ]
         listOfResponses = []
         for response in await asyncio.gather(*futures):
@@ -275,7 +279,7 @@ async def getDataFromPeers(query, queryVector, queryLanguage, numberOfURLs,
 
 
 async def getImagesFromPeers(query, queryVector, queryLanguage, numberOfURLs,
-                             numberOfPage):
+                             numberOfPage, minimumScore):
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         loop = asyncio.get_event_loop()
         futures = [
@@ -283,7 +287,7 @@ async def getImagesFromPeers(query, queryVector, queryLanguage, numberOfURLs,
                 executor,
                 functools.partial(sendImagesAnswerRequestToPeer, peer, query,
                                   queryVector, queryLanguage, numberOfURLs,
-                                  numberOfPage)) for peer in listOfPeers
+                                  numberOfPage, minimumScore)) for peer in listOfPeers
         ]
         listOfResponses = []
         for response in await asyncio.gather(*futures):
@@ -387,9 +391,10 @@ def answer(query: str, page: int) -> jsonify:
         }
 
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, page)
+    minimumScore = min(urls["scores"])
 
     listOfDataFromPeers = asyncio.run(
-        getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, page))
+        getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, page, minimumScore))
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
         listOfUrlsFromPeers = list(
@@ -445,9 +450,10 @@ def answerImages(query: str, page: int) -> jsonify:
         return {"images": []}
 
     images = loadMoreImages(q_vec, 10, page)
+    minimumScore = min(images["scores"])
 
     listOfDataFromPeers = asyncio.run(
-        getImagesFromPeers(query, q_vec, queryLanguage, numberOfURLs, page))
+        getImagesFromPeers(query, q_vec, queryLanguage, numberOfURLs, page, minimumScore))
     if len(listOfDataFromPeers) > 0:
         listOfImagesFromHost = list(zip(images["images"], images["scores"]))
         listOfImagesFromPeers = list(
@@ -666,8 +672,10 @@ def fetchSearxVideos():
 def _retrieveImage():
     url = request.args.get("url", "", type=str)
     if url.startswith("//"):
-        url = "http:" + url
-    image = requests.get(url, allow_redirects=True)
+        try:
+            image = requests.get("http:"url, allow_redirects=True)
+        except:
+            image = requests.get("https:"url, allow_redirects=True)
 
     pic = Image.open(io.BytesIO(image.content))
     pic.thumbnail((480, 480), Image.LANCZOS)
@@ -675,7 +683,7 @@ def _retrieveImage():
     img_io = io.BytesIO()
     pic.save(img_io, 'PNG', optimize=True)
     img_io.seek(0)
-    return send_file(img_io, mimetype='image/jpeg')
+    return send_file(img_io, mimetype='image/png')
 
 
 @app.route('/sw.js', methods=['GET'])
@@ -836,8 +844,12 @@ def _answerPeer():
     queryLanguage = request.args.get("queryLanguage", 0, type=str)
     numberOfURLs = request.args.get("numberOfURLs", 0, type=int)
     numberOfPage = request.args.get("numberOfPage", 1, type=int)
-    return jsonify(result=answerPeer(query, q_vec, queryLanguage, numberOfURLs,
-                                     numberOfPage))
+    minimumScore = request.args.get("minimumScore", 0, type=float)
+    result = answerPeer(query, q_vec, queryLanguage, numberOfURLs, numberOfPage)
+    if max(result["url_scores"]) >= minimumScore:
+        return jsonify(result=result)
+    else:
+        raise Exception("No relevant results.") 
 
 
 @app.route("/_answerPeerImages")
@@ -848,8 +860,12 @@ def _answerPeerImages():
     queryLanguage = request.args.get("queryLanguage", 0, type=str)
     numberOfURLs = request.args.get("numberOfURLs", 0, type=int)
     numberOfPage = request.args.get("numberOfPage", 1, type=int)
-    return jsonify(result=answerPeerImages(query, q_vec, queryLanguage,
-                                           numberOfURLs, numberOfPage))
+    minimumScore = request.args.get("minimumScore", 0, type=float)
+    result = answerPeerImages(query, q_vec, queryLanguage, numberOfURLs, numberOfPage)
+    if max(result["images_scores"]) >= minimumScore:
+        return jsonify(result=result)
+    else:
+        raise Exception("No relevant results.") 
 
 
 if __name__ == "__main__":

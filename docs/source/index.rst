@@ -3,12 +3,17 @@
         You can adapt this file completely to your liking, but it should at least
         contain the root `toctree` directive.
 
+==================================
 Welcome to FUTURE's documentation!
 ==================================
 
+Contents
+========
+
 .. toctree::
         :maxdepth: 2
-        :caption: Contents:
+
+        api
 
 FUTURE is a decentralized, open-source and privacy focused search engine.
 It is capable of running completely standalone, but it usually complements its own results with others sourced from meta-search at public Searx instances.
