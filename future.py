@@ -391,7 +391,7 @@ def answer(query: str, page: int) -> jsonify:
         }
 
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, page)
-    minimumScore = min(urls["scores"])
+    minimumScore = max(urls["scores"])
 
     listOfDataFromPeers = asyncio.run(
         getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, page, minimumScore))
@@ -450,7 +450,7 @@ def answerImages(query: str, page: int) -> jsonify:
         return {"images": []}
 
     images = loadMoreImages(q_vec, 10, page)
-    minimumScore = min(images["scores"])
+    minimumScore = max(images["scores"])
 
     listOfDataFromPeers = asyncio.run(
         getImagesFromPeers(query, q_vec, queryLanguage, numberOfURLs, page, minimumScore))
