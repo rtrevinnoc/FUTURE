@@ -673,9 +673,9 @@ def _retrieveImage():
     url = request.args.get("url", "", type=str)
     if url.startswith("//"):
         try:
-            image = requests.get("http:"url, allow_redirects=True)
+            image = requests.get("http:" + url, allow_redirects=True)
         except:
-            image = requests.get("https:"url, allow_redirects=True)
+            image = requests.get("https:" + url, allow_redirects=True)
 
     pic = Image.open(io.BytesIO(image.content))
     pic.thumbnail((480, 480), Image.LANCZOS)
