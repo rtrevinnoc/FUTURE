@@ -424,11 +424,11 @@ def answer(query: str, page: int) -> jsonify:
                 escapeHTMLString(DBPediaDef),
                 "corrected":
                 escapeHTMLString(query),
-                "urls": bigListOfUrls
+                "urls": bigListOfUrls[:15]
         }
     else:
         return {
-                "urls": bigListOfUrls
+                "urls": bigListOfUrls[:15]
         }
 
 
@@ -472,11 +472,11 @@ def answerImages(query: str, page: int) -> jsonify:
         registerQueryInAnalytics(query)
         return {
                 "corrected": escapeHTMLString(query),
-                "images": bigListOfImages
+                "images": bigListOfImages[:15]
         }
     else:
         return {
-                "images": bigListOfImages
+                "images": bigListOfImages[:15]
         }
 
 
