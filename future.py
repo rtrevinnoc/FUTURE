@@ -42,7 +42,7 @@ from PIL import Image
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
 
-global port, hostIP, hostname, listOfPeers, app, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, numberOfURLs, goodSearxInstances, headersForSearx, cache
+global port, hostIP, hostname, listOfPeers, numberOfPeers, app, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, numberOfURLs, goodSearxInstances, headersForSearx, cache
 port = int(PEER_PORT)
 hostIP = requests.get(
     "https://api.ipify.org?format=json").json()["ip"] + ":" + str(port)
@@ -231,6 +231,7 @@ if hostname != "private":
         for key, value in peerRegistryDBSelector:
             listOfPeers.append(key.decode("utf-8"))
             sendRegisterRequestToPeer(key)
+    numberOfPeers = len(listOfPeers)
 
 searxInstances = requests.get(
     "https://searx.space/data/instances.json").json()["instances"]
@@ -270,12 +271,17 @@ async def getDataFromPeers(query, queryVector, queryLanguage, numberOfURLs,
                 executor,
                 functools.partial(sendAnswerRequestToPeer, peer, query,
                                   queryVector, queryLanguage, numberOfURLs,
-                                  numberOfPage, minimumScore)) for peer in listOfPeers
+                                  numberOfPage, minimumScore))
+            for peer in listOfPeers
         ]
         listOfResponses = []
         for response in await asyncio.gather(*futures):
             listOfResponses.append(response)
-        return listOfResponses
+            if numberOfPeers >= 5:
+                if len(listOfResponses) == 5:
+                    return listOfResponses
+            else:
+                return listOfResponses
 
 
 async def getImagesFromPeers(query, queryVector, queryLanguage, numberOfURLs,
@@ -287,12 +293,17 @@ async def getImagesFromPeers(query, queryVector, queryLanguage, numberOfURLs,
                 executor,
                 functools.partial(sendImagesAnswerRequestToPeer, peer, query,
                                   queryVector, queryLanguage, numberOfURLs,
-                                  numberOfPage, minimumScore)) for peer in listOfPeers
+                                  numberOfPage, minimumScore))
+            for peer in listOfPeers
         ]
         listOfResponses = []
         for response in await asyncio.gather(*futures):
             listOfResponses.append(response)
-        return listOfResponses
+            if numberOfPeers >= 5:
+                if len(listOfResponses) == 5:
+                    return listOfResponses
+            else:
+                return listOfResponses
 
 
 def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
@@ -354,6 +365,7 @@ def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
     except:
         return {"images": [], "vectorIds": [], "scores": []}
 
+
 def registerQueryInAnalytics(query: str):
     if len(query) <= 160:
         with analyticsDBIndex.begin(write=True) as analyticsDBTransaction:
@@ -394,7 +406,8 @@ def answer(query: str, page: int) -> jsonify:
     minimumScore = max(urls["scores"])
 
     listOfDataFromPeers = asyncio.run(
-        getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, page, minimumScore))
+        getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, page,
+                         minimumScore))
     if len(listOfDataFromPeers) > 0:
         listOfUrlsFromHost = list(zip(urls["urls"], urls["scores"]))
         listOfUrlsFromPeers = list(
@@ -413,23 +426,20 @@ def answer(query: str, page: int) -> jsonify:
         except:
             DBPediaDef = "Brief description not found."
 
-    bigListOfUrls = list({frozenset(item.items()): item for item in bigListOfUrls}.values())
+    bigListOfUrls = list(
+        {frozenset(item.items()): item
+         for item in bigListOfUrls}.values())
 
     if page == 1:
         registerQueryInAnalytics(query)
         return {
-                "answer":
-                escapeHTMLString(getAbstractFromDBPedia(query)),
-                "small_summary":
-                escapeHTMLString(DBPediaDef),
-                "corrected":
-                escapeHTMLString(query),
-                "urls": bigListOfUrls[:15]
+            "answer": escapeHTMLString(getAbstractFromDBPedia(query)),
+            "small_summary": escapeHTMLString(DBPediaDef),
+            "corrected": escapeHTMLString(query),
+            "urls": bigListOfUrls[:15]
         }
     else:
-        return {
-                "urls": bigListOfUrls[:15]
-        }
+        return {"urls": bigListOfUrls[:15]}
 
 
 def answerImages(query: str, page: int) -> jsonify:
@@ -453,7 +463,8 @@ def answerImages(query: str, page: int) -> jsonify:
     minimumScore = max(images["scores"])
 
     listOfDataFromPeers = asyncio.run(
-        getImagesFromPeers(query, q_vec, queryLanguage, numberOfURLs, page, minimumScore))
+        getImagesFromPeers(query, q_vec, queryLanguage, numberOfURLs, page,
+                           minimumScore))
     if len(listOfDataFromPeers) > 0:
         listOfImagesFromHost = list(zip(images["images"], images["scores"]))
         listOfImagesFromPeers = list(
@@ -466,18 +477,18 @@ def answerImages(query: str, page: int) -> jsonify:
     else:
         bigListOfImages = images["images"]
 
-    bigListOfImages = list({frozenset(item.items()): item for item in bigListOfImages}.values())
+    bigListOfImages = list(
+        {frozenset(item.items()): item
+         for item in bigListOfImages}.values())
 
     if page == 1:
         registerQueryInAnalytics(query)
         return {
-                "corrected": escapeHTMLString(query),
-                "images": bigListOfImages[:15]
+            "corrected": escapeHTMLString(query),
+            "images": bigListOfImages[:15]
         }
     else:
-        return {
-                "images": bigListOfImages[:15]
-        }
+        return {"images": bigListOfImages[:15]}
 
 
 def answerMap(query: str) -> jsonify:
@@ -847,11 +858,12 @@ def _answerPeer():
     numberOfURLs = request.args.get("numberOfURLs", 0, type=int)
     numberOfPage = request.args.get("numberOfPage", 1, type=int)
     minimumScore = request.args.get("minimumScore", 0, type=float)
-    result = answerPeer(query, q_vec, queryLanguage, numberOfURLs, numberOfPage)
+    result = answerPeer(query, q_vec, queryLanguage, numberOfURLs,
+                        numberOfPage)
     if max(result["url_scores"]) <= minimumScore:
         return jsonify(result=result)
     else:
-        raise Exception("No relevant results.") 
+        raise Exception("No relevant results.")
 
 
 @app.route("/_answerPeerImages")
@@ -863,11 +875,12 @@ def _answerPeerImages():
     numberOfURLs = request.args.get("numberOfURLs", 0, type=int)
     numberOfPage = request.args.get("numberOfPage", 1, type=int)
     minimumScore = request.args.get("minimumScore", 0, type=float)
-    result = answerPeerImages(query, q_vec, queryLanguage, numberOfURLs, numberOfPage)
+    result = answerPeerImages(query, q_vec, queryLanguage, numberOfURLs,
+                              numberOfPage)
     if max(result["images_scores"]) <= minimumScore:
         return jsonify(result=result)
     else:
-        raise Exception("No relevant results.") 
+        raise Exception("No relevant results.")
 
 
 if __name__ == "__main__":
