@@ -277,11 +277,11 @@ async def getDataFromPeers(query, queryVector, queryLanguage, numberOfURLs,
         listOfResponses = []
         for response in await asyncio.gather(*futures):
             listOfResponses.append(response)
-            if numberOfPeers >= 5:
-                if len(listOfResponses) == 5:
-                    return listOfResponses
-            else:
+            if numberOfPeers >= 5 and len(listOfResponses) == 5:
                 return listOfResponses
+            else:
+                continue
+        return listOfResponses
 
 
 async def getImagesFromPeers(query, queryVector, queryLanguage, numberOfURLs,
@@ -299,11 +299,11 @@ async def getImagesFromPeers(query, queryVector, queryLanguage, numberOfURLs,
         listOfResponses = []
         for response in await asyncio.gather(*futures):
             listOfResponses.append(response)
-            if numberOfPeers >= 5:
-                if len(listOfResponses) == 5:
-                    return listOfResponses
-            else:
+            if numberOfPeers >= 5 and len(listOfResponses) == 5:
                 return listOfResponses
+            else:
+                continue
+        return listOfResponses
 
 
 def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
