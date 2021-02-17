@@ -318,6 +318,11 @@ def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
             "language": url["language"],
         } for url in search["results"]]
 
+        try:
+            print("Tokens minted:", mintTokens(q_vec, np.frombuffer(search["results"][0]["vec"], dtype=np.float32)))
+        except:
+            print("The contract rejected the answer and did not award tokens.")
+
         urlsInPreferedLanguage, urlsInOtherLanguages = [], []
         for url in urls:
             if url["language"] == queryLanguage:
@@ -349,9 +354,14 @@ def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
                 lowerLimit = 0
 
             resultImages = []
-            for image in vectorIds[0][lowerLimit:totalItems]:
+            for idx, image in enumerate(vectorIds[0][lowerLimit:totalItems]):
                 image = bson.loads(
                     imageDBTransaction.get(str(image).encode("utf-8")))
+                if idx == 1:
+                    try:
+                        print("Tokens minted:", mintTokens(term, np.frombuffer(image["vec"], dtype=np.float32)))
+                    except:
+                        print("The contract rejected the answer and did not award tokens.")
                 resultImages.append({
                     "url": image["url"],
                     "parentUrl": image["parentUrl"]
@@ -403,7 +413,10 @@ def answer(query: str, page: int) -> jsonify:
         }
 
     urls = loadMoreUrls(q_vec, queryLanguage, numberOfURLs, page)
-    minimumScore = max(urls["scores"])
+    try:
+        minimumScore = max(urls["scores"])
+    except:
+        minimumScore = 1
 
     listOfDataFromPeers = asyncio.run(
         getDataFromPeers(query, q_vec, queryLanguage, numberOfURLs, page,
@@ -460,7 +473,11 @@ def answerImages(query: str, page: int) -> jsonify:
         return {"images": []}
 
     images = loadMoreImages(q_vec, 10, page)
-    minimumScore = max(images["scores"])
+    try:
+        minimumScore = max(images["scores"])
+    except:
+        minimumScore = 1
+
 
     listOfDataFromPeers = asyncio.run(
         getImagesFromPeers(query, q_vec, queryLanguage, numberOfURLs, page,

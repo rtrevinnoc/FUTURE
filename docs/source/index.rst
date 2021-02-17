@@ -39,6 +39,7 @@ It is suggested to start with this configuration template, which is essentially 
         #!/usr/bin/env python3
         # -*- coding: utf8 -*-
         import secrets
+        from web3 import Web3
 
         WTF_CSRF_ENABLED = True
         SECRET_KEY = secrets.token_urlsafe(16)
@@ -65,6 +66,10 @@ It is suggested to start with this configuration template, which is essentially 
         COLABORATE = "<a href='https://github.com/rtrevinnoc/FUTURE'>COLABORATE</a>"
         CACHE_TIMEOUT = 15
         CACHE_THRESHOLD = 100
+        WEB3API = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
+        ETHEREUM_ACCOUNT = WEB3API.eth.accounts[0]
+        CONTRACT_CODE = 'future-token/build/contracts/FUTURE.json'
+        CONTRACT_ADDRESS = "0x2ebDA3D6B2F24aE57164b0384daa9af2C0D17323"
 
 After you have configurated your FUTURE instance, but before you can start the server, you will be required to add a minimum of ~25 urls to your local index, by executing:
 

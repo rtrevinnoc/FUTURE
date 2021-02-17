@@ -31,11 +31,20 @@ from scipy.spatial import distance
 from itertools import tee, islice, chain
 from nltk.corpus import wordnet
 from SPARQLWrapper import SPARQLWrapper, JSON
+from web3 import Web3
 from polyglot.detect import Detector
 
 import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
+
+try:
+    from config import WEB3API, ETHEREUM_ACCOUNT, CONTRACT_CODE, CONTRACT_ADDRESS
+    WEB3API.eth.default_account = ETHEREUM_ACCOUNT
+    abi = json.load(open(CONTRACT_CODE))['abi']
+    contract = WEB3API.eth.contract(address=CONTRACT_ADDRESS, abi=abi)
+except:
+    print("No connection to Ethereum network.")
 
 sparql = SPARQLWrapper("http://dbpedia.org/sparql")
 sparql.setReturnFormat(JSON)
@@ -476,6 +485,14 @@ def inferLanguage(string: str) -> str:
         return Detector(string).language.name
     except:
         return "Undefined"
+
+def mintTokens(queryVec: np.array, answerVec: np.array) -> int:
+    if WEB3API.isConnected():
+        queryVec = (queryVec * 100).astype(int).tolist()
+        answerVec = (answerVec * 100).astype(int).tolist()
+        return contract.functions.mint(queryVec, answerVec).call()
+    else:
+        raise "Cannot connect to Ethereum network."
 
 
 class Monad():
