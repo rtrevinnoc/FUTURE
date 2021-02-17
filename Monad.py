@@ -490,7 +490,9 @@ def mintTokens(queryVec: np.array, answerVec: np.array) -> int:
     if WEB3API.isConnected():
         queryVec = (queryVec * 100).astype(int).tolist()
         answerVec = (answerVec * 100).astype(int).tolist()
-        return contract.functions.mint(queryVec, answerVec).call()
+        response = contract.functions.mint(queryVec, answerVec).call()
+        print("Tokens minted:", response)
+        return response
     else:
         raise "Cannot connect to Ethereum network."
 

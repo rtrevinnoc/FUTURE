@@ -22,7 +22,7 @@
 #########################################################################
 
 from Monad import *
-import os.path, os, shutil, json, random, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools, mimetypes, io
+import os.path, os, shutil, json, random, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools, mimetypes, io, threading
 import numpy as np
 import numexpr as ne
 from flask import (Flask, render_template, request, redirect,
@@ -319,7 +319,8 @@ def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
         } for url in search["results"]]
 
         try:
-            print("Tokens minted:", mintTokens(q_vec, np.frombuffer(search["results"][0]["vec"], dtype=np.float32)))
+            minter_thread = threading.Thread(target=mintTokens, args=(q_vec, np.frombuffer(search["results"][0]["vec"], dtype=np.float32)))
+            minter_thread.start()
         except:
             print("The contract rejected the answer and did not award tokens.")
 
@@ -359,7 +360,8 @@ def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
                     imageDBTransaction.get(str(image).encode("utf-8")))
                 if idx == 1:
                     try:
-                        print("Tokens minted:", mintTokens(term, np.frombuffer(image["vec"], dtype=np.float32)))
+                        minter_thread = threading.Thread(target=mintTokens, args=(term, np.frombuffer(image["vec"], dtype=np.float32)))
+                        minter_thread.start()
                     except:
                         print("The contract rejected the answer and did not award tokens.")
                 resultImages.append({
