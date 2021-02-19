@@ -38,7 +38,6 @@ contract FUTURE is IERC20, SafeMath {
 
 	uint256 public _totalSupply;
 	address public owner;
-	uint public _reward;
 
 	mapping(address => uint) balances;
 	mapping(address => mapping(address => uint)) allowed;
@@ -48,8 +47,8 @@ contract FUTURE is IERC20, SafeMath {
 		symbol = "FTR";
 		decimals = 8;
 		owner = msg.sender;
-		_totalSupply = 21000000 * 10 ** uint256(decimals);   // 24 decimals 
-		_reward = 100;
+		//_maxSupply = 21000000 * 10 ** uint256(decimals);   // 24 decimals 
+		_totalSupply = 0;
 		//balances[msg.sender] = _totalSupply;
 		//emit Transfer(address(0), msg.sender, _totalSupply);
 	}
@@ -103,7 +102,7 @@ contract FUTURE is IERC20, SafeMath {
 	* @dev totalSupply : Display total supply of token
 	*/ 
 	function totalSupply() virtual override public view returns (uint) {
-		return _totalSupply;
+		return _totalSupply - balances[address(0)];
 	}
 
 	/**
@@ -145,9 +144,10 @@ contract FUTURE is IERC20, SafeMath {
 		int normQueryVec = sqrt(sumQueryVec);
 		int normAnswerVec = sqrt(sumAnswerVec);
 		require((normQueryVec + normAnswerVec) > 0, "Cannot divide by 0.");
-		int cosSim = int(_reward) - ((dotProduct)/(normQueryVec + normAnswerVec));
-		require(cosSim > 0, "Not successful answer.");
-		uint _amount = uint(cosSim);
+		int cosSim = 100 - ((dotProduct)/(normQueryVec + normAnswerVec));
+		require(cosSim > 0, "Non successful answer.");
+		uint _amount = ((uint(cosSim) * 10000000000000000)/(10000000000000000 + _totalSupply)) + 1;
+		_totalSupply = safeAdd(_totalSupply, _amount);
 		balances[msg.sender] = safeAdd(balances[msg.sender], _amount);
 		emit Transfer(address(0), msg.sender, _amount);
 		return true;
