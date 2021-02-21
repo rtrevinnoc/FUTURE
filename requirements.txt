@@ -33,3 +33,5 @@ uWSGI==2.0.19.1
 Werkzeug==0.16.1
 wordnet==0.0.1b2
 WTForms==2.3.3
+languagecodes==1.0.7
+banal==1.0.4
