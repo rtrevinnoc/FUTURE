@@ -30,7 +30,8 @@ pip3 install -U numexpr
 pip3 install -U flask-caching
 pip3 install -U pillow
 pip3 install -U web3
-pip3 install -U translate
+pip3 install -U languagecodes
+pip3 install -U banal
 
 python3 -m spacy download en_core_web_sm
 python3 -c "import nltk; nltk.download('punkt')"

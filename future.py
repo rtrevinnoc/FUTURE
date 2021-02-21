@@ -22,7 +22,7 @@
 #########################################################################
 
 from Monad import *
-import os.path, os, shutil, json, random, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools, mimetypes, io, threading
+import os.path, os, shutil, json, random, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools, mimetypes, io, threading, languagecodes
 import numpy as np
 import numexpr as ne
 from flask import (Flask, render_template, request, redirect,
@@ -38,7 +38,6 @@ from symspellpy.symspellpy import SymSpell, Verbosity
 from bs4 import BeautifulSoup
 from config import HOST_NAME, PEER_PORT, CONTACT, MAINTAINER, FIRST_NOTICE, SECOND_NOTICE, DONATE, COLABORATE, CACHE_TIMEOUT, CACHE_THRESHOLD
 from PIL import Image
-from translate import Translator
 
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
@@ -406,8 +405,15 @@ def answer(query: str, page: int) -> jsonify:
         query = queryBeforePreprocessing
     query = query.lower().strip()
     if queryLanguage != "en":
-        translator = Translator(from_lang=queryLanguage, to_lang="en")
-        query = translator.translate(query)
+        try:
+            query = requests.get("https://www.apertium.org/apy/translate", params={'q': query, 'markUnknown': 'no', 'langpair': languagecodes.iso_639_alpha3(queryLanguage) + '|eng'}).json()['responseData']['translatedText']
+        except:
+            return {
+                    "answer": "Could not translate input.",
+                    "small_summary": "Could not translate input.",
+                    "corrected": query,
+                    "urls": []
+                    }
     try:
         q_vec = getSentenceMeanVector(query)
     except:
