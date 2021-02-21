@@ -38,6 +38,7 @@ from symspellpy.symspellpy import SymSpell, Verbosity
 from bs4 import BeautifulSoup
 from config import HOST_NAME, PEER_PORT, CONTACT, MAINTAINER, FIRST_NOTICE, SECOND_NOTICE, DONATE, COLABORATE, CACHE_TIMEOUT, CACHE_THRESHOLD
 from PIL import Image
+from translate import Translator
 
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
@@ -404,6 +405,9 @@ def answer(query: str, page: int) -> jsonify:
     else:
         query = queryBeforePreprocessing
     query = query.lower().strip()
+    if queryLanguage != "en":
+        translator = Translator(from_lang=queryLanguage. to_lang="en")
+        query = translator.translate(query)
     try:
         q_vec = getSentenceMeanVector(query)
     except:

@@ -482,9 +482,9 @@ def escapeHTMLString(string: str) -> str:
 
 def inferLanguage(string: str) -> str:
     try:
-        return Detector(string).language.name
+        return Detector(string).language.code
     except:
-        return "Undefined"
+        return "autodetect"
 
 def mintTokens(queryVec: np.array, answerVec: np.array) -> int:
     if WEB3API.isConnected():
