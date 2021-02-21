@@ -406,7 +406,7 @@ def answer(query: str, page: int) -> jsonify:
         query = queryBeforePreprocessing
     query = query.lower().strip()
     if queryLanguage != "en":
-        translator = Translator(from_lang=queryLanguage. to_lang="en")
+        translator = Translator(from_lang=queryLanguage, to_lang="en")
         query = translator.translate(query)
     try:
         q_vec = getSentenceMeanVector(query)
