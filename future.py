@@ -359,7 +359,7 @@ def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
             for idx, image in enumerate(vectorIds[0][lowerLimit:totalItems]):
                 image = bson.loads(
                     imageDBTransaction.get(str(image).encode("utf-8")))
-                if idx == 1:
+                # if idx == 1:
                     # minter_thread = multiprocessing.Process(
                         # target=mintTokens,
                         # args=(term,
