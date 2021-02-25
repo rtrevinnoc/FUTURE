@@ -318,11 +318,12 @@ def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
             "language": url["language"],
         } for url in search["results"]]
 
-        try:
-            minter_thread = threading.Thread(target=mintTokens, args=(q_vec, np.frombuffer(search["results"][0]["vec"], dtype=np.float32)))
-            minter_thread.start()
-        except:
-            print("The contract rejected the answer and did not award tokens.")
+        minter_thread = threading.Thread(target=mintTokens,
+                                         args=(q_vec,
+                                               np.frombuffer(
+                                                   search["results"][0]["vec"],
+                                                   dtype=np.float32)))
+        minter_thread.start()
 
         urlsInPreferedLanguage, urlsInOtherLanguages = [], []
         for url in urls:
@@ -359,11 +360,11 @@ def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
                 image = bson.loads(
                     imageDBTransaction.get(str(image).encode("utf-8")))
                 if idx == 1:
-                    try:
-                        minter_thread = threading.Thread(target=mintTokens, args=(term, np.frombuffer(image["vec"], dtype=np.float32)))
-                        minter_thread.start()
-                    except:
-                        print("The contract rejected the answer and did not award tokens.")
+                    minter_thread = threading.Thread(
+                        target=mintTokens,
+                        args=(term,
+                              np.frombuffer(image["vec"], dtype=np.float32)))
+                    minter_thread.start()
                 resultImages.append({
                     "url": image["url"],
                     "parentUrl": image["parentUrl"]
@@ -406,14 +407,23 @@ def answer(query: str, page: int) -> jsonify:
     query = query.lower().strip()
     if queryLanguage != "en":
         try:
-            query = requests.get("https://www.apertium.org/apy/translate", params={'q': query, 'markUnknown': 'no', 'langpair': languagecodes.iso_639_alpha3(queryLanguage) + '|eng'}).json()['responseData']['translatedText']
+            query = requests.get(
+                "https://www.apertium.org/apy/translate",
+                params={
+                    'q':
+                    query,
+                    'markUnknown':
+                    'no',
+                    'langpair':
+                    languagecodes.iso_639_alpha3(queryLanguage) + '|eng'
+                }).json()['responseData']['translatedText']
         except:
             return {
-                    "answer": "Could not translate input.",
-                    "small_summary": "Could not translate input.",
-                    "corrected": query,
-                    "urls": []
-                    }
+                "answer": "Could not translate input.",
+                "small_summary": "Could not translate input.",
+                "corrected": query,
+                "urls": []
+            }
     try:
         q_vec = getSentenceMeanVector(query)
     except:
@@ -489,7 +499,6 @@ def answerImages(query: str, page: int) -> jsonify:
         minimumScore = max(images["scores"])
     except:
         minimumScore = 1
-
 
     listOfDataFromPeers = asyncio.run(
         getImagesFromPeers(query, q_vec, queryLanguage, numberOfURLs, page,
