@@ -318,12 +318,12 @@ def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
             "language": url["language"],
         } for url in search["results"]]
 
-        minter_thread = multiprocessing.Process(
-            target=mintTokens,
-            args=(q_vec,
-                  np.frombuffer(search["results"][0]["vec"],
-                                dtype=np.float32)))
-        minter_thread.start()
+        # minter_thread = multiprocessing.Process(
+            # target=mintTokens,
+            # args=(q_vec,
+                  # np.frombuffer(search["results"][0]["vec"],
+                                # dtype=np.float32)))
+        # minter_thread.start()
 
         urlsInPreferedLanguage, urlsInOtherLanguages = [], []
         for url in urls:
@@ -360,11 +360,11 @@ def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
                 image = bson.loads(
                     imageDBTransaction.get(str(image).encode("utf-8")))
                 if idx == 1:
-                    minter_thread = multiprocessing.Process(
-                        target=mintTokens,
-                        args=(term,
-                              np.frombuffer(image["vec"], dtype=np.float32)))
-                    minter_thread.start()
+                    # minter_thread = multiprocessing.Process(
+                        # target=mintTokens,
+                        # args=(term,
+                              # np.frombuffer(image["vec"], dtype=np.float32)))
+                    # minter_thread.start()
                 resultImages.append({
                     "url": image["url"],
                     "parentUrl": image["parentUrl"]
