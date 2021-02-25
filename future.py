@@ -22,7 +22,7 @@
 #########################################################################
 
 from Monad import *
-import os.path, os, shutil, json, random, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools, mimetypes, io, multiprocessing, languagecode
+import os.path, os, shutil, json, random, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools, mimetypes, io, threading, languagecodes
 import numpy as np
 import numexpr as ne
 from flask import (Flask, render_template, request, redirect,
@@ -318,11 +318,11 @@ def loadMoreUrls(q_vec: np.ndarray, queryLanguage: str, numberOfURLs: int,
             "language": url["language"],
         } for url in search["results"]]
 
-        minter_thread = multiprocessing.Process(
-            target=mintTokens,
-            args=(q_vec,
-                  np.frombuffer(search["results"][0]["vec"],
-                                dtype=np.float32)))
+        minter_thread = threading.Thread(target=mintTokens,
+                                         args=(q_vec,
+                                               np.frombuffer(
+                                                   search["results"][0]["vec"],
+                                                   dtype=np.float32)))
         minter_thread.start()
 
         urlsInPreferedLanguage, urlsInOtherLanguages = [], []
@@ -360,7 +360,7 @@ def loadMoreImages(term: np.ndarray, number, page: int) -> dict:
                 image = bson.loads(
                     imageDBTransaction.get(str(image).encode("utf-8")))
                 if idx == 1:
-                    minter_thread = multiprocessing.Process(
+                    minter_thread = threading.Thread(
                         target=mintTokens,
                         args=(term,
                               np.frombuffer(image["vec"], dtype=np.float32)))
