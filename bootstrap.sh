@@ -39,10 +39,10 @@ python3 -c "import nltk; nltk.download('wordnet')"
 
 wget http://nlp.stanford.edu/data/glove.6B.zip
 unzip -d "glove.6B" glove.6B.zip
-rm -rf glove.6B/glove.6B.100d.txt glove.6B/glove.6B.200d.txt glove.6B/glove.6B.300d.txt
-GLOVE_SIZE=$(du glove.6B/glove.6B.50d.txt | cut -f1)
+rm -rf glove.6B/glove.6B.100d.txt glove.6B/glove.6B.200d.txt glove.6B/glove.6B.300d.txt glove.6B.zip
+GLOVE_LINE=$(head -n 1 glove.6B/glove.6B.50d.txt)
 
-if [ "$GLOVE_SIZE" -lt "167336" ]
+if [ "$GLOVE_LINE" != "400000 50" ]
 then
 	sed -i '1i 400000 50' glove.6B/glove.6B.50d.txt
 fi
