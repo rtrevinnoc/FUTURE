@@ -35,3 +35,4 @@ wordnet==0.0.1b2
 WTForms==2.3.3
 languagecodes==1.0.7
 banal==1.0.4
+pymongo=3.11.1

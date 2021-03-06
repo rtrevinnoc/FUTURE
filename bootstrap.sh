@@ -10,6 +10,7 @@ pip3 install -U spacy
 pip3 install -U folium
 pip3 install -U geopy
 pip3 install -U bson
+pip3 install -U pymongo
 pip3 install -U lmdb
 pip3 install -U hnswlib
 pip3 install -U nltk
