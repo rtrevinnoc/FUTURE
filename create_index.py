@@ -25,6 +25,9 @@ import lmdb, base64, hnswlib, bson
 import numpy as np
 from Monad import Monad, getSentenceMeanVector
 
+bson.loads = bson.BSON.decode
+bson.dumps = bson.BSON.encode
+
 futureURLs = Monad("future_urls")
 futureURLs.createIndex("FUTURE_url_vecs")
 futureURLs.compileIndex()
