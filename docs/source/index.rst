@@ -74,6 +74,13 @@ It is suggested to start with this configuration template, which is essentially 
         except:
                 pass
 
+**NOTE:** In case you want to use a docker container, simpy run the following commands before everything else below:
+
+.. code-block:: bash
+
+        docker build -t future .
+        docker run -i -t -p 3000:3000 future bash
+
 After you have configurated your FUTURE instance, but before you can start the server, you will be required to add a minimum of ~25 urls to your local index, by executing:
 
 .. code-block:: bash
