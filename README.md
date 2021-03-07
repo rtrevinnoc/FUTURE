@@ -59,7 +59,7 @@ DONATE = "<a href='https://www.buymeacoffee.com/searchatfuture'>DONATE</a>"
 COLABORATE = "<a href='https://github.com/rtrevinnoc/FUTURE'>COLABORATE</a>"
 ```
 
-**NOTE:** In case you want to use a docker container, simpy run the following commands before everything else below:
+**NOTE:** In case you want to use a docker container, simpy run the following commands before everything else below (Or use the pre-built image from [DockerHub](https://hub.docker.com/repository/docker/rtrevinnoc/future)):
 
 ```bash
 docker build -t future .
