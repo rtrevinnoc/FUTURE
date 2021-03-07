@@ -35,4 +35,3 @@ WTForms
 languagecodes
 banal
 pymongo
-en-core-web-sm
