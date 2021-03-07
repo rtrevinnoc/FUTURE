@@ -27,7 +27,7 @@ from urllib.parse import urljoin, urlparse
 from scrapy.crawler import CrawlerProcess
 from nltk.tokenize import word_tokenize
 from gensim.models import KeyedVectors
-from config import SEED_URLS, CONCURRENT_REQUESTS, CONCURRENT_REQUESTS_PER_DOMAIN, CONCURRENT_ITEMS, REACTOR_THREADPOOL_MAXSIZE, DOWNLOAD_MAXSIZE, LOG_LEVEL, AUTOTHROTTLE, DEPTH_PRIORITY, TARGET_CONCURRENCY, MAX_DELAY, START_DELAY
+from config import SEED_URLS, CONCURRENT_REQUESTS, CONCURRENT_REQUESTS_PER_DOMAIN, CONCURRENT_ITEMS, REACTOR_THREADPOOL_MAXSIZE, DOWNLOAD_MAXSIZE, LOG_LEVEL, AUTOTHROTTLE, DEPTH_PRIORITY, TARGET_CONCURRENCY, MAX_DELAY, START_DELAY, LIMIT_DOMAINS, ALLOWED_DOMAINS
 from Monad import *
 import numpy as np
 
@@ -123,7 +123,7 @@ def returnDataFromImageTags(url: str, someIterable: list) -> list:
 
 class Indexer(scrapy.Spider):
     name = "indexer"
-    allowed_urls = ["*"]
+    allowed_urls = ALLOWED_DOMAINS
     custom_settings = {
         "CONCURRENT_REQUESTS": CONCURRENT_REQUESTS,
         "CONCURRENT_REQUESTS_PER_DOMAIN": CONCURRENT_REQUESTS_PER_DOMAIN,
@@ -151,7 +151,10 @@ class Indexer(scrapy.Spider):
         "DEPTH_PRIORITY": DEPTH_PRIORITY,
         "SCHEDULER_DISK_QUEUE": 'scrapy.squeues.PickleFifoDiskQueue',
         "SCHEDULER_MEMORY_QUEUE": 'scrapy.squeues.FifoMemoryQueue',
-        "AJAXCRAWL_ENABLED": True
+        "AJAXCRAWL_ENABLED": True,
+        "SPIDER_MIDDLEWARES": {
+            'scrapy.spidermiddlewares.offsite.OffsiteMiddleware': LIMIT_DOMAINS
+        }
     }
 
     start_urls = SEED_URLS

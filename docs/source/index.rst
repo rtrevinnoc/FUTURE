@@ -47,6 +47,8 @@ It is suggested to start with this configuration template, which is essentially 
         with open("tranco_JKGY.csv") as tranco:
                 SEED_URLS = [x.strip() for x in tranco.readlines()]
         PEER_PORT = 3000
+        LIMIT_DOMAINS = None
+        ALLOWED_DOMAINS = ["*"]
         CONCURRENT_REQUESTS = 10
         CONCURRENT_REQUESTS_PER_DOMAIN = 2.0
         CONCURRENT_ITEMS = 100
