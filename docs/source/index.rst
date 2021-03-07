@@ -48,7 +48,7 @@ It is suggested to start with this configuration template, which is essentially 
                 SEED_URLS = [x.strip() for x in tranco.readlines()]
         PEER_PORT = 3000
         LIMIT_DOMAINS = None
-        ALLOWED_DOMAINS = ["*"]
+        ALLOWED_DOMAINS = []
         CONCURRENT_REQUESTS = 10
         CONCURRENT_REQUESTS_PER_DOMAIN = 2.0
         CONCURRENT_ITEMS = 100
