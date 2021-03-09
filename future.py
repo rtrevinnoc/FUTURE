@@ -22,7 +22,7 @@
 #########################################################################
 
 from Monad import *
-import os.path, os, shutil, json, random, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools, mimetypes, io, threading, languagecodes
+import os.path, os, shutil, json, random, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, socket, ast, functools, asyncio, concurrent.futures, itertools, mimetypes, io, threading, languagecodes, psutil
 import numpy as np
 import numexpr as ne
 from flask import (Flask, render_template, request, redirect,
@@ -588,7 +588,23 @@ def _registerPeer():
                                 overwrite=False)
     peerRegistryTransaction.commit()
 
+    if hostname != "private":
+        listOfPeers.append(peerIP)
+        numberOfPeers += 1
+
     return jsonify(result={"listOfPeers": listOfPeers})
+
+
+@app.route('/_getPeerInfo')
+def _getPeerInfo():
+    return jsonify(
+        result={
+            "uptime": time.time() - psutil.boot_time(),
+            "ip": hostIP,
+            "name": hostname,
+            "cpu": psutil.cpu_percent(),
+            "mem": psutil.virtual_memory().percent
+        })
 
 
 @app.route('/_fetchSearxResults', methods=['GET'])

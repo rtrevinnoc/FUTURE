@@ -35,3 +35,4 @@ WTForms
 languagecodes
 banal
 pymongo
+psutil
