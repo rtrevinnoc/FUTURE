@@ -627,6 +627,11 @@ def _getPeerInfo():
         })
 
 
+@app.route('/_getPeerList')
+def _getPeerList():
+    return jsonify(result={"listOfPeers": listOfPeers})
+
+
 @app.route('/_fetchSearxResults', methods=['GET'])
 def fetchSearxResults():
     query = request.args.get("query", 0, type=str)
