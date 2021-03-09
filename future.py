@@ -62,10 +62,9 @@ peerRegistryTransaction = peerRegistry.begin(write=True)
 peerRegistryTransaction.put("wearebuildingthefuture.com".encode('utf-8'),
                             "".encode('utf-8'),
                             overwrite=False)
-if hostname != "wearebuildingthefuture.com":
-    peerRegistryTransaction.put(hostIP.encode('utf-8'),
-                                "".encode('utf-8'),
-                                overwrite=False)
+peerRegistryTransaction.put(hostIP.encode('utf-8'),
+                            "".encode('utf-8'),
+                            overwrite=False)
 peerRegistryTransaction.commit()
 analyticsDBIndex = lmdb.open("future_analytics",
                              map_size=int(1e12),
@@ -95,7 +94,10 @@ def sendRegisterRequestToPeer(url):
     print("peer:, ", peer)
     print("#######################")
     if peer == hostIP or peer == hostname:
-        listOfPeers.append(peer)
+        if peer != hostname:
+            listOfPeers.append(peer)
+        elif hostname == "wearebuildingthefuture.com"
+            listOfPeers.append(hostname)
         listOfPeers = list(set(listOfPeers))
         print("Same as origin")
         return "Same as origin"
