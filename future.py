@@ -106,6 +106,8 @@ def sendRegisterRequestToPeer(url):
                                             "".encode('utf-8'),
                                             overwrite=False)
             peerRegistryTransaction.commit()
+            listOfPeers.append(peer)
+            listOfPeers = list(set(listOfPeers))
             print("Registered with http")
             return "Registered with http"
         except:
@@ -119,6 +121,8 @@ def sendRegisterRequestToPeer(url):
                                                 "".encode('utf-8'),
                                                 overwrite=False)
                 peerRegistryTransaction.commit()
+                listOfPeers.append(peer)
+                listOfPeers = list(set(listOfPeers))
                 print("Registered with https")
                 return "Registered with https"
             except:
@@ -150,6 +154,8 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                              },
                              timeout=10)
             result = r.json()["result"]
+            listOfPeers.append(peer)
+            listOfPeers = list(set(listOfPeers))
             print("Obtained with http")
             return {"urls": list(zip(result["urls"], result["url_scores"]))}
         except:
@@ -165,11 +171,17 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                                  },
                                  timeout=10)
                 result = r.json()["result"]
+                listOfPeers.append(peer)
+                listOfPeers = list(set(listOfPeers))
                 print("Obtained with https")
                 return {
                     "urls": list(zip(result["urls"], result["url_scores"]))
                 }
             except:
+                try:
+                    listOfPeers.remove(peer)
+                except:
+                    pass
                 print("Could not connect with peer")
                 return {"urls": []}
 
@@ -198,6 +210,8 @@ def sendImagesAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                              },
                              timeout=10)
             result = r.json()["result"]
+            listOfPeers.append(peer)
+            listOfPeers = list(set(listOfPeers))
             print("Obtained with http")
             return {
                 "images": list(zip(result["images"], result["images_scores"]))
@@ -215,12 +229,18 @@ def sendImagesAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                                  },
                                  timeout=10)
                 result = r.json()["result"]
+                listOfPeers.append(peer)
+                listOfPeers = list(set(listOfPeers))
                 print("Obtained with https")
                 return {
                     "images":
                     list(zip(result["images"], result["images_scores"]))
                 }
             except:
+                try:
+                    listOfPeers.remove(peer)
+                except:
+                    pass
                 print("Could not connect with peer")
                 return {"images": []}
 
@@ -229,7 +249,6 @@ if hostname != "private":
     with peerRegistry.begin() as peerRegistryDBTransaction:
         peerRegistryDBSelector = peerRegistryDBTransaction.cursor()
         for key, value in peerRegistryDBSelector:
-            listOfPeers.append(key.decode("utf-8"))
             sendRegisterRequestToPeer(key)
     numberOfPeers = len(listOfPeers)
 
@@ -590,6 +609,7 @@ def _registerPeer():
 
     if hostname != "private":
         listOfPeers.append(peerIP)
+        listOfPeers = list(set(listOfPeers))
         numberOfPeers += 1
 
     return jsonify(result={"listOfPeers": listOfPeers})
