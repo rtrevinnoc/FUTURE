@@ -95,6 +95,8 @@ def sendRegisterRequestToPeer(url):
     print("peer:, ", peer)
     print("#######################")
     if peer == hostIP or peer == hostname:
+        listOfPeers.append(peer)
+        listOfPeers = list(set(listOfPeers))
         print("Same as origin")
         return "Same as origin"
     else:
