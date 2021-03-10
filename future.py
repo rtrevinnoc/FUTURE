@@ -961,7 +961,7 @@ def _answerPeer():
     if max(result["url_scores"]) <= minimumScore:
         return jsonify(result=result)
     else:
-        raise Exception("No relevant results.")
+        return jsonify(result={"urls": [], "url_scores": []})#Exception("No relevant results.")
 
 
 @app.route("/_answerPeerImages")
@@ -978,7 +978,7 @@ def _answerPeerImages():
     if max(result["images_scores"]) <= minimumScore:
         return jsonify(result=result)
     else:
-        raise Exception("No relevant results.")
+        return jsonify(result={"images": [], "images_scores": []})#Exception("No relevant results.")
 
 
 if __name__ == "__main__":
