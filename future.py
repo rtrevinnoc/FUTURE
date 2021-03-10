@@ -88,7 +88,7 @@ cache = Cache(app,
 
 
 def sendRegisterRequestToPeer(url):
-    global listOfPeers
+    global listOfPeers, numberOfPeers
     peer = url.decode("utf-8")
     print("#######################")
     print("host:, ", hostIP)
@@ -142,7 +142,7 @@ def sendRegisterRequestToPeer(url):
 
 def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                             numberOfURLs, numberOfPage, minimumScore):
-    global listOfPeers
+    global listOfPeers, numberOfPeers
     peer = url
     queryVector = json.dumps(queryVector.tolist())
     print("#######################")
@@ -202,7 +202,7 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
 
 def sendImagesAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                                   numberOfURLs, numberOfPage, minimumScore):
-    global listOfPeers
+    global listOfPeers, numberOfPeers
     peer = url
     queryVector = json.dumps(queryVector.tolist())
     print("#######################")
@@ -618,7 +618,7 @@ def answerPeerImages(query: str, q_vec: list, queryLanguage: str,
 
 @app.route('/_registerPeer')
 def _registerPeer():
-    global listOfPeers
+    global listOfPeers, numberOfPeers
     peerIP = request.args.get("ip", 0, type=str)
     peerRegistryTransaction = peerRegistry.begin(write=True)
     peerRegistryTransaction.put(str(peerIP).encode('utf-8'),
