@@ -48,6 +48,7 @@ hostIP = requests.get(
     "https://api.ipify.org?format=json").json()["ip"] + ":" + str(port)
 hostname = HOST_NAME
 listOfPeers = []
+numberOfPeers = 0
 numberOfURLs = 5  # LATER ADD SUPORT TO ONLY GET IMPORTANT URLS
 dirname = os.path.dirname(__file__)
 app = Flask(__name__, static_url_path="")
