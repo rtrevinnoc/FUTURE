@@ -99,6 +99,7 @@ def sendRegisterRequestToPeer(url):
         elif peer != hostname:
             listOfPeers.append(peer)
         listOfPeers = list(set(listOfPeers))
+        numberOfPeers += 1
         print("Same as origin")
         return "Same as origin"
     else:
@@ -114,6 +115,7 @@ def sendRegisterRequestToPeer(url):
             peerRegistryTransaction.commit()
             listOfPeers.append(peer)
             listOfPeers = list(set(listOfPeers))
+            numberOfPeers += 1
             print("Registered with http")
             return "Registered with http"
         except:
@@ -129,6 +131,7 @@ def sendRegisterRequestToPeer(url):
                 peerRegistryTransaction.commit()
                 listOfPeers.append(peer)
                 listOfPeers = list(set(listOfPeers))
+                numberOfPeers += 1
                 print("Registered with https")
                 return "Registered with https"
             except:
@@ -163,6 +166,7 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
             result = r.json()["result"]
             listOfPeers.append(peer)
             listOfPeers = list(set(listOfPeers))
+            numberOfPeers += 1
             print("Obtained with http")
             return {"urls": list(zip(result["urls"], result["url_scores"]))}
         except:
@@ -180,6 +184,7 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                 result = r.json()["result"]
                 listOfPeers.append(peer)
                 listOfPeers = list(set(listOfPeers))
+                numberOfPeers += 1
                 print("Obtained with https")
                 return {
                     "urls": list(zip(result["urls"], result["url_scores"]))
@@ -187,6 +192,7 @@ def sendAnswerRequestToPeer(url, query, queryVector, queryLanguage,
             except:
                 try:
                     listOfPeers.remove(peer)
+                    numberOfPeers -= 1
                 except:
                     pass
                 print("Could not connect with peer")
@@ -220,6 +226,7 @@ def sendImagesAnswerRequestToPeer(url, query, queryVector, queryLanguage,
             result = r.json()["result"]
             listOfPeers.append(peer)
             listOfPeers = list(set(listOfPeers))
+            numberOfPeers += 1
             print("Obtained with http")
             return {
                 "images": list(zip(result["images"], result["images_scores"]))
@@ -239,6 +246,7 @@ def sendImagesAnswerRequestToPeer(url, query, queryVector, queryLanguage,
                 result = r.json()["result"]
                 listOfPeers.append(peer)
                 listOfPeers = list(set(listOfPeers))
+                numberOfPeers += 1
                 print("Obtained with https")
                 return {
                     "images":
@@ -247,6 +255,7 @@ def sendImagesAnswerRequestToPeer(url, query, queryVector, queryLanguage,
             except:
                 try:
                     listOfPeers.remove(peer)
+                    numberOfPeers -= 1
                 except:
                     pass
                 print("Could not connect with peer")
