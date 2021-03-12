@@ -665,10 +665,13 @@ def _getPeerInfoList():
         })
         else:
             try:
-                response = requests.get("http://" + peer + "/_getPeerInfo")
+                try:
+                    response = requests.get("http://" + peer + "/_getPeerInfo")
+                except:
+                    response = requests.get("https://" + peer + "/_getPeerInfo")
+                peerInfoList.append(response.json()["result"])
             except:
-                response = requests.get("https://" + peer + "/_getPeerInfo")
-            peerInfoList.append(response.json()["result"])
+                pass
     return jsonify(result={"listOfPeers": peerInfoList})
 
 
