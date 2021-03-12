@@ -36,7 +36,7 @@ from werkzeug.utils import secure_filename
 from base64 import b64decode
 from symspellpy.symspellpy import SymSpell, Verbosity
 from bs4 import BeautifulSoup
-from config import HOST_NAME, PEER_PORT, CONTACT, MAINTAINER, FIRST_NOTICE, SECOND_NOTICE, DONATE, COLABORATE, CACHE_TIMEOUT, CACHE_THRESHOLD
+from config import HOST_NAME, PEER_PORT, HOME_URL, CONTACT, MAINTAINER, FIRST_NOTICE, SECOND_NOTICE, DONATE, COLABORATE, CACHE_TIMEOUT, CACHE_THRESHOLD
 from PIL import Image
 
 bson.loads = bson.BSON.decode
@@ -60,7 +60,7 @@ hnswImagesLookup.set_ef(100)
 imageDBIndex = lmdb.open("future_images", map_size=int(1e12), writemap=True)
 peerRegistry = lmdb.open("peer_registry", map_size=int(1e12), writemap=True)
 peerRegistryTransaction = peerRegistry.begin(write=True)
-peerRegistryTransaction.put("wearebuildingthefuture.com".encode('utf-8'),
+peerRegistryTransaction.put(HOME_URL.encode('utf-8'),
                             "".encode('utf-8'),
                             overwrite=False)
 peerRegistryTransaction.put(hostIP.encode('utf-8'),
@@ -95,7 +95,7 @@ def sendRegisterRequestToPeer(url):
     print("peer:, ", peer)
     print("#######################")
     if peer == hostIP or peer == hostname:
-        if hostname == "wearebuildingthefuture.com":
+        if hostname == HOME_URL:
             listOfPeers.append(hostname)
         elif peer != hostname:
             listOfPeers.append(peer)
@@ -651,6 +651,27 @@ def _getPeerList():
     return jsonify(result={"listOfPeers": listOfPeers})
 
 
+@app.route('/_getPeerInfoList')
+def _getPeerInfoList():
+    peerInfoList = []
+    for peer in listOfPeers:
+        if peer == hostIP or peer == hostname:
+            peerInfoList.append({
+            "uptime": time.time() - psutil.boot_time(),
+            "ip": hostIP,
+            "name": hostname,
+            "cpu": psutil.cpu_percent(),
+            "mem": psutil.virtual_memory().percent
+        })
+        else:
+            try:
+                response = requests.get("http://" + peer + "/_getPeerInfo")
+            except:
+                response = requests.get("https://" + peer + "/_getPeerInfo")
+            peerInfoList.append(response.json()["result"])
+    return jsonify(result={"listOfPeers": peerInfoList})
+
+
 @app.route('/_fetchSearxResults', methods=['GET'])
 def fetchSearxResults():
     query = request.args.get("query", 0, type=str)
@@ -819,7 +840,7 @@ def openSearchSpec():
                        xmlns:moz="http://www.mozilla.org/2006/browser/search/">
   <!-- Created on Wed, 13 Jan 2021 20:19:19 GMT -->
   <ShortName>future_search</ShortName>
-  <Description>Adds wearebuildingthefuture.com as a search engine.</Description>
+  <Description>Adds FUTURE as a search engine.</Description>
   <Url type="text/html" method="get" template="http://""" + hostname +
                     """/?q={searchTerms}"/>
   <Url type="application/x-suggestions+json" template="http://""" + hostname +
@@ -961,7 +982,10 @@ def _answerPeer():
     if max(result["url_scores"]) <= minimumScore:
         return jsonify(result=result)
     else:
-        return jsonify(result={"urls": [], "url_scores": []})#Exception("No relevant results.")
+        return jsonify(result={
+            "urls": [],
+            "url_scores": []
+        })  #Exception("No relevant results.")
 
 
 @app.route("/_answerPeerImages")
@@ -978,7 +1002,15 @@ def _answerPeerImages():
     if max(result["images_scores"]) <= minimumScore:
         return jsonify(result=result)
     else:
-        return jsonify(result={"images": [], "images_scores": []})#Exception("No relevant results.")
+        return jsonify(result={
+            "images": [],
+            "images_scores": []
+        })  #Exception("No relevant results.")
+
+
+@app.route("/stats")
+def stats():
+    return render_template("stats.html")
 
 
 if __name__ == "__main__":

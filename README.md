@@ -38,6 +38,7 @@ HOST_NAME = "my_public_future_instance"         # THE NAMES 'private' and 'weare
 with open("tranco_JKGY.csv") as tranco:
         SEED_URLS = [x.strip() for x in tranco.readlines()]
 PEER_PORT = 3000
+HOME_URL = "wearebuildingthefuture.com"
 LIMIT_DOMAINS = None
 ALLOWED_DOMAINS = []
 CONCURRENT_REQUESTS = 10

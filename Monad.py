@@ -32,7 +32,10 @@ from itertools import tee, islice, chain
 from nltk.corpus import wordnet
 from SPARQLWrapper import SPARQLWrapper, JSON
 from web3 import Web3
-from polyglot.detect import Detector
+try:
+    from polyglot.detect import Detector
+except:
+    pass
 
 import os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests
 bson.loads = bson.BSON.decode

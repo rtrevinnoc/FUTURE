@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!-- Copyright (c) 2020 Roberto Treviño Cervantes -->
+		<!-- This file is part of FUTURE (Powered by Monad).
+
+	  FUTURE is free software: you can redistribute it and/or modify
+	  it under the terms of the GNU General Public License as published by
+	  the Free Software Foundation, either version 3 of the License, or
+	  (at your option) any later version.
+
+	  FUTURE is distributed in the hope that it will be useful,
+	  but WITHOUT ANY WARRANTY; without even the implied warranty of
+	  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	  GNU General Public License for more details.
+
+	  You should have received a copy of the GNU General Public License
+	  along with FUTURE.  If not, see <https://www.gnu.org/licenses/>. -->
+
+	  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+	  <meta name="msapplication-TileColor" content="#1b1a1a">
+	  <meta name="theme-color" content="#ffffff">
+	  <link rel="stylesheet" href="{{ url_for('static', filename='css/default/FONTS.css') }}" type="text/css" charset="utf-8" />
+	  <link rel="stylesheet" type="text/css" href="https://unpkg.com/augmented-ui@2/augmented-ui.css">
+	  <script src="https://code.jquery.com/jquery-3.6.0.min.js" charset="utf-8"></script>
+	  <title>FUTURE</title>
+	  <h1 id="title"><a href="#">FUTURE</a></h1>
+	</head>
+	<body>
+		<style>
+			body {
+				--media-prefers-light: initial;
+				--c3-l: var(--media-prefers-light) #e4e4e4;
+				--c3: var(--c3-l, #2c2c2a);
+				--hot-blue: var(--hbl, #b1ffff);
+				--hot-red: #ff604d;
+				--hot-green: #b9ffb1;
+				background-color: #111111;
+				font-family: 'Source Sans Pro';
+			}
+			#title {
+				text-align: center;
+				line-height: 65px;
+				font-family: 'Source Sans Pro Light';
+				font-size: 40px;
+				font-weight: lighter;
+				word-spacing: 25px;
+				color: var(--hot-red);
+			}
+
+			#title a {
+				color: inherit;
+				text-decoration: none;
+			}
+			#peer_table {
+				position: absolute;
+				width: 100%;
+				text-align: center;
+				display: flex;
+				justify-content: center;
+			}
+			#peer_table td {
+				font-size: 0.75rem;
+				text-align: center;
+				padding: 0.175rem;
+				background: var(--hot-green);
+				color: black;
+			}
+			#peer_table table {
+				background: var(--c3);
+				margin-left: auto;
+				margin-right: auto;
+				--aug-border: initial;
+				--aug-border-all: 2px;
+				--aug-border-bg: var(--hot-blue);
+				--aug-br: 1rem;
+				--aug-br-inset2: 0%;
+				--aug-b: 0.75rem;
+				--aug-tl: 0.5rem;
+				--aug-t: 5%;
+				--aug-b-center: 30%;
+				padding: 25px;
+			}
+			#peer_table .theader td {
+				font-weight: bold;
+				padding-top: 0.5rem;
+				padding-bottom: 0.25rem;
+				color: var(--hot-blue);
+				background: var(--c3);
+			}
+			#notice {
+				text-align: center;
+				color: var(--hot-green);
+			}
+		</style>
+
+		<p id="notice"></p>
+		<br>
+		<div id="peer_table">
+			<table id="stats" data-augmented-ui="tl-2-clip-y t-rect-xy br-2-clip-x b-rect-x">
+				<tr class="theader">
+					<td>Server name</td>
+					<td>Uptime</td>
+					<td>IP</td>
+					<td>CPU Load</td>
+					<td>RAM Load</td>
+				</tr>
+			</table>
+		</div>
+
+		<script async>
+			$(function() {
+
+				(function refresh() {
+
+					$.getJSON('_getPeerInfoList', {}, function(data) {
+
+						peer_list = data.result["listOfPeers"]
+
+						$(".peer").remove()
+						$("#notice").text(peer_list.length + " nodes connected")
+						peer_list.forEach(function(peer) {
+
+							$("#stats").append('<tr class="peer"><td><a href="http://' + peer["name"] + '">' + peer["name"] + '</a></td><td>' + peer["uptime"] + '</td><td><a href="http://' + peer["ip"] + '">' + peer["ip"] + '</a></td><td>' + peer["cpu"] + '</td><td>' + peer["mem"] + '</td></tr>')
+
+						});
+
+					})
+
+					setInterval(refresh, 60000 * 15)
+
+				})();
+
+			});
+		</script>
+	</body>
+</html>
