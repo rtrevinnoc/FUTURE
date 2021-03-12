@@ -229,6 +229,10 @@ p#gathered {
 	font-size: 1.7vh;
 }
 
+.underlined_link {
+	text-decoration: underline;
+}
+
 .video_item .video_thumbnail {
 	margin-right: 20px;
 	display: flex;

@@ -309,7 +309,7 @@ $(function() {
 			searx_response = data.result
 
 			searx_response["urls"].reverse().forEach(function(url) {
-				$("#links_list").prepend('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '">' + url["url"] + '</a></span></p><p class="body searchable">' + url["body"] + '<p></div>')
+				$("#links_list").prepend('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '"><img src="/searX_badge.png"></img> <span class="underlined_link">' + url["url"] + '</span></a></span></p><p class="body searchable">' + url["body"] + '<p></div>')
 			});
 
 			counter += 1
