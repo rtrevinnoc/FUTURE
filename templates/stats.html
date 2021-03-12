@@ -101,6 +101,8 @@
 					<td>Server name</td>
 					<td>Uptime</td>
 					<td>IP</td>
+					<td>Maintainer</td>
+					<td>Contact</td>
 					<td>CPU Load (%)</td>
 					<td>RAM Load (%)</td>
 				</tr>
@@ -120,7 +122,7 @@
 						$("#notice").text(peer_list.length + " nodes connected")
 						peer_list.forEach(function(peer) {
 
-							$("#stats").append('<tr class="peer"><td><a href="http://' + peer["name"] + '">' + peer["name"] + '</a></td><td>' + peer["uptime"] + '</td><td><a href="http://' + peer["ip"] + '">' + peer["ip"] + '</a></td><td>' + peer["cpu"] + '</td><td>' + peer["mem"] + '</td></tr>')
+							$("#stats").append('<tr class="peer"><td><a href="http://' + peer["name"] + '">' + peer["name"] + '</a></td><td>' + peer["uptime"] + '</td><td><a href="http://' + peer["ip"] + '">' + peer["ip"] + '</a></td><td>' + peer["maintainer"] + '</td><td>' + peer["contact"] + '</td><td>' + peer["cpu"] + '</td><td>' + peer["mem"] + '</td></tr>')
 
 						});
 
