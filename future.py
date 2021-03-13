@@ -642,9 +642,7 @@ def _getPeerInfo():
             "ip": hostIP,
             "name": hostname,
             "cpu": psutil.cpu_percent(),
-            "mem": psutil.virtual_memory().percent,
-            "maintainer": MAINTAINER,
-            "contact": CONTACT
+            "mem": psutil.virtual_memory().percent
         })
 
 
@@ -663,9 +661,7 @@ def _getPeerInfoList():
             "ip": hostIP,
             "name": hostname,
             "cpu": psutil.cpu_percent(),
-            "mem": psutil.virtual_memory().percent,
-            "maintainer": MAINTAINER,
-            "contact": CONTACT
+            "mem": psutil.virtual_memory().percent
         })
         else:
             try:
