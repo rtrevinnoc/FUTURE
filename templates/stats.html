@@ -28,6 +28,17 @@
 	</head>
 	<body>
 		<style>
+			@media screen and (min-width: 320px) and (max-width: 767px) and (orientation: landscape) {
+				html {
+					transform: rotate(0deg);
+					transform-origin: left top;
+					width: 100%;
+					overflow-x: hidden;
+					position: absolute;
+					left: 0;
+					right: 0;
+				}
+			}
 			body {
 				--media-prefers-light: initial;
 				--c3-l: var(--media-prefers-light) #e4e4e4;
