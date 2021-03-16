@@ -69,6 +69,7 @@ It is suggested to start with this configuration template, which is essentially 
         COLABORATE = "<a href='https://github.com/rtrevinnoc/FUTURE'>COLABORATE</a>"
         CACHE_TIMEOUT = 15
         CACHE_THRESHOLD = 100
+        COMPLEMENTARY_VECTOR_CACHE = -1
         try:
                 WEB3API = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
                 ETHEREUM_ACCOUNT = WEB3API.eth.accounts[0]

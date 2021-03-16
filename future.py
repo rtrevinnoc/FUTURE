@@ -270,34 +270,6 @@ if hostname != "private":
             sendRegisterRequestToPeer(key)
     numberOfPeers = len(listOfPeers)
 
-searxInstances = requests.get(
-    "https://searx.space/data/instances.json").json()["instances"]
-goodSearxInstances = filter(
-    lambda x: x[1].get("timing").get("search").get("error") == None,
-    filter(
-        lambda x: x[1].get("timing").get("search")["success_percentage"] >= 90,
-        filter(
-            lambda x: x[1].get("timing").get("search") != None,
-            filter(lambda x: type(x[1].get("timing")) == dict,
-                   searxInstances.items()))))
-goodSearxInstances = filter(
-    lambda x: x[1].get("tls")["grade"] == "A+",
-    filter(
-        lambda x: x[1].get("tls") != None,
-        filter(lambda x: x[1]["network_type"] == "normal",
-               goodSearxInstances)))
-goodSearxInstances = sorted(
-    goodSearxInstances, key=lambda x: x[1]["timing"]["search"]["all"]["mean"])
-
-headersForSearx = {
-    "Accept-Encoding": "gzip, deflate, br",
-    "Accept-Language": "en-US,en;q=0.5",
-    "Upgrade-Insecure-Requests": "1",
-    "User-Agent":
-    "Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0",
-    "X-Amzn-Trace-Id": "Root=1-5ff4f39d-43753d3a161269974fdca42e"
-}
-
 
 async def getDataFromPeers(query, queryVector, queryLanguage, numberOfURLs,
                            numberOfPage, minimumScore):

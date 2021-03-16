@@ -31,12 +31,13 @@ After cloning the repository, add a `config.py` file, which will allow you to cu
 #!/usr/bin/env python3
 # -*- coding: utf8 -*-
 import secrets
+from web3 import Web3
 
 WTF_CSRF_ENABLED = True
 SECRET_KEY = secrets.token_urlsafe(16)
 HOST_NAME = "my_public_future_instance"         # THE NAMES 'private' and 'wearebuildingthefuture.com' are reserved for private and main nodes, respectively.
 with open("tranco_JKGY.csv") as tranco:
-        SEED_URLS = [x.strip() for x in tranco.readlines()]
+	SEED_URLS = [x.strip() for x in tranco.readlines()]
 PEER_PORT = 3000
 HOME_URL = "wearebuildingthefuture.com"
 LIMIT_DOMAINS = None
@@ -58,6 +59,16 @@ FIRST_NOTICE = "Written and Mantained By <a href='https://keybase.io/rtrevinnoc'
 SECOND_NOTICE = "Proudly Hosted on <a href='https://uberspace.de/en/'>Uberspace</a>"
 DONATE = "<a href='https://www.buymeacoffee.com/searchatfuture'>DONATE</a>"
 COLABORATE = "<a href='https://github.com/rtrevinnoc/FUTURE'>COLABORATE</a>"
+CACHE_TIMEOUT = 15
+CACHE_THRESHOLD = 100
+COMPLEMENTARY_VECTOR_CACHE = -1
+try:
+	WEB3API = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
+	ETHEREUM_ACCOUNT = WEB3API.eth.accounts[0]
+	CONTRACT_CODE = 'future-token/build/contracts/FUTURE.json'
+	CONTRACT_ADDRESS = "0x2ebDA3D6B2F24aE57164b0384daa9af2C0D17323"
+except:
+	pass
 ```
 
 **NOTE:** In case you want to use a docker container, simpy run the following commands before everything else below (Or use the pre-built image from [DockerHub](https://hub.docker.com/repository/docker/rtrevinnoc/future)):
