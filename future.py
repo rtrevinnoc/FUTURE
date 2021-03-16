@@ -427,12 +427,13 @@ def answer(query: str, page: int) -> jsonify:
                     languagecodes.iso_639_alpha3(queryLanguage) + '|eng'
                 }).json()['responseData']['translatedText']
         except:
-            return {
-                "answer": "Could not translate input.",
-                "small_summary": "Could not translate input.",
-                "corrected": query,
-                "urls": []
-            }
+            pass
+            # return {
+                # "answer": "Could not translate input.",
+                # "small_summary": "Could not translate input.",
+                # "corrected": query,
+                # "urls": []
+            # }
     try:
         q_vec = getSentenceMeanVector(query)
     except:
@@ -614,7 +615,9 @@ def _getPeerInfo():
             "ip": hostIP,
             "name": hostname,
             "cpu": psutil.cpu_percent(),
-            "mem": psutil.virtual_memory().percent
+            "mem": psutil.virtual_memory().percent,
+            "urls": FUTURE.beginTransaction().stat()["entries"],
+            "images": imageDBIndex.begin().stat()["entries"]
         })
 
 
@@ -633,7 +636,9 @@ def _getPeerInfoList():
             "ip": hostIP,
             "name": hostname,
             "cpu": psutil.cpu_percent(),
-            "mem": psutil.virtual_memory().percent
+            "mem": psutil.virtual_memory().percent,
+            "urls": FUTURE.beginTransaction().stat()["entries"],
+            "images": imageDBIndex.begin().stat()["entries"]
         })
         else:
             try:

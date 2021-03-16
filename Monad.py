@@ -409,8 +409,9 @@ def getDefinitionFromSearx(word):
 
 
 def saveComplementaryVector(word, vec):
-    if len(complementaryVectors) < COMPLEMENTARY_VECTOR_CACHE or COMPLEMENTARY_VECTOR_CACHE == -1:
+    if (len(complementaryVectors) < COMPLEMENTARY_VECTOR_CACHE or COMPLEMENTARY_VECTOR_CACHE == -1) and complementaryVectors.get(word, None) == None:
         logger.info(word + "\t" + " ".join(str(_) for _ in np.around(vec, 5)))
+        complementaryVectors[word] = vec
 
 
 def appendIfNotEmpty(list1, element):

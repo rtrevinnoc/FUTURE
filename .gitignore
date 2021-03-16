@@ -28,3 +28,4 @@ ex.py
 docs/build/
 external_image_cache/
 event_log.txt
+complementary_vectors_50d.txt
