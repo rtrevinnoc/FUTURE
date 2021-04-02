@@ -377,7 +377,7 @@ def getDefinitionFromDBPedia(word: str, noUrl: bool = True) -> Any:
                    FILTER (langMatches(lang(?desc),"en")).
                }
             """ % getResourceFromDBPedia(
-            preprocessSentece("Statue of Liberty"))["resource"])
+            preprocessSentece(word))["resource"])
         response = sparql.query().convert()[u"results"][u"bindings"][0]
         return {
             "definition": response[u"callret-0"][u"value"],
