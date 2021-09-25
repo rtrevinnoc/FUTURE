@@ -34,6 +34,7 @@ pip3 install -U web3
 pip3 install -U languagecodes
 pip3 install -U banal
 pip3 install -U psutil
+pip3 install -U tranco
 
 python3 -m spacy download en_core_web_sm
 python3 -c "import nltk; nltk.download('punkt')"

@@ -40,12 +40,14 @@ It is suggested to start with this configuration template, which is essentially 
         # -*- coding: utf8 -*-
         import secrets
         from web3 import Web3
+        from tranco import Tranco
+
+        t = Tranco(cache=True, cache_dir='.tranco')
 
         WTF_CSRF_ENABLED = True
         SECRET_KEY = secrets.token_urlsafe(16)
         HOST_NAME = "my_public_future_instance"         # THE NAMES 'private' and 'wearebuildingthefuture.com' are reserved for private and main nodes, respectively.
-        with open("tranco_JKGY.csv") as tranco:
-                SEED_URLS = [x.strip() for x in tranco.readlines()]
+        SEED_URLS = ["http://" + x for x in t.list().top(1000)]
         PEER_PORT = 3000
         HOME_URL = "wearebuildingthefuture.com"
         LIMIT_DOMAINS = None
