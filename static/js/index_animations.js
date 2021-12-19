@@ -317,7 +317,7 @@ $(function() {
             return null;
         }
 
-	var searx_complement_bool = getCookie("searx_complement") || true;
+	var searx_complement_bool = getCookie("searx_complement");
 	if (searx_complement_bool === "false") {
 		searx_complement_bool = false;
 		searx_complement.attr("class", "ion-close-circled")
