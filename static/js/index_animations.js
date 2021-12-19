@@ -31,6 +31,7 @@ $(function() {
 	var images_button = $('#images')
 	var videos_button = $('#videos')
 	var maps_button = $('#maps')
+	var searx_complement = $('#searx_complement_icon')
 	
 	// LOAD PARTICLES ANIMATION
 	particlesJS.load('particles-js', 'particles_white.json');
@@ -295,6 +296,49 @@ $(function() {
 		}
 	}
 
+        function setCookie(name, value, days) {
+            var expires = "";
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
+
+        function getCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+	var searx_complement_bool = getCookie("searx_complement") || true;
+	if (searx_complement_bool === "false") {
+		searx_complement_bool = false;
+		searx_complement.attr("class", "ion-close-circled")
+	} else {
+		setCookie("searx_complement", "true")
+		searx_complement_bool = true;
+		searx_complement.attr("class", "ion-checkmark-circled")
+	}
+
+	searx_complement.click(function(e) {
+		if (searx_complement_bool) {
+			setCookie("searx_complement", "false")
+			searx_complement_bool = false
+			searx_complement.attr("class", "ion-close-circled")
+		} else {
+			setCookie("searx_complement", "true")
+			searx_complement_bool = true
+			searx_complement.attr("class", "ion-checkmark-circled")
+		}
+	})
+
 	$('#sidebar_content').hide();
 	function get_urls(input) {
 		var date = new Date();
@@ -303,16 +347,27 @@ $(function() {
 		counter = 0
 		current_links_page = 1
 
-		$.getJSON($SCRIPT_ROOT + '/_fetchSearxResults', {
-			query: input
-		}, function(data) {
-			searx_response = data.result
+		if (searx_complement_bool) {
+			$.getJSON($SCRIPT_ROOT + '/_fetchSearxResults', {
+				query: input
+			}, function(data) {
+				searx_response = data.result
 
-			searx_response["urls"].reverse().forEach(function(url) {
-				$("#links_list").prepend('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '"><img src="/searX_badge.png"></img> <span class="underlined_link">' + url["url"] + '</span></a></span></p><p class="body searchable">' + url["body"] + '<p></div>')
-			});
+				searx_response["urls"].reverse().forEach(function(url) {
+					$("#links_list").prepend('<div class="url_item"><p class="link_paragraph"><span class="domain"><a href="' + url["url"] + '">' + url["header"] + '</a></span></p><p class="link_paragraph2"><span class="link"><a href="' + url["url"] + '"><img src="/searX_badge.png"></img> <span class="underlined_link">' + url["url"] + '</span></a></span></p><p class="body searchable">' + url["body"] + '<p></div>')
+				});
 
-			counter += 1
+				counter += 1
+				if (counter == 2) {
+					$(".hex").removeClass("rotate")
+					var new_date = new Date();
+					var end_time = new_date.getTime();
+					$("#links_description").prepend('<p id="gathered">Gathered ' + $("#links_list .url_item").length + ' resources in ' + ((end_time - start_time)/1000) + 's</p>')
+					$("load_more_links").hide()
+				}
+			})
+		} else {
+			counter += 1;
 			if (counter == 2) {
 				$(".hex").removeClass("rotate")
 				var new_date = new Date();
@@ -320,7 +375,7 @@ $(function() {
 				$("#links_description").prepend('<p id="gathered">Gathered ' + $("#links_list .url_item").length + ' resources in ' + ((end_time - start_time)/1000) + 's</p>')
 				$("load_more_links").hide()
 			}
-		})
+		}
 
 		$.getJSON($SCRIPT_ROOT + '/_answer', {
 			query: input,
@@ -366,21 +421,23 @@ $(function() {
 		counter = 0
 		current_images_page = 1
 
-		$.getJSON($SCRIPT_ROOT + '/_fetchSearxImages', {
-			query: input
-		}, function(data) {
-			searx_response = data.result
+		if (searx_complement_bool) {
+			$.getJSON($SCRIPT_ROOT + '/_fetchSearxImages', {
+				query: input
+			}, function(data) {
+				searx_response = data.result
 
-			searx_response["images"].reverse().forEach(function(image) {
-				$("#images_list").prepend('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="/_retrieveImage?url=' + image["url"] + '" alt="Not available"></a></div>')
-			});
+				searx_response["images"].reverse().forEach(function(image) {
+					$("#images_list").prepend('<div class="grid-item"><a href=' + image["parentUrl"] + '><img class="image-item" src="/_retrieveImage?url=' + image["url"] + '" alt="Not available"></a></div>')
+				});
 
-			counter += 1
-			if (counter == 2) {
-				$(".hex").removeClass("rotate")
-				$("load_more_images").hide()
-			}
-		})
+				counter += 1
+				if (counter == 2) {
+					$(".hex").removeClass("rotate")
+					$("load_more_images").hide()
+				}
+			})
+		}
 
 		$.getJSON($SCRIPT_ROOT + '/_answerImages', {
 			query: input,

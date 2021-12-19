@@ -29,8 +29,8 @@ from flask import (Flask, render_template, request, redirect,
                    send_from_directory, flash, abort, jsonify, escape,
                    Response, send_file)
 from forms import *
-# from werkzeug.middleware.proxy_fix import ProxyFix
-from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
+# from werkzeug.contrib.fixers import ProxyFix
 from flask_caching import Cache
 from werkzeug.utils import secure_filename
 from base64 import b64decode

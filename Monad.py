@@ -55,7 +55,6 @@ sparql.setReturnFormat(JSON)
 gloveVectors = KeyedVectors.load_word2vec_format("./glove.6B/glove.6B.50d.txt",
                                                  binary=False)
 gloveVectors.init_sims()
-gloveVocabulary: dict = gloveVectors.vocab
 
 stopWords: List[str] = [
     x.decode("utf-8").rstrip()
