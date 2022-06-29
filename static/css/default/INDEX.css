@@ -43,7 +43,7 @@ label {
 
 #small_summary, .load_more_items {
 	border-radius: 8px;
-	font-size: 2vh;
+	font-size: 15px;
 	padding: 12px;
 }
 
@@ -82,7 +82,7 @@ p#gathered {
 	font-family: 'Source Sans Pro';
 	font-weight: 400;
 	font-style: italic;
-	font-size: 2.4vh;
+	font-size: 20px;
 	margin-top: 1vh;
 	margin-bottom: 1vh;
 }
@@ -193,7 +193,7 @@ p#gathered {
 	font-weight: 400;
 	font-style: normal;
 
-	font-size: 2vh;
+	font-size: 20px;
 	word-break: break-word !important;
 }
 
@@ -211,22 +211,31 @@ p#gathered {
 }
 .url_item .link_paragraph2, .video_item .link_paragraph2 {
 	margin-top: 0;
+	margin-bottom: 0;
 }
 
 .url_item .link_paragraph .domain, .video_item .link_paragraph .domain {
 	font-family: 'Source Sans Pro Light';
 	font-weight: 700;
-	font-size: 2.7vh;
+	font-size: 20px;
 }
 
 .url_item .link_paragraph2 .link, .video_item .link_paragraph2 .link {
 	font-family: monospace;
-	font-size: 1.3vh;
+	font-size: 15px;
 }
 
 .url_item .link_paragraph2, .video_item .link_paragraph2 {
 	font-family: monospace;
-	font-size: 1.7vh;
+	font-size: 15px;
+}
+
+.url_item .body {
+	margin-top: 10px;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;  
+	overflow: hidden;
 }
 
 .underlined_link {
@@ -530,7 +539,7 @@ p#gathered {
 	color: #DDDDDD;
 	font-family: 'Source Sans Pro';
 	text-align: center;
-	font-size: 1.1vw;
+	font-size: 15px;
 }
 
 .grid_item img {
