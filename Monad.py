@@ -131,7 +131,7 @@ def cleanDBPediaResourceName(name: str) -> str:
 
     if name.startswith("#"):
         return "http://dbpedia.org/resource/" + name.split(
-            "-")[1].title().replace(" ", "_")
+            "-")[1].title().replace(" ", "_").replace("Of", "of")
 
 
 def getTaggedNames(string: str) -> list:
