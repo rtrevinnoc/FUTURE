@@ -331,7 +331,7 @@ def getResourceFromDBPedia(query: str) -> dict:
         return {
             "resource":
             "http://dbpedia.org/resource/" +
-            preprocessSentece(query).capitalize().replace(" ", "_"),
+            preprocessSentece(query).title().replace(" ", "_").replace("Of", "of"),
             "verification":
             True
         }
