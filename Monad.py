@@ -31,7 +31,6 @@ from scipy.spatial import distance
 from itertools import tee, islice, chain
 from nltk.corpus import wordnet
 from SPARQLWrapper import SPARQLWrapper, JSON
-from web3 import Web3
 from config import COMPLEMENTARY_VECTOR_CACHE
 try:
     from polyglot.detect import Detector
@@ -40,14 +39,6 @@ except:
 
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
-
-try:
-    from config import WEB3API, ETHEREUM_ACCOUNT, CONTRACT_CODE, CONTRACT_ADDRESS
-    WEB3API.eth.default_account = ETHEREUM_ACCOUNT
-    abi = json.load(open(CONTRACT_CODE))['abi']
-    contract = WEB3API.eth.contract(address=CONTRACT_ADDRESS, abi=abi)
-except:
-    print("No connection to Ethereum network.")
 
 sparql = SPARQLWrapper("http://dbpedia.org/sparql")
 sparql.setReturnFormat(JSON)
@@ -516,20 +507,6 @@ def inferLanguage(string: str) -> str:
         return Detector(string).language.code
     except:
         return "unk"
-
-
-def mintTokens(queryVec: np.array, answerVec: np.array) -> int:
-    try:
-        if WEB3API.isConnected():
-            queryVec = (queryVec * 100).astype(int).tolist()
-            answerVec = (answerVec * 100).astype(int).tolist()
-            response = contract.functions.mint(queryVec, answerVec).call()
-            print("Tokens minted:", response)
-            return response
-        else:
-            print("Cannot connect to Ethereum network.")
-    except:
-        print("The contract rejected the answer and did not award tokens.")
 
 
 class Monad():
