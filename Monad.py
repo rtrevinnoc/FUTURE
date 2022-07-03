@@ -22,7 +22,7 @@
 #########################################################################
 
 from typing import Generator, Iterable, Any, Tuple, Iterator, List, Callable
-import base64, h5py, gensim, re, spacy, folium, html, os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, logging
+import base64, h5py, gensim, re, spacy, html, os.path, os, shutil, json, random, smtplib, sys, socket, re, mimetypes, datetime, lmdb, hnswlib, time, bson, requests, logging
 from geopy.geocoders import Nominatim
 from nltk.tokenize import sent_tokenize
 from gensim.models import KeyedVectors
@@ -62,34 +62,6 @@ stopWords: List[str] = [
 ] + [" "]
 
 spacyModel: Callable = spacy.load("en_core_web_sm", disable=["parser"])
-
-searxInstances = requests.get(
-    "https://searx.space/data/instances.json").json()["instances"]
-goodSearxInstances = filter(
-    lambda x: x[1].get("timing").get("search").get("error") == None,
-    filter(
-        lambda x: x[1].get("timing").get("search")["success_percentage"] >= 90,
-        filter(
-            lambda x: x[1].get("timing").get("search") != None,
-            filter(lambda x: type(x[1].get("timing")) == dict,
-                   searxInstances.items()))))
-goodSearxInstances = filter(
-    lambda x: x[1].get("tls")["grade"] == "A+",
-    filter(
-        lambda x: x[1].get("tls") != None,
-        filter(lambda x: x[1]["network_type"] == "normal",
-               goodSearxInstances)))
-goodSearxInstances = sorted(
-    goodSearxInstances, key=lambda x: x[1]["timing"]["search"]["all"]["mean"])
-
-headersForSearx = {
-    "Accept-Encoding": "gzip, deflate, br",
-    "Accept-Language": "en-US,en;q=0.5",
-    "Upgrade-Insecure-Requests": "1",
-    "User-Agent":
-    "Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0",
-    "X-Amzn-Trace-Id": "Root=1-5ff4f39d-43753d3a161269974fdca42e"
-}
 
 logger = logging.getLogger('log')
 logger.setLevel(logging.INFO)
@@ -384,29 +356,6 @@ def getDefinitionFromDBPedia(word: str, noUrl: bool = True) -> Any:
         }
 
 
-def getDefinitionFromSearx(word):
-    while True:
-        try:
-            resultURLsFromSearx = requests.get(goodSearxInstances[int(
-                random.random() * len(goodSearxInstances))][0] + "search",
-                                               headers=headersForSearx,
-                                               params={
-                                                   'q': word,
-                                                   'format': 'json',
-                                                   'lang': 'en-US'
-                                               },
-                                               timeout=5).json()['results']
-            for result in resultURLsFromSearx:
-                try:
-                    body = result["content"]
-                except:
-                    pass
-            return body
-            break
-        except:
-            pass
-
-
 def saveComplementaryVector(word, vec):
     if (len(complementaryVectors) < COMPLEMENTARY_VECTOR_CACHE or COMPLEMENTARY_VECTOR_CACHE == -1) and complementaryVectors.get(word, None) == None:
         logger.info(word + "\t" + " ".join(str(_) for _ in np.around(vec, 5)))
@@ -453,42 +402,26 @@ def getSentenceMeanVector(sentence: str) -> np.array:
                         wordVectors,
                         getWordChunkVector(getDefinitionFromDBPedia(word)))
                 except:
-                    try:
-                        searxVector = getWordChunkVector(getDefinitionFromSearx(word))
-                        appendIfNotEmpty(
-                                wordVectors,
-                                searxVector)
-                        saveComplementaryVector(word, searxVector)
-                        del searxVector
-                    except:
-                        for subword in word.split(" "):
-                            subword = subword.strip()
+                    for subword in word.split(" "):
+                        subword = subword.strip()
+                        try:
+                            appendIfNotEmpty(wordVectors,
+                                             getBaseVector(subword))
+                        except:
                             try:
-                                appendIfNotEmpty(wordVectors,
-                                                 getBaseVector(subword))
+                                appendIfNotEmpty(
+                                    wordVectors,
+                                    getWordChunkVector(
+                                        wordnet.synsets(subword)
+                                        [0].definition()))
                             except:
                                 try:
                                     appendIfNotEmpty(
                                         wordVectors,
                                         getWordChunkVector(
-                                            wordnet.synsets(subword)
-                                            [0].definition()))
+                                            getDefinitionFromDBPedia(subword)))
                                 except:
-                                    try:
-                                        appendIfNotEmpty(
-                                            wordVectors,
-                                            getWordChunkVector(
-                                                getDefinitionFromDBPedia(subword)))
-                                    except:
-                                        try:
-                                            searxVector = getWordChunkVector(getDefinitionFromSearx(subword))
-                                            appendIfNotEmpty(
-                                                    wordVectors,
-                                                    searxVector)
-                                            saveComplementaryVector(subword, searxVector)
-                                            del searxVector
-                                        except:
-                                            pass
+                                    pass
     try:
         if len(wordVectors) > 0:
             return np.array(wordVectors).mean(axis=0).astype(np.float32)

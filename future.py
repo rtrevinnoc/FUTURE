@@ -28,7 +28,6 @@ import numexpr as ne
 from flask import (Flask, render_template, request, redirect,
                    send_from_directory, flash, abort, jsonify, escape,
                    Response, send_file)
-from forms import *
 from werkzeug.middleware.proxy_fix import ProxyFix
 # from werkzeug.contrib.fixers import ProxyFix
 from flask_caching import Cache
@@ -36,13 +35,13 @@ from werkzeug.utils import secure_filename
 from base64 import b64decode
 from symspellpy.symspellpy import SymSpell, Verbosity
 from bs4 import BeautifulSoup
-from config import HOST_NAME, PEER_PORT, HOME_URL, CONTACT, MAINTAINER, FIRST_NOTICE, SECOND_NOTICE, DONATE, COLABORATE, CACHE_TIMEOUT, CACHE_THRESHOLD
+from config import HOST_NAME, PEER_PORT, HOME_URL, CACHE_TIMEOUT, CACHE_THRESHOLD
 from PIL import Image
 
 bson.loads = bson.BSON.decode
 bson.dumps = bson.BSON.encode
 
-global port, hostIP, hostname, listOfPeers, numberOfPeers, app, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, numberOfURLs, goodSearxInstances, headersForSearx, cache
+global port, hostIP, hostname, listOfPeers, numberOfPeers, app, hnswImagesLookup, imageDBIndex, analyticsDBIndex, spellChecker, dirname, numberOfURLs, cache
 port = int(PEER_PORT)
 hostIP = requests.get(
     "https://api.ipify.org?format=json").json()["ip"] + ":" + str(port)
@@ -539,33 +538,6 @@ def answerImages(query: str, page: int) -> jsonify:
         return {"images": bigListOfImages[:15]}
 
 
-def answerMap(query: str) -> jsonify:
-    queryBeforePreprocessing = query
-    queryLanguage = inferLanguage(query)
-    if getResourceFromDBPedia(
-            queryBeforePreprocessing)["verification"] == False:
-        spellCheckerSuggestions = spellChecker.lookup_compound(
-            query, 2)  # LAST PARAMETER INDICATES MAX EDIT DISTANCE LOOKUP
-        query = " ".join(
-            [suggestion.term for suggestion in spellCheckerSuggestions])
-    else:
-        query = queryBeforePreprocessing
-    query = query.lower().strip()
-    try:
-        q_vec = getSentenceMeanVector(query)
-    except:
-        return {
-            "map": "",
-        }
-
-    registerQueryInAnalytics(query)
-
-    return {
-        "corrected": escapeHTMLString(query),
-        "map": getMap(queryBeforePreprocessing, query)
-    }
-
-
 def answerPeer(query: str, q_vec: list, queryLanguage: str, numberOfURLs: int,
                numberOfPage: int) -> jsonify:
     q_vec = np.array(ast.literal_eval("".join(q_vec)))
@@ -652,131 +624,6 @@ def _getPeerInfoList():
     return jsonify(result={"listOfPeers": peerInfoList})
 
 
-@app.route('/_fetchSearxResults', methods=['GET'])
-def fetchSearxResults():
-    query = request.args.get("query", 0, type=str)
-
-    queryBeforePreprocessing = query
-    if getResourceFromDBPedia(
-            queryBeforePreprocessing)["verification"] == False:
-        spellCheckerSuggestions = spellChecker.lookup_compound(
-            query, 2)  # LAST PARAMETER INDICATES MAX EDIT DISTANCE LOOKUP
-        query = " ".join(
-            [suggestion.term for suggestion in spellCheckerSuggestions])
-    else:
-        query = queryBeforePreprocessing
-
-    while True:
-        try:
-            resultURLsFromSearx = requests.get(goodSearxInstances[int(
-                random.random() * len(goodSearxInstances))][0] + "search",
-                                               headers=headersForSearx,
-                                               params={
-                                                   'q': query,
-                                                   'format': 'json'
-                                               },
-                                               timeout=5).json()['results']
-            resultURLsFromSearx = [{
-                'url':
-                result.get('url', "No URL available."),
-                'header':
-                result.get('title', "No header available."),
-                'body':
-                result.get('content', "No description available.")
-            } for result in resultURLsFromSearx]
-            break
-        except:
-            pass
-
-    return jsonify(result={"urls": resultURLsFromSearx[:15]})
-
-
-@app.route('/_fetchSearxImages', methods=['GET'])
-def fetchSearxImages():
-    query = request.args.get("query", 0, type=str)
-
-    queryBeforePreprocessing = query
-    if getResourceFromDBPedia(
-            queryBeforePreprocessing)["verification"] == False:
-        spellCheckerSuggestions = spellChecker.lookup_compound(
-            query, 2)  # LAST PARAMETER INDICATES MAX EDIT DISTANCE LOOKUP
-        query = " ".join(
-            [suggestion.term for suggestion in spellCheckerSuggestions])
-    else:
-        query = queryBeforePreprocessing
-
-    while True:
-        try:
-            resultImagesFromSearx = requests.get(goodSearxInstances[int(
-                random.random() * len(goodSearxInstances))][0] + "search",
-                                                 headers=headersForSearx,
-                                                 params={
-                                                     'q': query,
-                                                     'format': 'json',
-                                                     'categories': 'images'
-                                                 },
-                                                 timeout=5).json()['results']
-            resultImagesFromSearx = [{
-                'url': result.get('img_src', ""),
-                'parentUrl': result.get('url', "")
-            } for result in resultImagesFromSearx]
-            break
-        except:
-            pass
-
-    return jsonify(result={"images": resultImagesFromSearx[:15]})
-
-
-@app.route('/_fetchSearxVideos', methods=['GET'])
-def fetchSearxVideos():
-    query = request.args.get("query", 0, type=str)
-
-    queryBeforePreprocessing = query
-    if getResourceFromDBPedia(
-            queryBeforePreprocessing)["verification"] == False:
-        spellCheckerSuggestions = spellChecker.lookup_compound(
-            query, 2)  # LAST PARAMETER INDICATES MAX EDIT DISTANCE LOOKUP
-        query = " ".join(
-            [suggestion.term for suggestion in spellCheckerSuggestions])
-    else:
-        query = queryBeforePreprocessing
-
-    while True:
-        try:
-            resultVideosFromSearx = requests.get(goodSearxInstances[int(
-                random.random() * len(goodSearxInstances))][0] + "search",
-                                                 headers=headersForSearx,
-                                                 params={
-                                                     'q': query,
-                                                     'format': 'json',
-                                                     'categories': 'videos'
-                                                 },
-                                                 timeout=5).json()['results']
-            resultVideosFromSearx = sorted(
-                resultVideosFromSearx,
-                key=lambda x: "youtube" in x.get("url"),
-                reverse=True)
-            resultVideosFromSearx = [{
-                'title':
-                result.get("title", "Untitled"),
-                'author':
-                result.get("author", "unknown"),
-                'length':
-                result.get("length", "Length not available."),
-                'date':
-                result.get("publishedDate", "unknown date"),
-                'url':
-                result.get('url', "Resource not available."),
-                'thumbnail':
-                result.get('thumbnail', "")
-            } for result in resultVideosFromSearx]
-            break
-        except:
-            pass
-
-    return jsonify(result={"videos": resultVideosFromSearx[:15]})
-
-
 @app.route('/_retrieveImage')
 @cache.cached(timeout=15, query_string=True)
 def _retrieveImage():
@@ -796,109 +643,6 @@ def _retrieveImage():
     pic.save(img_io, 'PNG', optimize=True)
     img_io.seek(0)
     return send_file(img_io, mimetype='image/png')
-
-
-@app.route('/sw.js', methods=['GET'])
-def sw():
-    return send_from_directory(".", "sw.js")
-
-
-@app.route("/particles_white.json")
-def particlesWhite():
-    return send_from_directory("static/js/", "particles_white.json")
-
-
-@app.route("/particles_black.json")
-def particlesBlack():
-    return send_from_directory("static/js/", "particles_black.json")
-
-
-@app.route("/future_search.xml")
-def openSearchSpec():
-    return Response("""<?xml version="1.0" encoding="UTF-8"?>
-<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
-                       xmlns:moz="http://www.mozilla.org/2006/browser/search/">
-  <!-- Created on Wed, 13 Jan 2021 20:19:19 GMT -->
-  <ShortName>future_search</ShortName>
-  <Description>Adds FUTURE as a search engine.</Description>
-  <Url type="text/html" method="get" template="http://""" + hostname +
-                    """/?q={searchTerms}"/>
-  <Url type="application/x-suggestions+json" template="http://""" + hostname +
-                    """/_autocomplete/?term={searchTerms}&amp;type=list"/>
-  <Contact>""" + CONTACT + """</Contact>
-  <Image width="16" height="16">https://mycroftproject.com/updateos.php/id0/future_search.ico</Image>
-  <Developer>""" + MAINTAINER + """</Developer>
-  <InputEncoding>UTF-8</InputEncoding>
-  <moz:SearchForm>http://""" + hostname + """/</moz:SearchForm>
-  <Url type="application/opensearchdescription+xml" rel="self" template="https://mycroftproject.com/updateos.php/id0/future_search.xml"/>
-</OpenSearchDescription>""",
-                    mimetype='text/xml')
-
-
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        currentPage = request.form.get("current_page", 0, type=int)
-        if currentPage:
-            nextPage = request.form.get("next_page", 0, type=bool)
-            lastPage = request.form.get("last_page", 0, type=bool)
-            previousQuery = request.form.get("previous_query", 0, type=str)
-            q_vec = getSentenceMeanVector(previousQuery)
-            queryLanguage = inferLanguage(previousQuery)
-            if nextPage:
-                followingPage = currentPage + 1
-            elif lastPage:
-                if currentPage == 1:
-                    followingPage = 1
-                else:
-                    followingPage = currentPage - 1
-            return render_template("answer.html",
-                                   previousQuery=previousQuery,
-                                   section="links",
-                                   answer=loadMoreUrls(q_vec, queryLanguage,
-                                                       numberOfURLs,
-                                                       followingPage)["urls"],
-                                   currentPage=followingPage)
-
-        query = request.form.get("a", 0, type=str)
-        response = answer(query)
-
-        if request.form.get("links", 0, type=bool):
-            return render_template("answer.html",
-                                   previousQuery=query,
-                                   section="links",
-                                   answer=response["urls"],
-                                   currentPage=1)
-        elif request.form.get("summary", 0, type=bool):
-            return render_template("answer.html",
-                                   previousQuery=query,
-                                   section="summary",
-                                   answer=response["answer"],
-                                   currentPage=1)
-        elif request.form.get("images", 0, type=bool):
-            return render_template("answer.html",
-                                   previousQuery=query,
-                                   section="images",
-                                   answer=response["images"],
-                                   currentPage=1)
-        elif request.form.get("maps", 0, type=bool):
-            return render_template("answer.html",
-                                   previousQuery=query,
-                                   section="maps",
-                                   answer=response["map"],
-                                   currentPage=1)
-        else:
-            return render_template("answer.html",
-                                   previousQuery=query,
-                                   section="summary",
-                                   answer=response["answer"],
-                                   currentPage=1)
-    return render_template("index.html",
-                           contact=CONTACT,
-                           first_notice=FIRST_NOTICE,
-                           second_notice=SECOND_NOTICE,
-                           donate=DONATE,
-                           colaborate=COLABORATE)
 
 
 @app.route("/_autocomplete", methods=["GET", "POST"])
@@ -939,13 +683,6 @@ def _answerImages():
     query = request.args.get("query", 0, type=str)
     page = request.args.get("page", 1, type=int)
     return jsonify(result=answerImages(query, page))
-
-
-@app.route("/_answerMap")
-def _answerMap():
-    """The method for processing form data and answering."""
-    query = request.args.get("query", 0, type=str)
-    return jsonify(result=answerMap(query))
 
 
 @app.route("/_answerPeer")
