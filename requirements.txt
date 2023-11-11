@@ -29,7 +29,7 @@ spacy
 SPARQLWrapper
 tldextract
 uWSGI
-Werkzeug==0.16.1
+Werkzeug==2.2.3
 wordnet
 WTForms
 languagecodes
